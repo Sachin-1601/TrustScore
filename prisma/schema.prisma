@@ -1,0 +1,435 @@
+// TrustScore - Production Relational Database Schema
+// Scalable Modular Monolith for PostgreSQL
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+enum UserRole {
+  CREATOR
+  BUSINESS
+  AGENCY
+  ADMIN
+}
+
+enum RiskLevel {
+  LOW
+  MODERATE
+  HIGH
+  CRITICAL
+}
+
+enum ScoreBand {
+  VERY_HIGH_TRUST
+  HIGH_TRUST
+  MODERATE_RISK
+  HIGH_RISK
+  VERY_HIGH_RISK
+}
+
+enum DataCoverage {
+  EXCELLENT
+  GOOD
+  MODERATE
+  LIMITED
+  INSUFFICIENT
+}
+
+enum SocialPlatform {
+  INSTAGRAM
+  TIKTOK
+  YOUTUBE
+}
+
+enum CollaborationStatus {
+  PENDING
+  ACCEPTED
+  DECLINED
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum CampaignStatus {
+  DRAFT
+  PENDING
+  ACTIVE
+  COMPLETED
+  CANCELLED
+}
+
+enum AdPlacement {
+  LEFT_SIDEBAR
+  RIGHT_SIDEBAR
+  BANNER
+  FEED
+}
+
+enum AdStatus {
+  ACTIVE
+  PENDING_REVIEW
+  PAUSED
+  EXPIRED
+}
+
+enum SubscriptionStatus {
+  ACTIVE
+  TRIALING
+  PAST_DUE
+  CANCELLED
+  EXPIRED
+}
+
+// ------------------------------------------------------------
+// 1. User & Authentication
+// ------------------------------------------------------------
+model User {
+  id              String           @id @default(cuid())
+  email           String           @unique
+  passwordHash    String
+  name            String
+  avatar          String?
+  role            UserRole         @default(BUSINESS)
+  createdAt       DateTime         @default(now())
+  updatedAt       DateTime         @updatedAt
+
+  // Relationships
+  creatorProfile  CreatorProfile?
+  businessProfile BusinessProfile?
+  subscriptions   Subscription[]
+  sentMessages    Message[]        @relation("SentMessages")
+  notifications   Notification[]
+  auditLogs       AuditLog[]
+
+  @@index([email])
+  @@index([role])
+}
+
+// ------------------------------------------------------------
+// 2. Creator Domain
+// ------------------------------------------------------------
+model CreatorProfile {
+  id                    String              @id @default(cuid())
+  userId                String              @unique
+  user                  User                @relation(fields: [userId], references: [id], onDelete: Cascade)
+  username              String              @unique
+  name                  String
+  avatar                String
+  bio                   String
+  category              String
+  location              String
+  country               String              @default("Australia")
+  platform              SocialPlatform      @default(INSTAGRAM)
+  followers             Int                 @default(0)
+  following             Int                 @default(0)
+  totalPosts            Int                 @default(0)
+  avgLikes              Int                 @default(0)
+  avgComments           Int                 @default(0)
+  avgViews              Int                 @default(0)
+  engagementRate        Float               @default(0.0)
+  startingRate          Int                 @default(300)
+  isAvailable           Boolean             @default(true)
+  verifiedBadge         Boolean             @default(false)
+  verifiedAt            DateTime?
+  dataCoverage          DataCoverage        @default(GOOD)
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+
+  // Data Science History & Metrics
+  trustScores           TrustScoreRecord[]
+  socialAccounts        SocialAccount[]
+  engagementSnapshots   EngagementSnapshot[]
+  collaborations        Collaboration[]
+  savedByBusinesses     SavedCreator[]
+  verifications         VerificationRecord[]
+
+  @@index([username])
+  @@index([category])
+  @@index([location])
+  @@index([followers])
+  @@index([verifiedBadge])
+}
+
+model SocialAccount {
+  id                String         @id @default(cuid())
+  creatorId         String
+  creator           CreatorProfile @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  platform          SocialPlatform
+  externalId        String
+  username          String
+  oauthTokenEnc     String?
+  tokenExpiresAt    DateTime?
+  isVerified        Boolean        @default(false)
+  lastSyncedAt      DateTime       @default(now())
+
+  @@unique([platform, externalId])
+  @@index([creatorId])
+}
+
+model EngagementSnapshot {
+  id               String         @id @default(cuid())
+  creatorId        String
+  creator          CreatorProfile @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  postIndex        Int
+  postId           String?
+  recordedAt       DateTime       @default(now())
+  likes            Int
+  comments         Int
+  views            Int?
+  engagementRate   Float
+  isAnomaly        Boolean        @default(false)
+
+  @@index([creatorId, recordedAt])
+}
+
+// ------------------------------------------------------------
+// 3. TrustScore Engine Records
+// ------------------------------------------------------------
+model TrustScoreRecord {
+  id                            String              @id @default(cuid())
+  creatorId                     String
+  creator                       CreatorProfile      @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  score                         Int
+  scoreBand                     ScoreBand
+  riskLevel                     RiskLevel
+  inflatedProbability           Float
+  uncertaintyMargin             Float               @default(1.5)
+  authenticityProbability       Float               @default(95.0)
+  commentDiversityPercent       Int                 @default(85)
+  growthStabilityScore          Int                 @default(90)
+  consistencyScore              Int                 @default(90)
+  volatilityIndex               Float               @default(12.0)
+  dataCoverage                  DataCoverage        @default(GOOD)
+  modelVersion                  String              @default("v1.2")
+  calculatedAt                  DateTime            @default(now())
+
+  // Factors breakdown
+  factors                       TrustScoreFactor[]
+
+  @@index([creatorId, calculatedAt])
+  @@index([score])
+}
+
+model TrustScoreFactor {
+  id             String           @id @default(cuid())
+  trustScoreId   String
+  trustScore     TrustScoreRecord @relation(fields: [trustScoreId], references: [id], onDelete: Cascade)
+  name           String
+  score          Int
+  signalType     String           // "positive" | "warning"
+  description    String
+
+  @@index([trustScoreId])
+}
+
+model VerificationRecord {
+  id             String         @id @default(cuid())
+  creatorId      String
+  creator        CreatorProfile @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  method         String         // "OAUTH_GRAPH_API" | "SUBMITTED_ANALYTICS"
+  verifiedAt     DateTime       @default(now())
+  evidenceRef    String?
+
+  @@index([creatorId])
+}
+
+// ------------------------------------------------------------
+// 4. Business & Campaigns Domain
+// ------------------------------------------------------------
+model BusinessProfile {
+  id                    String          @id @default(cuid())
+  userId                String          @unique
+  user                  User            @relation(fields: [userId], references: [id], onDelete: Cascade)
+  slug                  String          @unique
+  name                  String
+  logo                  String
+  category              String
+  location              String
+  tagline               String
+  description           String
+  website               String
+  isSponsored           Boolean         @default(false)
+  activeCampaignsCount  Int             @default(0)
+  createdAt             DateTime        @default(now())
+  updatedAt             DateTime        @updatedAt
+
+  // Relationships
+  campaigns             Campaign[]
+  collaborations        Collaboration[]
+  savedCreators         SavedCreator[]
+  advertisements        Advertisement[]
+
+  @@index([slug])
+  @@index([category])
+}
+
+model SavedCreator {
+  id             String          @id @default(cuid())
+  businessId     String
+  business       BusinessProfile @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  creatorId      String
+  creator        CreatorProfile  @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  notes          String?
+  savedAt        DateTime        @default(now())
+
+  @@unique([businessId, creatorId])
+  @@index([businessId])
+}
+
+model Campaign {
+  id                    String              @id @default(cuid())
+  businessId            String
+  business              BusinessProfile     @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  title                 String
+  category              String
+  budget                Float
+  status                CampaignStatus      @default(DRAFT)
+  deliverables          String
+  targetMinTrustScore   Int                 @default(80)
+  targetFollowerRange   String              @default("10k-50k")
+  startDate             DateTime?
+  endDate               DateTime?
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+
+  collaborations        Collaboration[]
+
+  @@index([businessId])
+  @@index([status])
+}
+
+model Collaboration {
+  id                    String              @id @default(cuid())
+  businessId            String
+  business              BusinessProfile     @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  creatorId             String
+  creator               CreatorProfile      @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  campaignId            String?
+  campaign              Campaign?           @relation(fields: [campaignId], references: [id], onDelete: SetNull)
+  campaignName          String
+  campaignDescription   String
+  budget                Float
+  deliverables          String
+  timeline              String
+  contactEmail          String
+  status                CollaborationStatus @default(PENDING)
+  createdAt             DateTime            @default(now())
+  updatedAt             DateTime            @updatedAt
+
+  messages              Message[]
+
+  @@index([businessId])
+  @@index([creatorId])
+  @@index([status])
+}
+
+model Message {
+  id                    String         @id @default(cuid())
+  collaborationId       String
+  collaboration         Collaboration  @relation(fields: [collaborationId], references: [id], onDelete: Cascade)
+  senderId              String
+  sender                User           @relation("SentMessages", fields: [senderId], references: [id], onDelete: Cascade)
+  text                  String
+  read                  Boolean        @default(false)
+  createdAt             DateTime       @default(now())
+
+  @@index([collaborationId, createdAt])
+}
+
+// ------------------------------------------------------------
+// 5. Commercial Advertising (Strictly Isolated from Scoring)
+// ------------------------------------------------------------
+model Advertisement {
+  id                    String          @id @default(cuid())
+  businessId            String
+  business              BusinessProfile @relation(fields: [businessId], references: [id], onDelete: Cascade)
+  packageId             String          // "starter" | "growth" | "premium"
+  tagline               String
+  description           String
+  badgeText             String          @default("Sponsored")
+  ctaText               String          @default("View Business")
+  ctaLink               String
+  placement             AdPlacement     @default(LEFT_SIDEBAR)
+  status                AdStatus        @default(ACTIVE)
+  impressions           Int             @default(0)
+  clicks                Int             @default(0)
+  startDate             DateTime        @default(now())
+  endDate               DateTime
+  createdAt             DateTime        @default(now())
+
+  @@index([placement, status])
+  @@index([businessId])
+}
+
+// ------------------------------------------------------------
+// 6. Subscriptions & Payments
+// ------------------------------------------------------------
+model Subscription {
+  id                    String             @id @default(cuid())
+  userId                String
+  user                  User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  planId                String             // "starter" | "growth" | "agency"
+  status                SubscriptionStatus @default(ACTIVE)
+  stripeCustomerId      String?
+  stripeSubscriptionId  String?
+  creatorChecksRemaining Int              @default(50)
+  creatorChecksLimit    Int                @default(50)
+  currentPeriodStart    DateTime           @default(now())
+  currentPeriodEnd      DateTime
+  createdAt             DateTime           @default(now())
+  updatedAt             DateTime           @updatedAt
+
+  payments              PaymentRecord[]
+
+  @@index([userId])
+}
+
+model PaymentRecord {
+  id                    String         @id @default(cuid())
+  subscriptionId        String?
+  subscription          Subscription?  @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+  amount                Float
+  currency              String         @default("usd")
+  stripePaymentIntentId String?
+  status                String         // "succeeded" | "failed" | "pending"
+  purpose               String         // "SUBSCRIPTION" | "ADVERTISEMENT" | "CREDIT_TOP_UP"
+  createdAt             DateTime       @default(now())
+
+  @@index([subscriptionId])
+}
+
+// ------------------------------------------------------------
+// 7. Platform Notifications & Audit Observability
+// ------------------------------------------------------------
+model Notification {
+  id                    String         @id @default(cuid())
+  userId                String
+  user                  User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  title                 String
+  message               String
+  type                  String         // "COLLABORATION" | "CAMPAIGN" | "PAYMENT" | "VERIFICATION"
+  link                  String?
+  read                  Boolean        @default(false)
+  createdAt             DateTime       @default(now())
+
+  @@index([userId, read])
+}
+
+model AuditLog {
+  id                    String         @id @default(cuid())
+  userId                String?
+  user                  User?          @relation(fields: [userId], references: [id], onDelete: SetNull)
+  action                String
+  entityType            String
+  entityId              String?
+  details               String?
+  ipAddress             String?
+  createdAt             DateTime       @default(now())
+
+  @@index([action, createdAt])
+}

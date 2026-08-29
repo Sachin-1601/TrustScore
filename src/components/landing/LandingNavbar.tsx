@@ -11,6 +11,7 @@ export function LandingNavbar() {
   const navLinks = [
     { label: "Discover", href: "/creators" },
     { label: "Leaderboard", href: "/leaderboard" },
+    { label: "Pricing", href: "/pricing" },
     { label: "Businesses", href: "/businesses" },
     { label: "Advertise", href: "/advertise", highlight: true },
     { label: "For Businesses", href: "/for-businesses" },

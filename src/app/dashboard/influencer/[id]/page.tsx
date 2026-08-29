@@ -12,6 +12,7 @@ import { RiskBadge } from "@/components/common/RiskBadge";
 import { VerificationBadge } from "@/components/common/VerificationBadge";
 import { PlatformIcon } from "@/components/common/PlatformIcon";
 import { Modal } from "@/components/common/Modal";
+import { RateAdjustmentCalculator } from "@/components/dashboard/RateAdjustmentCalculator";
 import { formatNumber, formatPercent, getScoreColor } from "@/lib/utils";
 import {
   ShieldCheck,
@@ -592,6 +593,20 @@ export default function InfluencerResultPage() {
             </div>
           </div>
         </div>
+
+        {/* Interactive Rate & Prescriptive Counter-Offer Calculator */}
+        <RateAdjustmentCalculator
+          creatorName={influencer.name}
+          creatorUsername={influencer.username}
+          trustScore={influencer.trustScore}
+          riskLevel={influencer.riskLevel}
+          inflatedProbability={influencer.inflatedEngagementProbability}
+          uncertaintyMargin={influencer.uncertaintyMargin}
+          initialRate={450}
+          followersCount={influencer.followers}
+          engagementRate={influencer.engagementRate}
+          isDark={false}
+        />
 
         {/* Positive & Warning Risk Factors List */}
         <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-sm space-y-6">

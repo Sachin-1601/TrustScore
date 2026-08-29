@@ -4,6 +4,7 @@ import React, { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Logo } from "@/components/common/Logo";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   LayoutDashboard,
   Search,
@@ -23,24 +24,32 @@ import {
   Send,
   Briefcase,
   Megaphone,
+  CreditCard,
+  MessageSquare,
+  UserCheck,
+  Lock,
 } from "lucide-react";
 
 export function DashboardSidebar() {
   const pathname = usePathname();
   const [isCollapsed, setIsCollapsed] = useState(false);
+  const { user, role, switchRole } = useAuth();
 
   const mainNav = [
     { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
     { label: "Discover Creators", href: "/creators", icon: Users },
     { label: "Saved Creators", href: "/dashboard/saved", icon: Bookmark },
     { label: "Collaborations", href: "/dashboard/collaborations", icon: Send },
+    { label: "Messages", href: "/dashboard/messages", icon: MessageSquare },
     { label: "Active Campaigns", href: "/dashboard/campaigns", icon: Briefcase },
+    { label: "Billing & Quotas", href: "/dashboard/billing", icon: CreditCard },
+    { label: "Creator View", href: "/dashboard/creator", icon: UserCheck },
     { label: "Advertise On Platform", href: "/dashboard/advertise", icon: Megaphone, highlight: true },
     { label: "Analyze Creator", href: "/dashboard/analyze", icon: Search },
-    { label: "Creator Directory", href: "/dashboard/influencers", icon: Users },
     { label: "Comparisons", href: "/dashboard/compare", icon: Scale },
     { label: "Reports", href: "/dashboard/reports", icon: FileText },
     { label: "Model Insights", href: "/dashboard/model-insights", icon: Cpu, badge: "Prototype" },
+    { label: "Admin Console", href: "/admin", icon: Lock },
   ];
 
   const secondaryNav = [
@@ -69,34 +78,63 @@ export function DashboardSidebar() {
 
           <button
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="hidden lg:flex p-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors"
+            className="hidden lg:flex p-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors cursor-pointer"
             title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
           </button>
         </div>
 
-        {/* Quick Launch Analyze CTA (Expanded only) */}
+        {/* Role Switcher Pills (for demoing SaaS roles) */}
         {!isCollapsed && (
-          <div className="p-3 mx-3 my-3 bg-gradient-to-r from-blue-950/60 to-slate-900 border border-blue-800/40 rounded-2xl">
-            <div className="flex items-center gap-2 text-blue-300 font-bold text-xs">
-              <Sparkles className="w-3.5 h-3.5 text-blue-400" />
-              <span>Discover Authentic Creators</span>
+          <div className="px-3 pt-2 pb-1">
+            <div className="flex items-center justify-between text-[10px] uppercase font-bold text-slate-500 pb-1">
+              <span>Simulate Role:</span>
+              <span className="text-blue-400 font-extrabold">{role}</span>
             </div>
-            <p className="text-[11px] text-slate-400 mt-1">
-              Find partners with 90+ TrustScores
-            </p>
-            <Link
-              href="/creators"
-              className="mt-2 block text-center py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-semibold text-xs rounded-xl shadow-xs transition-colors"
-            >
-              Browse Marketplace
-            </Link>
+            <div className="grid grid-cols-4 gap-1 p-1 bg-slate-950 rounded-xl border border-slate-800 text-[10px] text-center font-bold">
+              <button
+                type="button"
+                onClick={() => switchRole("BUSINESS")}
+                className={`py-1 rounded-lg cursor-pointer transition-colors ${
+                  role === "BUSINESS" ? "bg-blue-600 text-white" : "text-slate-400 hover:text-slate-200"
+                }`}
+              >
+                Brand
+              </button>
+              <button
+                type="button"
+                onClick={() => switchRole("CREATOR")}
+                className={`py-1 rounded-lg cursor-pointer transition-colors ${
+                  role === "CREATOR" ? "bg-emerald-600 text-white" : "text-slate-400 hover:text-slate-200"
+                }`}
+              >
+                Creator
+              </button>
+              <button
+                type="button"
+                onClick={() => switchRole("AGENCY")}
+                className={`py-1 rounded-lg cursor-pointer transition-colors ${
+                  role === "AGENCY" ? "bg-purple-600 text-white" : "text-slate-400 hover:text-slate-200"
+                }`}
+              >
+                Agency
+              </button>
+              <button
+                type="button"
+                onClick={() => switchRole("ADMIN")}
+                className={`py-1 rounded-lg cursor-pointer transition-colors ${
+                  role === "ADMIN" ? "bg-rose-600 text-white" : "text-slate-400 hover:text-slate-200"
+                }`}
+              >
+                Admin
+              </button>
+            </div>
           </div>
         )}
 
         {/* Main Navigation List */}
-        <nav className="px-3 py-1 space-y-1">
+        <nav className="px-3 py-2 space-y-1 overflow-y-auto max-h-[calc(100vh-280px)]">
           {mainNav.map((item) => {
             const Icon = item.icon;
             const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
@@ -153,14 +191,14 @@ export function DashboardSidebar() {
         {/* User Card */}
         <div className={`pt-2 flex items-center gap-3 px-2 ${isCollapsed ? "justify-center" : ""}`}>
           <img
-            src="https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80"
-            alt="Sarah Jenkins"
+            src={user?.avatar || "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80"}
+            alt={user?.name || "User"}
             className="w-8 h-8 rounded-full object-cover ring-1 ring-slate-700 shrink-0"
           />
           {!isCollapsed && (
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-bold text-slate-100 truncate">Sarah Jenkins</p>
-              <p className="text-[11px] text-slate-400 truncate">Brand Director</p>
+              <p className="text-xs font-bold text-slate-100 truncate">{user?.name || "Sarah Jenkins"}</p>
+              <p className="text-[11px] text-slate-400 truncate">{role} Tier</p>
             </div>
           )}
           {!isCollapsed && (

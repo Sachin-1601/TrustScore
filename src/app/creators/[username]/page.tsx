@@ -10,6 +10,7 @@ import { PlatformIcon } from "@/components/common/PlatformIcon";
 import { VerificationBadge } from "@/components/common/VerificationBadge";
 import { RiskBadge } from "@/components/common/RiskBadge";
 import { ScoreGauge } from "@/components/common/ScoreGauge";
+import { RateAdjustmentCalculator } from "@/components/dashboard/RateAdjustmentCalculator";
 import { CollaborationModal } from "@/components/marketplace/CollaborationModal";
 import { formatNumber } from "@/lib/utils";
 import {
@@ -396,6 +397,20 @@ function CreatorProfileView({ creator }: { creator: (typeof MOCK_CREATORS)[0] })
             </div>
           </div>
         </div>
+
+        {/* Prescriptive Rate & Counter-Offer Calculator */}
+        <RateAdjustmentCalculator
+          creatorName={creator.name}
+          creatorUsername={creator.username}
+          trustScore={creator.trustScore}
+          riskLevel={creator.riskLevel}
+          inflatedProbability={creator.inflatedEngagementProbability}
+          uncertaintyMargin={creator.uncertaintyMargin}
+          initialRate={creator.startingRate || 450}
+          followersCount={creator.followers}
+          engagementRate={creator.engagementRate}
+          isDark={true}
+        />
 
         {/* Preferred Campaigns & Past Brands */}
         <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-4">
