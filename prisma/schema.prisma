@@ -151,12 +151,24 @@ model CreatorProfile {
   applications          CampaignApplication[]
   savedByBusinesses     SavedCreator[]
   verifications         VerificationRecord[]
+  views                 CreatorProfileView[]
 
   @@index([username])
   @@index([category])
   @@index([location])
   @@index([followers])
   @@index([verifiedBadge])
+}
+
+model CreatorProfileView {
+  id          String         @id @default(cuid())
+  creatorId   String
+  creator     CreatorProfile @relation(fields: [creatorId], references: [id], onDelete: Cascade)
+  viewerIp    String?
+  referrer    String?
+  viewedAt    DateTime       @default(now())
+
+  @@index([creatorId, viewedAt])
 }
 
 model SocialAccount {

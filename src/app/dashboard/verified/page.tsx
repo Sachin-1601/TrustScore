@@ -1,49 +1,61 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
-import { MOCK_INFLUENCERS } from "@/data/mockInfluencers";
+import { Creator } from "@/types/creator";
 import { VerificationBadge } from "@/components/common/VerificationBadge";
 import { PlatformIcon } from "@/components/common/PlatformIcon";
 import { Modal } from "@/components/common/Modal";
 import { formatNumber } from "@/lib/utils";
 import {
-  CheckCircle2,
   ShieldCheck,
   Award,
-  Lock,
   ArrowRight,
-  ExternalLink,
   Sparkles,
-  Search,
-  Check,
+  Loader2,
 } from "lucide-react";
-import confetti from "canvas-confetti";
 
 export default function VerifiedCreatorsPage() {
-  const verifiedCreators = MOCK_INFLUENCERS.filter((inf) => inf.verifiedBadge);
-
+  const [verifiedCreators, setVerifiedCreators] = useState<Creator[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
   const [isModalOpen, setIsModalOpen] = useState(false);
-  const [handle, setHandle] = useState("@alexfitness");
+  const [handle, setHandle] = useState("");
   const [isConnecting, setIsConnecting] = useState(false);
-  const [isSuccess, setIsSuccess] = useState(false);
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
 
-  const handleSimulateOAuth = (e: React.FormEvent) => {
+  useEffect(() => {
+    async function loadVerified() {
+      try {
+        const res = await fetch("/api/creators?verifiedOnly=true");
+        if (res.ok) {
+          const data = await res.json();
+          setVerifiedCreators(data.creators || []);
+        }
+      } catch {
+        // Network error
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadVerified();
+  }, []);
+
+  const handleConnectTelemetry = (e: React.FormEvent) => {
     e.preventDefault();
     setIsConnecting(true);
+    setStatusMessage(null);
     setTimeout(() => {
       setIsConnecting(false);
-      setIsSuccess(true);
-      confetti({ particleCount: 80, spread: 60 });
-    }, 1200);
+      setStatusMessage("Platform API credentials are required in production environment to complete OAuth sync.");
+    }, 1000);
   };
 
   return (
-    <div className="min-h-full flex flex-col bg-slate-50">
+    <div className="min-h-full flex flex-col bg-slate-950 text-slate-100">
       <DashboardHeader
         title="Verified Creators Portal"
-        subtitle="Browse creators with cryptographically verified OAuth engagement telemetry"
+        subtitle="Browse creators with cryptographically verified direct engagement telemetry"
       />
 
       <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-8">
@@ -58,165 +70,159 @@ export default function VerifiedCreatorsPage() {
               Voluntary Creator Verification
             </h2>
             <p className="text-sm text-slate-300 leading-relaxed">
-              Creators who voluntarily connect their official accounts demonstrate stronger evidence of authenticity. Verification unlocks higher brand sponsor conversions and verified media kit badges.
+              Verified creators connect direct analytics credentials or upload verifiable audit logs. This unlocks the highest confidence scoring and verified badge placement in the business marketplace.
             </p>
           </div>
 
           <button
             onClick={() => setIsModalOpen(true)}
-            className="px-6 py-3.5 bg-white hover:bg-slate-100 text-slate-900 font-bold text-xs rounded-2xl shadow-md transition-all flex items-center justify-center gap-2 shrink-0 cursor-pointer"
+            className="px-6 py-3.5 bg-white hover:bg-slate-100 text-slate-950 font-bold text-xs rounded-xl shadow-lg transition-all shrink-0 cursor-pointer self-start md:self-auto"
           >
-            <ShieldCheck className="w-4 h-4 text-emerald-600" />
-            <span>Verify an Account Now</span>
+            Apply for Verification Badge
           </button>
         </div>
 
-        {/* Verified Directory Grid */}
-        <div className="space-y-4">
-          <div className="flex items-center justify-between">
-            <h3 className="text-lg font-bold text-slate-900">
-              Active Verified Creator Roster ({verifiedCreators.length})
+        {/* Directory Header */}
+        <div className="flex items-center justify-between">
+          <div>
+            <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
+              <ShieldCheck className="w-5 h-5 text-emerald-400" />
+              <span>Verified Creator Cohort ({verifiedCreators.length})</span>
             </h3>
-            <span className="text-xs text-slate-500">
-              Filtered for verified status
-            </span>
+            <p className="text-xs text-slate-400">
+              Creators with cryptographically verified engagement and public authenticity dossiers
+            </p>
           </div>
 
+          <Link
+            href="/creators?verifiedOnly=true"
+            className="text-xs font-bold text-blue-400 hover:text-blue-300 flex items-center gap-1"
+          >
+            <span>Explore on Marketplace</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </div>
+
+        {/* Verified Creators Grid */}
+        {isLoading ? (
+          <div className="py-20 flex flex-col items-center justify-center gap-3 text-slate-400">
+            <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
+            <span className="text-xs font-semibold">Loading verified creators cohort...</span>
+          </div>
+        ) : verifiedCreators.length > 0 ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            {verifiedCreators.map((inf) => (
+            {verifiedCreators.map((creator) => (
               <div
-                key={inf.id}
-                className="bg-white rounded-3xl p-6 border border-slate-200 shadow-xs hover:shadow-md transition-all flex flex-col justify-between"
+                key={creator.id}
+                className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-md flex flex-col justify-between"
               >
-                <div>
-                  <div className="flex items-center justify-between">
-                    <div className="flex items-center gap-3">
-                      <img
-                        src={inf.avatar}
-                        alt={inf.name}
-                        className="w-14 h-14 rounded-2xl object-cover ring-2 ring-blue-100"
-                      />
-                      <div>
-                        <div className="flex items-center gap-1.5 font-bold text-slate-900 text-base">
-                          <span>{inf.username}</span>
-                          <PlatformIcon platform={inf.platform} size="sm" />
-                        </div>
-                        <p className="text-xs text-slate-500">{inf.name} • {inf.category}</p>
+                <div className="space-y-3">
+                  <div className="flex items-center gap-3.5">
+                    <img
+                      src={creator.avatar}
+                      alt={creator.name}
+                      className="w-14 h-14 rounded-2xl object-cover border border-slate-700"
+                    />
+                    <div className="min-w-0">
+                      <div className="flex items-center gap-1.5">
+                        <Link
+                          href={`/creators/${creator.id}`}
+                          className="font-bold text-slate-100 text-sm hover:text-blue-400 truncate block"
+                        >
+                          {creator.username}
+                        </Link>
+                        <VerificationBadge size="sm" showText={false} />
                       </div>
+                      <span className="text-xs text-slate-400 block">{creator.name} • {creator.category}</span>
                     </div>
                   </div>
 
-                  <div className="mt-4">
-                    <VerificationBadge isVerified={true} verifiedDate={inf.verifiedDate} size="md" />
-                  </div>
-
-                  <p className="text-xs text-slate-600 mt-3 line-clamp-2 leading-relaxed">
-                    {inf.bio}
+                  <p className="text-xs text-slate-300 line-clamp-2 leading-relaxed">
+                    {creator.bio}
                   </p>
 
-                  <div className="grid grid-cols-2 gap-2 mt-4 text-xs">
-                    <div className="bg-slate-50 p-2.5 rounded-xl">
-                      <span className="text-[10px] text-slate-400 block font-semibold uppercase">TrustScore</span>
-                      <span className="text-base font-extrabold text-blue-700">{inf.trustScore} / 100</span>
+                  <div className="grid grid-cols-2 gap-2 pt-2 border-t border-slate-800 text-xs">
+                    <div className="p-2.5 bg-slate-950 rounded-xl border border-slate-800/80">
+                      <span className="text-[10px] text-slate-500 uppercase font-bold block">Followers</span>
+                      <strong className="text-slate-200">{formatNumber(creator.followers)}</strong>
                     </div>
-                    <div className="bg-slate-50 p-2.5 rounded-xl">
-                      <span className="text-[10px] text-slate-400 block font-semibold uppercase">Inflated Risk</span>
-                      <span className="text-base font-extrabold text-emerald-700">{inf.inflatedEngagementProbability}%</span>
+                    <div className="p-2.5 bg-slate-950 rounded-xl border border-slate-800/80">
+                      <span className="text-[10px] text-slate-500 uppercase font-bold block">TrustScore</span>
+                      <strong className="text-emerald-400">{creator.trustScore}/100</strong>
                     </div>
                   </div>
                 </div>
 
-                <div className="mt-6 pt-4 border-t border-slate-100 flex items-center justify-between">
-                  <span className="text-xs font-semibold text-slate-500">{formatNumber(inf.followers)} followers</span>
+                <div className="pt-2">
                   <Link
-                    href={`/dashboard/influencer/${inf.id}`}
-                    className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:text-blue-800"
+                    href={`/creators/${creator.id}`}
+                    className="w-full py-2.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-200 font-bold text-xs rounded-xl transition-colors flex items-center justify-center gap-1.5"
                   >
-                    <span>View Audit</span>
+                    <span>View Authenticity Dossier</span>
                     <ArrowRight className="w-3.5 h-3.5" />
                   </Link>
                 </div>
               </div>
             ))}
           </div>
-        </div>
+        ) : (
+          <div className="bg-slate-900/60 border border-slate-800 rounded-3xl p-12 text-center space-y-3">
+            <h3 className="text-base font-bold text-slate-200">No verified creators yet</h3>
+            <p className="text-xs text-slate-400">Complete verification to be the first creator listed in this cohort.</p>
+          </div>
+        )}
       </div>
 
-      {/* Verification Claim Simulator Modal */}
-      <Modal
-        isOpen={isModalOpen}
-        onClose={() => {
-          setIsModalOpen(false);
-          setIsSuccess(false);
-        }}
-        title="Simulate Creator Verification"
-        description="Connect Instagram Graph API or TikTok Creator Marketplace credentials via read-only OAuth."
-      >
-        {!isSuccess ? (
-          <form onSubmit={handleSimulateOAuth} className="space-y-4">
+      {/* Verification Modal */}
+      {isModalOpen && (
+        <Modal
+          isOpen={isModalOpen}
+          onClose={() => {
+            setIsModalOpen(false);
+            setStatusMessage(null);
+          }}
+          title="Apply for Direct Telemetry Verification"
+        >
+          <form onSubmit={handleConnectTelemetry} className="space-y-4 text-xs">
             <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-                Creator Social Handle
+              <label className="block font-bold text-slate-300 uppercase tracking-wider text-[10px] mb-1">
+                Your Primary Social Handle
               </label>
               <input
                 type="text"
+                required
                 value={handle}
                 onChange={(e) => setHandle(e.target.value)}
-                placeholder="@username"
-                className="w-full px-4 py-2.5 rounded-xl border border-slate-300 text-sm font-semibold focus:outline-hidden focus:ring-2 focus:ring-blue-600"
-                required
+                placeholder="@yourhandle"
+                className="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 focus:outline-hidden focus:border-blue-500 text-xs"
               />
             </div>
 
-            <div className="p-3.5 bg-blue-50/60 border border-blue-100 rounded-xl text-xs text-blue-900 space-y-1">
-              <span className="font-bold flex items-center gap-1">
-                <Lock className="w-3.5 h-3.5 text-blue-600" />
-                Read-Only Telemetry Scopes
-              </span>
-              <p className="text-[11px] text-blue-700">
-                Audits post reach, video watch duration, and impressions directly via authorized platform APIs.
-              </p>
-            </div>
+            {statusMessage && (
+              <div className="p-3 bg-amber-500/10 border border-amber-500/30 text-amber-300 rounded-xl text-xs leading-relaxed">
+                {statusMessage}
+              </div>
+            )}
 
-            <button
-              type="submit"
-              disabled={isConnecting}
-              className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-            >
-              {isConnecting ? (
-                <>
-                  <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                  <span>Verifying API Telemetry...</span>
-                </>
-              ) : (
-                <>
-                  <span>Connect &amp; Authenticate</span>
-                  <ArrowRight className="w-4 h-4" />
-                </>
-              )}
-            </button>
+            <div className="pt-4 flex items-center justify-end gap-2">
+              <button
+                type="button"
+                onClick={() => setIsModalOpen(false)}
+                className="px-4 py-2 bg-slate-800 text-slate-300 rounded-xl font-semibold"
+              >
+                Close
+              </button>
+              <button
+                type="submit"
+                disabled={isConnecting}
+                className="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-md cursor-pointer disabled:opacity-50"
+              >
+                {isConnecting ? "Initiating..." : "Submit for Verification"}
+              </button>
+            </div>
           </form>
-        ) : (
-          <div className="text-center py-4 space-y-4">
-            <div className="w-14 h-14 rounded-full bg-emerald-100 text-emerald-600 mx-auto flex items-center justify-center">
-              <Check className="w-8 h-8" />
-            </div>
-            <div>
-              <h4 className="text-lg font-bold text-slate-900">Verification Certificate Generated!</h4>
-              <p className="text-xs text-slate-500 mt-1">{handle} has been verified.</p>
-            </div>
-            <div className="p-3 bg-emerald-50 border border-emerald-200 rounded-xl">
-              <VerificationBadge isVerified={true} size="lg" />
-            </div>
-            <button
-              onClick={() => setIsModalOpen(false)}
-              className="w-full py-2.5 bg-slate-900 text-white text-xs font-semibold rounded-xl"
-            >
-              Close
-            </button>
-          </div>
-        )}
-      </Modal>
+        </Modal>
+      )}
     </div>
   );
 }

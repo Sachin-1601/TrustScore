@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { LandingNavbar } from "@/components/landing/LandingNavbar";
 import { LandingFooter } from "@/components/landing/LandingFooter";
@@ -10,8 +10,7 @@ import { TrustScoreLeaderboard } from "@/components/marketplace/TrustScoreLeader
 import { CreatorMarketplaceCard } from "@/components/marketplace/CreatorMarketplaceCard";
 import { CategoryGrid } from "@/components/marketplace/CategoryGrid";
 import { AdPlacementModal } from "@/components/marketplace/AdPlacementModal";
-import { MOCK_SPONSORED_ADS } from "@/data/mockAdvertisements";
-import { MOCK_CREATORS } from "@/data/mockCreators";
+import { SponsoredAd, Creator } from "@/types/creator";
 import {
   Sparkles,
   ShieldCheck,
@@ -30,11 +29,35 @@ import {
 
 export default function MarketplaceHomePage() {
   const [isAdModalOpen, setIsAdModalOpen] = useState(false);
+  const [ads, setAds] = useState<SponsoredAd[]>([]);
+  const [recentlyVerifiedCreators, setRecentlyVerifiedCreators] = useState<Creator[]>([]);
 
-  // Left and Right sponsored ads for 3-column desktop layout
-  const leftAds = MOCK_SPONSORED_ADS.filter((a) => a.placement === "left_sidebar");
-  const rightAds = MOCK_SPONSORED_ADS.filter((a) => a.placement === "right_sidebar");
-  const recentlyVerifiedCreators = MOCK_CREATORS.filter((c) => c.verifiedBadge).slice(0, 6);
+  useEffect(() => {
+    async function loadLandingData() {
+      try {
+        const [adsRes, creatorsRes] = await Promise.all([
+          fetch("/api/advertisements"),
+          fetch("/api/creators?verifiedOnly=true&limit=6"),
+        ]);
+
+        if (adsRes.ok) {
+          const aData = await adsRes.json();
+          setAds(aData.advertisements || []);
+        }
+
+        if (creatorsRes.ok) {
+          const cData = await creatorsRes.json();
+          setRecentlyVerifiedCreators(cData.creators || []);
+        }
+      } catch {
+        // Network error
+      }
+    }
+    loadLandingData();
+  }, []);
+
+  const leftAds = ads.filter((a) => a.placement === "left_sidebar");
+  const rightAds = ads.filter((a) => a.placement === "right_sidebar");
 
   return (
     <div className="min-h-screen flex flex-col bg-[#090d16] text-slate-100 selection:bg-blue-600 selection:text-white">

@@ -155,22 +155,21 @@ export function CreatorSettingsView({ initialSection }: CreatorSettingsViewProps
   useEffect(() => {
     async function loadProfile() {
       try {
-        const userId = user?.id || "user-alex-creator";
-        const res = await fetch(`/api/creators/me?userId=${userId}`);
+        const res = await fetch(`/api/creators/me`);
         const data = await res.json();
         if (data.creator) {
           const c: Creator = data.creator;
           setCreator(c);
           setAvatar(c.avatar || user?.avatar || "");
-          setName(c.name || user?.name || "Alex Rivera");
-          setUsername(c.username || "@alexfitness");
+          setName(c.name || user?.name || "");
+          setUsername(c.username || `@${user?.name?.toLowerCase().replace(/\s+/g, "") || "creator"}`);
           setBio(c.bio || "");
           setCategory(c.category || "Fitness");
-          setLocation(c.location || "Melbourne, Australia");
-          setCountry(c.country || "Australia");
+          setLocation(c.location || "");
+          setCountry(c.country || "");
           setWebsite(c.website || "");
           setPlatform((c.platform as any) || "instagram");
-          setStartingRate(c.startingRate || 350);
+          setStartingRate(c.startingRate || 250);
           setAvailabilityStatus(c.availabilityStatus || "OPEN_TO_WORK");
           if (c.profileTags && c.profileTags.length > 0) {
             setSelectedTags(c.profileTags);
@@ -183,8 +182,7 @@ export function CreatorSettingsView({ initialSection }: CreatorSettingsViewProps
 
     async function loadSubscription() {
       try {
-        const userId = user?.id || "user-alex-creator";
-        const res = await fetch(`/api/creators/subscription?userId=${userId}`);
+        const res = await fetch(`/api/creators/subscription`);
         const data = await res.json();
         if (data.subscription) {
           setSubscription(data.subscription);
@@ -266,18 +264,18 @@ export function CreatorSettingsView({ initialSection }: CreatorSettingsViewProps
   const cleanUsername = active.username.replace("@", "");
 
   const currentSub: CreatorSubscriptionInfo = subscription || {
-    id: "sub-creator-alex",
-    userId: user?.id || "user-alex-creator",
-    plan: "PRO",
-    priceMonthly: 9.99,
+    id: `sub-${user?.id || "creator"}`,
+    userId: user?.id || "",
+    plan: "FREE",
+    priceMonthly: 0,
     status: "ACTIVE",
-    currentPeriodStart: "2026-08-01T00:00:00Z",
-    currentPeriodEnd: "2026-09-01T00:00:00Z",
+    currentPeriodStart: new Date().toISOString(),
+    currentPeriodEnd: new Date(Date.now() + 30 * 86400000).toISOString(),
     cancelAtPeriodEnd: false,
     usage: {
-      trustScoreChecks: { used: 12, limit: 25 },
-      profileViews: { used: 84, limit: 1000 },
-      socialConnections: { used: 2, limit: 3 },
+      trustScoreChecks: { used: 0, limit: 5 },
+      profileViews: { used: 0, limit: 100 },
+      socialConnections: { used: 0, limit: 1 },
     },
   };
 
@@ -314,8 +312,8 @@ export function CreatorSettingsView({ initialSection }: CreatorSettingsViewProps
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userId: user?.id || "user-alex-creator",
-          creatorId: creator?.id || "alexfitness",
+          userId: user?.id,
+          creatorId: creator?.id,
           role: user?.role || "CREATOR",
           name,
           avatar: avatar || active.avatar,
@@ -389,7 +387,7 @@ export function CreatorSettingsView({ initialSection }: CreatorSettingsViewProps
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userId: user?.id || "user-alex-creator",
+          userId: user?.id,
           plan,
         }),
       });
@@ -802,7 +800,7 @@ export function CreatorSettingsView({ initialSection }: CreatorSettingsViewProps
                       <input
                         type="text"
                         readOnly
-                        value={user?.id || "user-alex-creator"}
+                        value={user?.id || ""}
                         className="w-full px-3.5 py-2.5 rounded-xl border border-slate-200 bg-slate-50 text-slate-700 font-mono text-xs select-all"
                       />
                       <p className="text-[10px] text-slate-400 mt-1">

@@ -6,9 +6,11 @@ import { getServerSession } from "@/lib/session";
 export async function GET() {
   try {
     const session = await getServerSession();
-    const userId = session?.userId || "user-alex-creator";
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-    const subscription = await db.getCreatorSubscription(userId);
+    const subscription = await db.getCreatorSubscription(session.userId);
     return NextResponse.json({ subscription, success: true });
   } catch (err: any) {
     return NextResponse.json({ error: err.message || "Failed to fetch creator subscription" }, { status: 500 });

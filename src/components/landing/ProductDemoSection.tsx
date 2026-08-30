@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { MOCK_INFLUENCERS } from "@/data/mockInfluencers";
 import { ScoreGauge } from "@/components/common/ScoreGauge";
 import { RiskBadge } from "@/components/common/RiskBadge";
 import { ArrowRight, CheckCircle2, TrendingUp, AlertTriangle, MessageSquare, BarChart2 } from "lucide-react";
@@ -18,8 +17,62 @@ import {
   ResponsiveContainer,
 } from "recharts";
 
+const DEMO_SHOWCASE_CREATOR = {
+  id: "alexfitness",
+  username: "@alexfitness",
+  name: "Alex Rivera",
+  avatar: "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=160&auto=format&fit=crop&q=80",
+  category: "Fitness & Nutrition",
+  platform: "instagram" as const,
+  followers: 32400,
+  engagementRate: 4.8,
+  trustScore: 87,
+  scoreBand: "High Trust",
+  riskLevel: "Low" as const,
+  inflatedEngagementProbability: 4.2,
+  uncertaintyMargin: 1.5,
+  commentDiversityPercent: 88,
+  growthStabilityScore: 92,
+  authenticityProbability: 95.8,
+  isAvailableForCollaboration: true,
+  startingRate: 450,
+  followerGrowthHistory: [
+    { month: "Jan", followers: 26000, organicGrowth: 800, suspiciousSpike: 0 },
+    { month: "Feb", followers: 27200, organicGrowth: 1200, suspiciousSpike: 0 },
+    { month: "Mar", followers: 28100, organicGrowth: 900, suspiciousSpike: 0 },
+    { month: "Apr", followers: 29500, organicGrowth: 1400, suspiciousSpike: 0 },
+    { month: "May", followers: 30800, organicGrowth: 1300, suspiciousSpike: 0 },
+    { month: "Jun", followers: 32400, organicGrowth: 1600, suspiciousSpike: 0 },
+  ],
+  engagementHistory: [
+    { post: "Post 1", rate: 4.6, benchmark: 2.8 },
+    { post: "Post 2", rate: 5.1, benchmark: 2.8 },
+    { post: "Post 3", rate: 4.4, benchmark: 2.8 },
+    { post: "Post 4", rate: 4.9, benchmark: 2.8 },
+    { post: "Post 5", rate: 5.2, benchmark: 2.8 },
+    { post: "Post 6", rate: 4.8, benchmark: 2.8 },
+  ],
+  positiveFactors: [
+    "Comment diversity is high (88% unique vocabulary)",
+    "Engagement pattern is naturally volatile (low bot signature)",
+    "Follower growth curve is smooth and organic",
+  ],
+  warningFactors: [
+    "Slightly elevated comment cluster on carousel posts",
+  ],
+  prescriptiveGuidance: {
+    primaryRecommendation: "Proceed with standard sponsorship agreement",
+    recommendedPaymentAdjustment: "0% (Fair Market Value)",
+    confidenceLevel: "High Confidence (0.94)",
+    riskMitigationChecklist: [
+      "Standard net-30 payment milestone terms",
+      "Usage rights for 90-day paid amplification",
+    ],
+  },
+};
+
 export function ProductDemoSection() {
-  const influencer = MOCK_INFLUENCERS[0]; // @alexfitness
+  const influencer = DEMO_SHOWCASE_CREATOR;
   const [activeTab, setActiveTab] = useState<"growth" | "engagement">("growth");
 
   return (

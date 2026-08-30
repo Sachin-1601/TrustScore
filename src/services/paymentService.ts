@@ -44,7 +44,10 @@ export class PaymentService {
       };
     };
   }): Promise<{ processed: boolean; message: string }> {
-    const userId = event.data.object.metadata?.userId || "user-sarah-business";
+    const userId = event.data.object.metadata?.userId;
+    if (!userId) {
+      return { processed: false, message: "Missing userId in webhook metadata" };
+    }
     const itemType = event.data.object.metadata?.itemType || "SUBSCRIPTION";
 
     switch (event.type) {

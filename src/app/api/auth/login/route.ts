@@ -5,13 +5,13 @@ import { setSessionCookie } from "@/lib/session";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { email, password } = body;
+    const { email, password, accountType } = body;
 
     if (!email || !password) {
       return NextResponse.json({ error: "Email and password are required" }, { status: 400 });
     }
 
-    const { session, error } = await AuthService.login(email, password);
+    const { session, error } = await AuthService.login(email, password, accountType);
     if (error || !session) {
       return NextResponse.json({ error: error || "Authentication failed" }, { status: 401 });
     }

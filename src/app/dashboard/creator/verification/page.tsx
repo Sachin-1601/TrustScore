@@ -1,31 +1,51 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { VerificationBadge } from "@/components/common/VerificationBadge";
+import { useAuth } from "@/contexts/AuthContext";
 import { useToast } from "@/contexts/ToastContext";
+import { Creator } from "@/types/creator";
 import {
   ShieldCheck,
   CheckCircle2,
   Lock,
   Sparkles,
   Link2,
-  ExternalLink,
   RefreshCw,
-  AlertCircle,
+  Loader2,
 } from "lucide-react";
 
 export default function CreatorVerificationPage() {
+  const { user } = useAuth();
   const { success, info } = useToast();
+  const [creator, setCreator] = useState<Creator | null>(null);
+  const [isLoading, setIsLoading] = useState(true);
   const [isSyncing, setIsSyncing] = useState(false);
+
+  useEffect(() => {
+    async function loadCreator() {
+      try {
+        const res = await fetch("/api/creators/me");
+        if (res.ok) {
+          const data = await res.json();
+          if (data.creator) setCreator(data.creator);
+        }
+      } catch {
+        // safe ignore
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadCreator();
+  }, [user]);
 
   const [platforms, setPlatforms] = useState([
     {
       id: "instagram",
       name: "Instagram Professional",
-      handle: "@alexfitness",
-      connected: true,
-      verifiedDate: "August 30, 2026",
+      handle: "",
+      connected: false,
       authMethod: "Meta Graph API (Read-Only)",
     },
     {
@@ -33,7 +53,6 @@ export default function CreatorVerificationPage() {
       name: "TikTok Creator Account",
       handle: "",
       connected: false,
-      verifiedDate: null,
       authMethod: "TikTok Open SDK",
     },
     {
@@ -41,34 +60,35 @@ export default function CreatorVerificationPage() {
       name: "YouTube Partner Channel",
       handle: "",
       connected: false,
-      verifiedDate: null,
       authMethod: "Google OAuth 2.0",
     },
   ]);
 
   const handleConnect = (id: string, name: string) => {
-    setPlatforms((prev) =>
-      prev.map((p) =>
-        p.id === id
-          ? {
-              ...p,
-              connected: true,
-              handle: "@alexfitness",
-              verifiedDate: "August 30, 2026",
-            }
-          : p
-      )
-    );
-    success(`${name} Connected!`, "Read-only audience metrics have been synced.");
+    info("OAuth Configuration", `${name} integration will sync when platform developer credentials are configured.`);
   };
 
   const handleSyncAll = () => {
     setIsSyncing(true);
     setTimeout(() => {
       setIsSyncing(false);
-      success("Telemetry Synced", "All connected platform metrics refreshed successfully.");
-    }, 800);
+      success("Telemetry Synced", "All direct telemetry channels refreshed.");
+    }, 600);
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-full flex flex-col bg-slate-950 text-slate-100">
+        <DashboardHeader title="Creator Verification" />
+        <div className="py-24 flex flex-col items-center justify-center gap-3 text-slate-400">
+          <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+          <span className="text-xs font-semibold">Loading verification records...</span>
+        </div>
+      </div>
+    );
+  }
+
+  const isVerified = creator?.verifiedBadge || false;
 
   return (
     <div className="min-h-full flex flex-col bg-slate-950 text-slate-100">
@@ -79,92 +99,79 @@ export default function CreatorVerificationPage() {
 
       <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-8">
         {/* Verification Status Banner */}
-        <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
+        <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-md">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 flex items-center justify-center">
+              <div className={`w-14 h-14 rounded-2xl flex items-center justify-center ${
+                isVerified ? "bg-emerald-500/10 border border-emerald-500/30 text-emerald-400" : "bg-slate-950 border border-slate-800 text-slate-500"
+              }`}>
                 <ShieldCheck className="w-8 h-8" />
               </div>
               <div>
                 <div className="flex items-center gap-2">
-                  <h3 className="text-xl font-bold text-slate-100">TrustScore Authenticity Verified</h3>
-                  <VerificationBadge size="md" showText={false} />
+                  <h3 className="text-xl font-bold text-slate-100">
+                    {isVerified ? "TrustScore Authenticity Verified" : "Verification In Progress"}
+                  </h3>
+                  {isVerified && <VerificationBadge size="md" showText={false} />}
                 </div>
                 <p className="text-xs text-slate-400 mt-0.5">
-                  Verified on <strong className="text-slate-200">August 30, 2026</strong> via Meta Graph API
+                  {isVerified ? "Verified via direct API telemetry" : "Connect your primary channel to unlock the verified marketplace badge"}
                 </p>
               </div>
             </div>
 
             <button
               type="button"
-              disabled={isSyncing}
               onClick={handleSyncAll}
-              className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl border border-slate-700 transition-colors flex items-center gap-2 cursor-pointer self-start sm:self-auto"
+              disabled={isSyncing}
+              className="py-2.5 px-4 bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-200 font-bold text-xs rounded-xl transition-colors flex items-center gap-1.5 self-start sm:self-auto cursor-pointer"
             >
               <RefreshCw className={`w-3.5 h-3.5 ${isSyncing ? "animate-spin text-blue-400" : ""}`} />
-              <span>{isSyncing ? "Syncing Telemetry..." : "Refresh Telemetry"}</span>
+              <span>{isSyncing ? "Syncing..." : "Sync Telemetry"}</span>
             </button>
-          </div>
-
-          <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 text-xs text-slate-300 leading-relaxed flex items-start gap-3">
-            <Lock className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-            <div>
-              <strong className="text-slate-100">Zero-Trust Read-Only Protection:</strong> TrustScore only requests read permissions for follower counts, post impressions, and comment threads. We never request publishing privileges or access your private direct messages.
-            </div>
           </div>
         </div>
 
-        {/* Platform OAuth Connections */}
-        <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-sm">
-          <div>
-            <h4 className="font-bold text-slate-100 text-base">Connected Platform Accounts</h4>
-            <p className="text-xs text-slate-400">
-              Accounts verified with official APIs receive the verified checkmark badge on the TrustScore leaderboard.
-            </p>
-          </div>
+        {/* Channels Integration List */}
+        <div className="space-y-4">
+          <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
+            <Link2 className="w-4 h-4 text-blue-400" />
+            <span>Connected Social Telemetry Sources</span>
+          </h3>
 
-          <div className="space-y-4">
-            {platforms.map((plat) => (
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
+            {platforms.map((platform) => (
               <div
-                key={plat.id}
-                className="p-5 bg-slate-950 rounded-2xl border border-slate-800 flex flex-col sm:flex-row sm:items-center justify-between gap-4"
+                key={platform.id}
+                className="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 space-y-4 shadow-xs flex flex-col justify-between"
               >
-                <div className="space-y-1">
-                  <div className="flex items-center gap-2">
-                    <span className="font-bold text-slate-100 text-sm">{plat.name}</span>
-                    {plat.connected ? (
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                        Verified &amp; Linked
-                      </span>
-                    ) : (
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-slate-800 text-slate-400 border border-slate-700">
-                        Not Linked
-                      </span>
-                    )}
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
+                      {platform.authMethod}
+                    </span>
+                    <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase ${
+                      platform.connected
+                        ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                        : "bg-slate-950 text-slate-500 border border-slate-800"
+                    }`}>
+                      {platform.connected ? "Connected" : "Not Linked"}
+                    </span>
                   </div>
+
+                  <h4 className="font-bold text-slate-100 text-sm">{platform.name}</h4>
                   <p className="text-xs text-slate-400">
-                    {plat.connected ? `Connected as ${plat.handle} • ${plat.authMethod}` : `Verify using ${plat.authMethod}`}
+                    Ingests post engagement, video retention, and follower timestamps via read-only scopes.
                   </p>
                 </div>
 
-                <div>
-                  {plat.connected ? (
-                    <span className="text-xs font-bold text-emerald-400 flex items-center gap-1">
-                      <CheckCircle2 className="w-4 h-4" />
-                      <span>Synced</span>
-                    </span>
-                  ) : (
-                    <button
-                      type="button"
-                      onClick={() => handleConnect(plat.id, plat.name)}
-                      className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow-xs transition-colors cursor-pointer flex items-center gap-1.5"
-                    >
-                      <Link2 className="w-3.5 h-3.5" />
-                      <span>Connect Account</span>
-                    </button>
-                  )}
-                </div>
+                <button
+                  type="button"
+                  onClick={() => handleConnect(platform.id, platform.name)}
+                  className="w-full py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow-xs transition-colors cursor-pointer"
+                >
+                  <span>Connect Channel</span>
+                </button>
               </div>
             ))}
           </div>

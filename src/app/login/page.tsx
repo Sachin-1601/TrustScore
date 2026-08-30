@@ -41,7 +41,7 @@ function LoginContent() {
     setIsLoading(true);
     setErrorMessage(null);
 
-    const res = await login(email, password);
+    const res = await login(email, password, accountType);
     setIsLoading(false);
 
     if (res.success && res.session) {

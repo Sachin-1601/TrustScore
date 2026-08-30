@@ -70,12 +70,11 @@ export function DashboardSidebar() {
     { label: "Collaborations", href: "/dashboard/collaborations", icon: Send },
     { label: "Messages", href: "/dashboard/messages", icon: MessageSquare },
     { label: "Active Campaigns", href: "/dashboard/campaigns", icon: Briefcase },
-    { label: "Billing & Quotas", href: "/dashboard/billing", icon: CreditCard },
+    { label: "Billing & Subscription", href: "/dashboard/billing", icon: CreditCard },
     { label: "Advertise On Platform", href: "/dashboard/advertise", icon: Megaphone, highlight: true },
     { label: "Analyze Creator", href: "/dashboard/analyze", icon: Search },
     { label: "Comparisons", href: "/dashboard/compare", icon: Scale },
     { label: "Reports", href: "/dashboard/reports", icon: FileText },
-    { label: "Model Insights", href: "/dashboard/model-insights", icon: Cpu, badge: "Prototype" },
   ];
 
   // Pick active nav based on role
@@ -83,12 +82,13 @@ export function DashboardSidebar() {
   if (role === "ADMIN") {
     mainNav = [
       ...businessNav,
+      { label: "Model Insights", href: "/dashboard/model-insights", icon: Cpu },
       { label: "Admin Console", href: "/admin", icon: Lock },
     ];
   }
 
   const secondaryNav = [
-    { label: role === "CREATOR" ? "Settings" : "Settings & API", href: "/dashboard/settings", icon: Settings },
+    { label: "Settings", href: "/dashboard/settings", icon: Settings },
   ];
 
   return (

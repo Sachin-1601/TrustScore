@@ -62,18 +62,17 @@ export default function CreatorProfilePage() {
   useEffect(() => {
     async function loadProfile() {
       try {
-        const userId = user?.id || "user-alex-creator";
-        const res = await fetch(`/api/creators/me?userId=${userId}`);
+        const res = await fetch("/api/creators/me");
         const data = await res.json();
         if (data.creator) {
           const c: Creator = data.creator;
           setCreator(c);
-          setName(c.name || "Alex Rivera");
-          setUsername(c.username || "@alexfitness");
+          setName(c.name || user?.name || "");
+          setUsername(c.username || "");
           setBio(c.bio || "");
           setCategory(c.category || "Fitness");
-          setLocation(c.location || "Melbourne, Australia");
-          setWebsite(c.website || "https://alexriverafitness.com");
+          setLocation(c.location || "Australia");
+          setWebsite(c.website || "");
           setStartingRate(c.startingRate || 350);
           setAvailabilityStatus(c.availabilityStatus || "OPEN_TO_WORK");
           if (c.profileTags && c.profileTags.length > 0) {
@@ -120,9 +119,6 @@ export default function CreatorProfilePage() {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          userId: user?.id || "user-alex-creator",
-          creatorId: creator?.id || "alexfitness",
-          role: user?.role || "CREATOR",
           name,
           bio,
           category,

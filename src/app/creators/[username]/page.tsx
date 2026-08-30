@@ -1,11 +1,10 @@
 "use client";
 
-import React, { useState, use } from "react";
+import React, { useState, useEffect, use } from "react";
 import Link from "next/link";
-import { notFound } from "next/navigation";
 import { LandingNavbar } from "@/components/landing/LandingNavbar";
 import { LandingFooter } from "@/components/landing/LandingFooter";
-import { MOCK_CREATORS } from "@/data/mockCreators";
+import { Creator } from "@/types/creator";
 import { PlatformIcon } from "@/components/common/PlatformIcon";
 import { VerificationBadge } from "@/components/common/VerificationBadge";
 import { RiskBadge } from "@/components/common/RiskBadge";
@@ -27,9 +26,9 @@ import {
   TrendingUp,
   Activity,
   ArrowRight,
-  MessageSquare,
   BarChart2,
-  Lock,
+  Tag,
+  Loader2,
 } from "lucide-react";
 import {
   AreaChart,
@@ -46,28 +45,85 @@ import {
   Cell,
 } from "recharts";
 
-export default function CreatorProfilePage({
+export default function CreatorPublicProfilePage({
   params,
 }: {
   params: Promise<{ username: string }>;
 }) {
   const resolvedParams = use(params);
-  const targetId = resolvedParams.username.replace("@", "").toLowerCase();
+  const rawHandle = resolvedParams.username.replace("@", "").toLowerCase();
 
-  const creator = MOCK_CREATORS.find(
-    (c) => c.id === targetId || c.username.replace("@", "").toLowerCase() === targetId
-  );
+  const [creator, setCreator] = useState<Creator | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+  const [notFoundState, setNotFoundState] = useState<boolean>(false);
 
-  if (!creator) {
-    // Fallback to alexfitness for demo resilience
-    const fallback = MOCK_CREATORS[0];
-    return <CreatorProfileView creator={fallback} />;
+  useEffect(() => {
+    async function loadCreator() {
+      setIsLoading(true);
+      try {
+        const res = await fetch(`/api/creators/${rawHandle}`);
+        if (res.status === 404) {
+          setNotFoundState(true);
+          return;
+        }
+        if (res.ok) {
+          const data = await res.json();
+          if (data.creator) {
+            setCreator(data.creator);
+          } else {
+            setNotFoundState(true);
+          }
+        } else {
+          setNotFoundState(true);
+        }
+      } catch {
+        setNotFoundState(true);
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadCreator();
+  }, [rawHandle]);
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col bg-[#090d16] text-slate-100">
+        <LandingNavbar />
+        <main className="flex-1 flex flex-col items-center justify-center py-24 text-slate-400 gap-3">
+          <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+          <span className="text-xs font-semibold">Loading verified creator profile...</span>
+        </main>
+        <LandingFooter />
+      </div>
+    );
   }
 
-  return <CreatorProfileView creator={creator} />;
+  if (notFoundState || !creator) {
+    return (
+      <div className="min-h-screen flex flex-col bg-[#090d16] text-slate-100">
+        <LandingNavbar />
+        <main className="flex-1 max-w-7xl mx-auto w-full px-4 py-24 text-center space-y-4">
+          <h1 className="text-2xl font-black text-slate-100">Creator Profile Not Found</h1>
+          <p className="text-xs text-slate-400 max-w-md mx-auto">
+            The creator <strong className="text-slate-200">@{rawHandle}</strong> is not registered on TrustScore yet or has updated their handle.
+          </p>
+          <Link
+            href="/creators"
+            className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl"
+          >
+            <span>Explore All Verified Creators</span>
+            <ArrowRight className="w-3.5 h-3.5" />
+          </Link>
+        </main>
+        <LandingFooter />
+      </div>
+    );
+  }
+
+  return <CreatorProfileDetailView creator={creator} />;
 }
 
-function CreatorProfileView({ creator }: { creator: (typeof MOCK_CREATORS)[0] }) {
+function CreatorProfileDetailView({ creator }: { creator: Creator }) {
   const [isCollabModalOpen, setIsCollabModalOpen] = useState(false);
   const [isSaved, setIsSaved] = useState(false);
   const [copiedLink, setCopiedLink] = useState(false);
@@ -79,9 +135,9 @@ function CreatorProfileView({ creator }: { creator: (typeof MOCK_CREATORS)[0] })
   };
 
   const commentPieData = [
-    { name: "Unique Comments", value: creator.commentQuality.uniqueCommentsPercent, color: "#10b981" },
-    { name: "Generic Comments", value: creator.commentQuality.genericCommentsPercent, color: "#f59e0b" },
-    { name: "Repeated Patterns", value: creator.commentQuality.repeatedPatternsPercent, color: "#ef4444" },
+    { name: "Unique Comments", value: creator.commentQuality?.uniqueCommentsPercent || 85, color: "#10b981" },
+    { name: "Generic Comments", value: creator.commentQuality?.genericCommentsPercent || 10, color: "#f59e0b" },
+    { name: "Repeated Patterns", value: creator.commentQuality?.repeatedPatternsPercent || 5, color: "#ef4444" },
   ];
 
   return (
@@ -98,392 +154,207 @@ function CreatorProfileView({ creator }: { creator: (typeof MOCK_CREATORS)[0] })
           <span className="text-slate-200 font-semibold">{creator.username}</span>
         </div>
 
-        {/* Creator Hero Banner Card */}
+        {/* Hero Creator Dossier Card */}
         <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 relative overflow-hidden shadow-xl">
-          <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-6">
-            {/* Left: Avatar, Name & Bio */}
-            <div className="flex flex-col sm:flex-row items-start sm:items-center gap-5">
-              <div className="relative shrink-0">
-                <img
-                  src={creator.avatar}
-                  alt={creator.name}
-                  className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl object-cover border-2 border-slate-700 shadow-lg"
-                />
-                <div className="absolute -bottom-1.5 -right-1.5 p-1.5 bg-slate-950 rounded-xl border border-slate-800">
-                  <PlatformIcon platform={creator.platform} size="md" />
-                </div>
-              </div>
-
-              <div className="space-y-1.5">
-                <div className="flex flex-wrap items-center gap-2">
-                  <h1 className="text-2xl sm:text-3xl font-black text-slate-100">
+          <div className="flex flex-col md:flex-row md:items-center justify-between gap-6 relative z-10">
+            <div className="flex items-start sm:items-center gap-5">
+              <img
+                src={creator.avatar}
+                alt={creator.name}
+                className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl object-cover border-2 border-slate-700 shadow-lg shrink-0"
+              />
+              <div className="space-y-1.5 min-w-0">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h1 className="text-2xl sm:text-3xl font-black text-slate-100 truncate">
                     {creator.name}
                   </h1>
-                  <span className="text-base sm:text-lg font-bold text-slate-400">
-                    {creator.username}
-                  </span>
                   {creator.verifiedBadge && <VerificationBadge size="md" />}
+                  <div className="inline-flex p-1 bg-slate-950 rounded-lg border border-slate-800">
+                    <PlatformIcon platform={creator.platform} size="sm" />
+                  </div>
                 </div>
 
                 <div className="flex flex-wrap items-center gap-3 text-xs text-slate-400">
-                  <span className="px-2.5 py-0.5 rounded-lg bg-slate-800 text-slate-300 font-semibold">
+                  <span className="font-semibold text-slate-300">{creator.username}</span>
+                  <span>•</span>
+                  <span className="px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 font-semibold">
                     {creator.category}
                   </span>
+                  <span>•</span>
                   <div className="flex items-center gap-1">
                     <MapPin className="w-3.5 h-3.5 text-slate-500" />
                     <span>{creator.location}</span>
                   </div>
-                  <div className="flex items-center gap-1">
-                    <Calendar className="w-3.5 h-3.5 text-slate-500" />
-                    <span>Joined {creator.joinedDate}</span>
-                  </div>
                 </div>
 
-                <p className="text-xs sm:text-sm text-slate-300/90 max-w-xl leading-relaxed pt-1">
+                <p className="text-xs sm:text-sm text-slate-300 max-w-2xl leading-relaxed pt-1">
                   {creator.bio}
                 </p>
 
-                {/* Availability Status & Profile Tags */}
+                {/* Profile Tags & Availability */}
                 <div className="flex flex-wrap items-center gap-2 pt-2">
-                  <span
-                    className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-bold border ${
-                      creator.availabilityStatus === "NOT_AVAILABLE"
-                        ? "bg-rose-500/10 text-rose-400 border-rose-500/20"
-                        : "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
-                    }`}
-                  >
-                    <span className="w-1.5 h-1.5 rounded-full bg-current" />
-                    <span>
-                      {creator.availabilityStatus === "NOT_AVAILABLE"
-                        ? "Not Currently Available"
-                        : creator.availabilityStatus === "AVAILABLE_FOR_COLLABORATION"
-                        ? "Available for Collaboration"
-                        : "Open to Work"}
-                    </span>
+                  <span className={`px-2.5 py-0.5 rounded-md text-[10px] font-bold uppercase tracking-wider border ${
+                    creator.availabilityStatus === "NOT_AVAILABLE"
+                      ? "bg-rose-500/10 text-rose-400 border-rose-500/20"
+                      : "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                  }`}>
+                    {creator.availabilityStatus === "NOT_AVAILABLE" ? "Not Available" : "Open to Work"}
                   </span>
 
-                  {creator.profileTags && creator.profileTags.length > 0 && (
-                    <div className="flex flex-wrap gap-1.5">
-                      {creator.profileTags.map((tag) => (
-                        <span
-                          key={tag}
-                          className="px-2.5 py-0.5 rounded-lg bg-slate-900 border border-slate-800 text-[11px] font-semibold text-blue-300"
-                        >
-                          {tag}
-                        </span>
-                      ))}
-                    </div>
-                  )}
-                </div>
-              </div>
-            </div>
-
-            {/* Right: Collaboration & Action Buttons */}
-            <div className="flex flex-col sm:flex-row lg:flex-col items-stretch sm:items-center lg:items-end gap-3 shrink-0">
-              <div className="text-left sm:text-right">
-                <span className="text-[10px] uppercase font-bold text-slate-500 block">Est. Starting Rate</span>
-                <span className="text-xl font-black text-emerald-400">
-                  ${creator.startingRate} <span className="text-xs text-slate-400 font-semibold">USD</span>
-                </span>
-              </div>
-
-              <div className="flex items-center gap-2">
-                <button
-                  type="button"
-                  onClick={() => setIsSaved(!isSaved)}
-                  className={`p-3 rounded-xl border transition-colors cursor-pointer text-xs flex items-center justify-center ${
-                    isSaved
-                      ? "bg-blue-600/20 border-blue-500 text-blue-400"
-                      : "bg-slate-950 border-slate-800 hover:bg-slate-800 text-slate-400"
-                  }`}
-                  title="Save Creator to Dashboard"
-                >
-                  <Bookmark className="w-4 h-4" />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleShare}
-                  className="p-3 rounded-xl bg-slate-950 border border-slate-800 hover:bg-slate-800 text-slate-400 transition-colors cursor-pointer text-xs flex items-center justify-center"
-                  title="Share Profile"
-                >
-                  <Share2 className="w-4 h-4" />
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => setIsCollabModalOpen(true)}
-                  className="py-3 px-5 rounded-xl bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-bold text-xs transition-all shadow-md shadow-blue-600/30 flex items-center justify-center gap-2 cursor-pointer"
-                >
-                  <Send className="w-3.5 h-3.5" />
-                  <span>Collaborate With Creator</span>
-                </button>
-              </div>
-
-              {copiedLink && (
-                <span className="text-[11px] font-bold text-emerald-400 animate-fade-in">
-                  ✓ Profile link copied!
-                </span>
-              )}
-            </div>
-          </div>
-        </div>
-
-        {/* 4 Core Metrics Tiles */}
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
-          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 space-y-1">
-            <span className="text-[10px] uppercase font-bold text-slate-500 block">Total Followers</span>
-            <p className="text-2xl font-black text-slate-100">{formatNumber(creator.followers)}</p>
-            <span className="text-[11px] text-emerald-400 font-semibold">100% Organic curve</span>
-          </div>
-
-          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 space-y-1">
-            <span className="text-[10px] uppercase font-bold text-slate-500 block">Engagement Rate</span>
-            <p className="text-2xl font-black text-blue-400">{creator.engagementRate}%</p>
-            <span className="text-[11px] text-slate-400">Benchmark: 3.2% – 5.5%</span>
-          </div>
-
-          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 space-y-1">
-            <span className="text-[10px] uppercase font-bold text-slate-500 block">Comment Diversity</span>
-            <p className="text-2xl font-black text-emerald-400">{creator.commentQuality.uniqueCommentsPercent}%</p>
-            <span className="text-[11px] text-slate-400">Unique lexical stems</span>
-          </div>
-
-          <div className="bg-slate-900/80 border border-slate-800 rounded-2xl p-4 space-y-1">
-            <span className="text-[10px] uppercase font-bold text-slate-500 block">Growth Stability</span>
-            <p className="text-2xl font-black text-purple-400">{creator.growthStabilityScore}/100</p>
-            <span className="text-[11px] text-slate-400">Low volatility index</span>
-          </div>
-        </div>
-
-        {/* TrustScore Authenticity Intelligence Section */}
-        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          
-          {/* Left Column: TrustScore Gauge & Probabilistic Breakdown */}
-          <div className="lg:col-span-5 bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6">
-            <div className="flex items-center justify-between pb-3 border-b border-slate-800">
-              <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
-                <ShieldCheck className="w-5 h-5 text-blue-400" />
-                <span>TrustScore Authenticity Index</span>
-              </h3>
-              <RiskBadge risk={creator.riskLevel} size="sm" />
-            </div>
-
-            {/* Circular Gauge Centerpiece */}
-            <div className="flex flex-col items-center justify-center py-2">
-              <ScoreGauge
-                score={creator.trustScore}
-                size="lg"
-                showRiskLabel={false}
-              />
-              <div className="text-center mt-3 space-y-0.5">
-                <span className="text-sm font-bold text-slate-200 block">
-                  {creator.scoreBand}
-                </span>
-                <p className="text-xs text-slate-400">
-                  Estimated inflated risk: <strong className="text-slate-200">{creator.inflatedEngagementProbability}%</strong> (±{creator.uncertaintyMargin}%)
-                </p>
-              </div>
-            </div>
-
-            {/* 5 Sub-Score Progress Bars */}
-            <div className="space-y-3 pt-2 text-xs">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
-                5-Vector Authenticity Breakdown
-              </span>
-
-              {[
-                { label: "Follower Quality", val: creator.subScores.followerAuthenticity },
-                { label: "Engagement Authenticity", val: creator.subScores.engagementAuthenticity },
-                { label: "Comment Diversity", val: creator.subScores.commentQuality },
-                { label: "Growth Monotonicity", val: creator.subScores.growthPattern },
-                { label: "Consistency Index", val: creator.subScores.engagementConsistency },
-              ].map((item) => (
-                <div key={item.label} className="space-y-1">
-                  <div className="flex justify-between font-semibold">
-                    <span className="text-slate-300">{item.label}</span>
-                    <span className="text-blue-400 font-bold">{item.val}/100</span>
-                  </div>
-                  <div className="w-full bg-slate-950 rounded-full h-1.5 overflow-hidden border border-slate-800">
-                    <div
-                      className="bg-blue-500 h-1.5 rounded-full"
-                      style={{ width: `${item.val}%` }}
-                    />
-                  </div>
-                </div>
-              ))}
-            </div>
-
-            {/* Prescriptive Recommendation Box */}
-            <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-2 text-xs">
-              <span className="font-bold text-slate-200 block">Campaign Decision Support:</span>
-              <p className="text-slate-400 leading-relaxed text-[11px]">
-                {creator.prescriptiveGuidance.primaryRecommendation}
-              </p>
-              <div className="pt-1 flex items-center justify-between text-[11px] font-bold">
-                <span className="text-slate-500">Rate Guidance:</span>
-                <span className="text-emerald-400">{creator.prescriptiveGuidance.recommendedPaymentAdjustment}</span>
-              </div>
-            </div>
-          </div>
-
-          {/* Right Column: Time-Series Charts & Comment Analysis */}
-          <div className="lg:col-span-7 space-y-6">
-            {/* Follower Growth Chart */}
-            <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 space-y-4">
-              <div className="flex items-center justify-between pb-2 border-b border-slate-800">
-                <div>
-                  <h4 className="font-bold text-slate-100 text-sm">
-                    12-Month Follower Growth Timeline
-                  </h4>
-                  <p className="text-xs text-slate-400">
-                    Monitored for sudden purchased follower spikes vs expected organic trajectory
-                  </p>
-                </div>
-              </div>
-
-              <div className="h-56 w-full">
-                <ResponsiveContainer width="100%" height="100%">
-                  <AreaChart data={creator.followerGrowthHistory}>
-                    <defs>
-                      <linearGradient id="growthColor" x1="0" y1="0" x2="0" y2="1">
-                        <stop offset="5%" stopColor="#2563eb" stopOpacity={0.4} />
-                        <stop offset="95%" stopColor="#2563eb" stopOpacity={0} />
-                      </linearGradient>
-                    </defs>
-                    <CartesianGrid strokeDasharray="3 3" vertical={false} stroke="#1e293b" />
-                    <XAxis dataKey="month" stroke="#64748b" fontSize={11} tickLine={false} />
-                    <YAxis stroke="#64748b" fontSize={11} tickLine={false} tickFormatter={(val) => `${(val / 1000).toFixed(0)}k`} />
-                    <Tooltip
-                      contentStyle={{ backgroundColor: "#0f172a", borderRadius: "12px", border: "1px solid #1e293b", color: "#f8fafc" }}
-                    />
-                    <Area type="monotone" dataKey="followers" stroke="#3b82f6" strokeWidth={2.5} fillOpacity={1} fill="url(#growthColor)" />
-                  </AreaChart>
-                </ResponsiveContainer>
-              </div>
-            </div>
-
-            {/* Comment Diversity & Why Businesses Trust Section */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              {/* Comment Diversity Donut */}
-              <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 space-y-3">
-                <h4 className="font-bold text-slate-100 text-xs">
-                  Comment Quality Breakdown
-                </h4>
-                <div className="h-36 w-full">
-                  <ResponsiveContainer width="100%" height="100%">
-                    <PieChart>
-                      <Pie
-                        data={commentPieData}
-                        cx="50%"
-                        cy="50%"
-                        innerRadius={38}
-                        outerRadius={55}
-                        paddingAngle={4}
-                        dataKey="value"
-                      >
-                        {commentPieData.map((entry, index) => (
-                          <Cell key={`cell-${index}`} fill={entry.color} />
-                        ))}
-                      </Pie>
-                      <Tooltip contentStyle={{ backgroundColor: "#0f172a", borderRadius: "8px", border: "1px solid #1e293b" }} />
-                    </PieChart>
-                  </ResponsiveContainer>
-                </div>
-                <div className="space-y-1 text-[11px]">
-                  <div className="flex justify-between">
-                    <span className="text-emerald-400 font-semibold">• Unique Authentic</span>
-                    <span className="font-bold">{creator.commentQuality.uniqueCommentsPercent}%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-amber-400 font-semibold">• Generic Emojis</span>
-                    <span className="font-bold">{creator.commentQuality.genericCommentsPercent}%</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span className="text-rose-400 font-semibold">• Pod Repetitive</span>
-                    <span className="font-bold">{creator.commentQuality.repeatedPatternsPercent}%</span>
-                  </div>
-                </div>
-              </div>
-
-              {/* Positive Factors */}
-              <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 space-y-3 flex flex-col justify-between">
-                <div>
-                  <h4 className="font-bold text-slate-100 text-xs">
-                    Why Businesses Trust {creator.username}
-                  </h4>
-                  <ul className="space-y-2 text-[11px] text-slate-300 mt-2">
-                    {creator.positiveFactors.map((f, i) => (
-                      <li key={i} className="flex items-start gap-1.5">
-                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0 mt-0.5" />
-                        <span>{f}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </div>
-
-                <div className="pt-2 border-t border-slate-800/80 text-[10px] text-slate-500 flex items-center gap-1">
-                  <Lock className="w-3 h-3" />
-                  <span>Model-based decision support prototype</span>
-                </div>
-              </div>
-            </div>
-          </div>
-        </div>
-
-        {/* Prescriptive Rate & Counter-Offer Calculator */}
-        <RateAdjustmentCalculator
-          creatorName={creator.name}
-          creatorUsername={creator.username}
-          trustScore={creator.trustScore}
-          riskLevel={creator.riskLevel}
-          inflatedProbability={creator.inflatedEngagementProbability}
-          uncertaintyMargin={creator.uncertaintyMargin}
-          initialRate={creator.startingRate || 450}
-          followersCount={creator.followers}
-          engagementRate={creator.engagementRate}
-          isDark={true}
-        />
-
-        {/* Preferred Campaigns & Past Brands */}
-        <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-4">
-          <h3 className="text-base font-bold text-slate-100">
-            Campaign Formats &amp; Brand Compatibility
-          </h3>
-          <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-            <div className="space-y-2">
-              <span className="font-bold text-slate-400 uppercase tracking-wider text-[10px]">
-                Preferred Campaign Types
-              </span>
-              <div className="flex flex-wrap gap-2">
-                {creator.preferredCampaignTypes.map((t) => (
-                  <span
-                    key={t}
-                    className="px-3 py-1.5 rounded-xl bg-slate-950 border border-slate-800 text-slate-200 font-semibold"
-                  >
-                    {t}
-                  </span>
-                ))}
-              </div>
-            </div>
-
-            {creator.pastBrandCollaborations && creator.pastBrandCollaborations.length > 0 && (
-              <div className="space-y-2">
-                <span className="font-bold text-slate-400 uppercase tracking-wider text-[10px]">
-                  Past Brand Partnerships
-                </span>
-                <div className="flex flex-wrap gap-2">
-                  {creator.pastBrandCollaborations.map((b) => (
+                  {creator.profileTags && creator.profileTags.map((tag) => (
                     <span
-                      key={b}
-                      className="px-3 py-1.5 rounded-xl bg-blue-950/40 border border-blue-800/50 text-blue-300 font-semibold"
+                      key={tag}
+                      className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-md bg-slate-950 border border-slate-800 text-slate-300 text-[10px] font-semibold"
                     >
-                      {b}
+                      <Tag className="w-2.5 h-2.5 text-blue-400" />
+                      <span>{tag}</span>
                     </span>
                   ))}
                 </div>
               </div>
+            </div>
+
+            {/* Action CTAs */}
+            <div className="flex flex-wrap items-center gap-3 shrink-0 self-start md:self-auto">
+              <button
+                type="button"
+                onClick={handleShare}
+                className="p-2.5 bg-slate-950 border border-slate-800 hover:bg-slate-800 text-slate-300 rounded-xl transition-colors cursor-pointer"
+                title="Share Profile Link"
+              >
+                <Share2 className="w-4 h-4" />
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setIsSaved(!isSaved)}
+                className={`py-2.5 px-4 rounded-xl border text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer ${
+                  isSaved
+                    ? "bg-purple-600/20 border-purple-500/40 text-purple-300"
+                    : "bg-slate-950 border-slate-800 text-slate-300 hover:bg-slate-800"
+                }`}
+              >
+                <Bookmark className="w-4 h-4" />
+                <span>{isSaved ? "Saved" : "Save Creator"}</span>
+              </button>
+
+              <button
+                type="button"
+                onClick={() => setIsCollabModalOpen(true)}
+                className="py-2.5 px-5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition-all shadow-md shadow-blue-600/30 flex items-center gap-2 cursor-pointer"
+              >
+                <Send className="w-4 h-4" />
+                <span>Request Collaboration</span>
+              </button>
+            </div>
+          </div>
+        </div>
+
+        {/* Metrics Grid */}
+        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+          <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 space-y-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Followers</span>
+            <p className="text-2xl sm:text-3xl font-black text-slate-100">{formatNumber(creator.followers)}</p>
+            <span className="text-[11px] text-slate-400">Total verified audience</span>
+          </div>
+
+          <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 space-y-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Engagement Rate</span>
+            <p className="text-2xl sm:text-3xl font-black text-blue-400">{creator.engagementRate}%</p>
+            <span className="text-[11px] text-slate-400">Across recent posts</span>
+          </div>
+
+          <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 space-y-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Authenticity Probability</span>
+            <p className="text-2xl sm:text-3xl font-black text-emerald-400">
+              {creator.authenticityProbability ? `${creator.authenticityProbability}%` : `${100 - creator.inflatedEngagementProbability}%`}
+            </p>
+            <span className="text-[11px] text-emerald-400 font-semibold">Genuine human engagement</span>
+          </div>
+
+          <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 space-y-1">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Est. Starting Rate</span>
+            <p className="text-2xl sm:text-3xl font-black text-slate-100">${creator.startingRate}</p>
+            <span className="text-[11px] text-slate-400">Per sponsored deliverable</span>
+          </div>
+        </div>
+
+        {/* TrustScore Dossier & Factor Breakdown */}
+        <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
+          <div className="lg:col-span-8 bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+              <div className="flex items-center gap-2">
+                <Sparkles className="w-5 h-5 text-blue-400" />
+                <h3 className="text-base font-bold text-slate-100">
+                  TrustScore Authenticity Dossier
+                </h3>
+              </div>
+              <RiskBadge risk={creator.riskLevel} />
+            </div>
+
+            {creator.trustScore > 0 ? (
+              <div className="grid grid-cols-1 sm:grid-cols-12 gap-6 items-center">
+                <div className="sm:col-span-5 flex flex-col items-center justify-center p-4 bg-slate-950 rounded-2xl border border-slate-800">
+                  <ScoreGauge score={creator.trustScore} size="lg" />
+                  <span className="mt-2 text-xs font-bold text-slate-300 uppercase tracking-wider">
+                    {creator.scoreBand}
+                  </span>
+                </div>
+
+                <div className="sm:col-span-7 space-y-3 text-xs">
+                  <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 flex items-center justify-between">
+                    <span className="text-slate-400">Comment Diversity:</span>
+                    <strong className="text-slate-200 font-bold">{creator.commentDiversityPercent}%</strong>
+                  </div>
+                  <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 flex items-center justify-between">
+                    <span className="text-slate-400">Growth Pattern Stability:</span>
+                    <strong className="text-slate-200 font-bold">{creator.growthStabilityScore}/100</strong>
+                  </div>
+                  <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 flex items-center justify-between">
+                    <span className="text-slate-400">Uncertainty Margin:</span>
+                    <strong className="text-blue-400 font-bold">±{creator.uncertaintyMargin}%</strong>
+                  </div>
+                  <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 flex items-center justify-between">
+                    <span className="text-slate-400">Data Coverage:</span>
+                    <strong className="text-emerald-400 font-bold">Verified Direct Telemetry</strong>
+                  </div>
+                </div>
+              </div>
+            ) : (
+              <div className="p-8 text-center bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
+                <h4 className="font-bold text-slate-200 text-sm">TrustScore unavailable — insufficient data</h4>
+                <p className="text-xs text-slate-400 max-w-md mx-auto">
+                  This creator has recently joined the marketplace. A comprehensive TrustScore audit will be computed once direct post telemetry is verified.
+                </p>
+              </div>
             )}
+          </div>
+
+          <div className="lg:col-span-4 bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-5">
+            <h3 className="text-base font-bold text-slate-100">Collaboration Terms</h3>
+            <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-3 text-xs text-slate-300">
+              <div className="flex items-center justify-between">
+                <span className="text-slate-400">Deliverable Format:</span>
+                <strong className="text-slate-200">Reels / Shorts / Posts</strong>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-slate-400">Response Rate:</span>
+                <strong className="text-emerald-400">&lt; 24 hours</strong>
+              </div>
+              <div className="flex items-center justify-between">
+                <span className="text-slate-400">Fraud Protection:</span>
+                <strong className="text-blue-400">Active Escrow</strong>
+              </div>
+            </div>
+
+            <button
+              type="button"
+              onClick={() => setIsCollabModalOpen(true)}
+              className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow-md shadow-blue-600/30 transition-all cursor-pointer flex items-center justify-center gap-2"
+            >
+              <Send className="w-3.5 h-3.5" />
+              <span>Send Campaign Offer</span>
+            </button>
           </div>
         </div>
       </main>

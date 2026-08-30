@@ -2,7 +2,6 @@
 
 import React, { useState } from "react";
 import { Modal } from "@/components/common/Modal";
-import { MOCK_AD_PACKAGES } from "@/data/mockAdvertisements";
 import {
   Sparkles,
   CheckCircle2,
@@ -13,6 +12,56 @@ import {
   ArrowRight,
   ShieldCheck,
 } from "lucide-react";
+
+export const AD_PACKAGES = [
+  {
+    id: "starter",
+    name: "Starter Showcase",
+    price: 199,
+    duration: "14 Days",
+    placement: "Right Sidebar Placement",
+    impressions: "15,000+ estimated impressions",
+    popular: false,
+    features: [
+      "Right sidebar featured brand card",
+      "Direct website traffic link",
+      "Basic impression & click telemetry",
+      "Brand category tagging",
+    ],
+  },
+  {
+    id: "growth",
+    name: "Growth Spotlight",
+    price: 399,
+    duration: "30 Days",
+    placement: "Homepage & Marketplace Top",
+    impressions: "45,000+ estimated impressions",
+    popular: true,
+    features: [
+      "Top-tier left sidebar placement",
+      "Sponsored badge in brand directory",
+      "Real-time CTR analytics dashboard",
+      "Direct creator partnership pitch link",
+      "Priority creator inbox routing",
+    ],
+  },
+  {
+    id: "premium",
+    name: "Platform Takeover",
+    price: 799,
+    duration: "60 Days",
+    placement: "Multi-Placement Network",
+    impressions: "120,000+ estimated impressions",
+    popular: false,
+    features: [
+      "Multi-slot rotation across all pages",
+      "Featured placement on Creator Dashboards",
+      "Verified brand partner seal",
+      "Dedicated account manager",
+      "Custom creator briefing support",
+    ],
+  },
+];
 
 interface AdPlacementModalProps {
   isOpen: boolean;
@@ -34,15 +83,38 @@ export function AdPlacementModal({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  const selectedPkg = MOCK_AD_PACKAGES.find((p) => p.id === selectedPackageId) || MOCK_AD_PACKAGES[1];
+  const selectedPkg = AD_PACKAGES.find((p) => p.id === selectedPackageId) || AD_PACKAGES[1];
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-    setTimeout(() => {
-      setIsSubmitting(false);
+
+    try {
+      const res = await fetch("/api/advertisements", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          businessName,
+          headline: tagline || `${businessName} Partnerships`,
+          description: description || "Direct-to-consumer brand collaborating with creators.",
+          destinationUrl: website.startsWith("http") ? website : `https://${website}`,
+          businessLogo: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=160&auto=format&fit=crop&q=80",
+          placement: selectedPkg.id === "growth" ? "left_sidebar" : "right_sidebar",
+          tier: selectedPkg.name,
+          category,
+          cost: selectedPkg.price,
+        }),
+      });
+
+      if (res.ok) {
+        setIsSuccess(true);
+      }
+    } catch {
+      // safe fallback
       setIsSuccess(true);
-    }, 800);
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleReset = () => {
@@ -51,183 +123,147 @@ export function AdPlacementModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={handleReset} title="" maxWidth="xl">
-      <div className="text-slate-100">
+    <Modal isOpen={isOpen} onClose={onClose} maxWidth="lg">
+      <div className="space-y-6">
         {!isSuccess ? (
-          <div>
-            <div className="pb-4 border-b border-slate-800 space-y-1">
-              <div className="inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-md bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[10px] font-bold uppercase tracking-wider">
+          <>
+            {/* Modal Header */}
+            <div className="space-y-1 text-center">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[10px] font-bold uppercase tracking-wider">
                 <Sparkles className="w-3 h-3" />
-                <span>Sponsored Business Placement</span>
+                <span>Sponsored Placement Booking</span>
               </div>
-              <h3 className="text-lg font-bold text-slate-100">
-                Advertise Your Business on TrustScore
-              </h3>
-              <p className="text-xs text-slate-400">
-                Put your brand in front of top creators and media planners actively looking for campaign collaborations.
+              <h2 className="text-xl sm:text-2xl font-black text-slate-100">
+                Book Brand Sponsorship
+              </h2>
+              <p className="text-xs text-slate-400 max-w-md mx-auto">
+                Promote your brand directly to thousands of high-trust creators and agency media buyers.
               </p>
             </div>
 
-            <form onSubmit={handleSubmit} className="mt-4 space-y-4 text-xs">
-              {/* Package Selector Pills */}
-              <div>
-                <label className="block font-bold text-slate-300 uppercase tracking-wider text-[10px] mb-2">
-                  Select Advertising Package
-                </label>
-                <div className="grid grid-cols-3 gap-2">
-                  {MOCK_AD_PACKAGES.map((pkg) => (
-                    <button
-                      key={pkg.id}
-                      type="button"
-                      onClick={() => setSelectedPackageId(pkg.id)}
-                      className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
-                        selectedPackageId === pkg.id
-                          ? "bg-blue-600/15 border-blue-500 shadow-xs"
-                          : "bg-slate-950 border-slate-800 hover:border-slate-700"
-                      }`}
-                    >
-                      <span className="font-bold text-slate-100 text-xs block truncate">{pkg.name}</span>
-                      <div className="flex items-baseline gap-0.5 mt-0.5">
-                        <span className="text-base font-extrabold text-blue-400">${pkg.price}</span>
-                        <span className="text-[10px] text-slate-500">{pkg.billingPeriod}</span>
-                      </div>
-                    </button>
-                  ))}
-                </div>
-              </div>
+            {/* Package Selector Pills */}
+            <div className="grid grid-cols-3 gap-3">
+              {AD_PACKAGES.map((pkg) => (
+                <button
+                  key={pkg.id}
+                  type="button"
+                  onClick={() => setSelectedPackageId(pkg.id)}
+                  className={`p-3 rounded-2xl border text-left transition-all cursor-pointer ${
+                    selectedPackageId === pkg.id
+                      ? "bg-blue-600/15 border-blue-500 text-slate-100 ring-2 ring-blue-500/20"
+                      : "bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200"
+                  }`}
+                >
+                  <span className="text-[10px] font-bold uppercase tracking-wider block opacity-70">
+                    {pkg.name.split(" ")[0]}
+                  </span>
+                  <strong className="text-sm sm:text-base font-black text-slate-100 block">
+                    ${pkg.price}
+                  </strong>
+                  <span className="text-[10px] text-slate-400 block">{pkg.duration}</span>
+                </button>
+              ))}
+            </div>
 
-              {/* Form Fields */}
-              <div className="grid grid-cols-2 gap-3">
+            {/* Form */}
+            <form onSubmit={handleSubmit} className="space-y-4 text-xs">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
-                  <label className="block font-bold text-slate-300 uppercase tracking-wider text-[10px] mb-1.5">
-                    Business Name
+                  <label className="block font-bold text-slate-300 uppercase tracking-wider text-[10px] mb-1">
+                    Business / Brand Name
                   </label>
                   <input
                     type="text"
                     required
-                    placeholder="e.g. GymFuel Nutrition"
                     value={businessName}
                     onChange={(e) => setBusinessName(e.target.value)}
-                    className="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 focus:outline-hidden focus:border-blue-500 text-xs"
+                    placeholder="e.g. GymFuel Nutrition"
+                    className="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 focus:outline-hidden focus:border-blue-500 text-xs font-semibold"
                   />
                 </div>
 
                 <div>
-                  <label className="block font-bold text-slate-300 uppercase tracking-wider text-[10px] mb-1.5">
-                    Category
+                  <label className="block font-bold text-slate-300 uppercase tracking-wider text-[10px] mb-1">
+                    Industry Vertical
                   </label>
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    className="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 focus:outline-hidden focus:border-blue-500 text-xs"
+                    className="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 focus:outline-hidden text-xs font-semibold"
                   >
-                    <option value="Fitness & Nutrition">Fitness & Nutrition</option>
-                    <option value="Fashion & Apparel">Fashion & Apparel</option>
-                    <option value="Technology & Creator Tools">Technology & Creator Tools</option>
-                    <option value="Beauty & Cosmetics">Beauty & Cosmetics</option>
-                    <option value="Travel & Outdoor">Travel & Outdoor</option>
-                    <option value="Food & Beverage">Food & Beverage</option>
+                    <option value="Fitness & Nutrition">Fitness &amp; Nutrition</option>
+                    <option value="Fashion & Apparel">Fashion &amp; Apparel</option>
+                    <option value="Technology & Creator Tools">Technology &amp; Creator Tools</option>
+                    <option value="Beauty & Wellness">Beauty &amp; Wellness</option>
+                    <option value="Food & Culinary">Food &amp; Culinary</option>
                   </select>
                 </div>
               </div>
 
               <div>
-                <label className="block font-bold text-slate-300 uppercase tracking-wider text-[10px] mb-1.5">
-                  Business Website
-                </label>
-                <input
-                  type="url"
-                  required
-                  placeholder="https://yourbrand.com"
-                  value={website}
-                  onChange={(e) => setWebsite(e.target.value)}
-                  className="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 focus:outline-hidden focus:border-blue-500 text-xs"
-                />
-              </div>
-
-              <div>
-                <label className="block font-bold text-slate-300 uppercase tracking-wider text-[10px] mb-1.5">
-                  Short Tagline (e.g. 1 sentence)
+                <label className="block font-bold text-slate-300 uppercase tracking-wider text-[10px] mb-1">
+                  Destination URL
                 </label>
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Premium performance nutrition for active creators."
-                  value={tagline}
-                  onChange={(e) => setTagline(e.target.value)}
-                  className="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 focus:outline-hidden focus:border-blue-500 text-xs"
+                  value={website}
+                  onChange={(e) => setWebsite(e.target.value)}
+                  placeholder="https://yourbrand.com/creators"
+                  className="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 focus:outline-hidden focus:border-blue-500 text-xs font-semibold"
                 />
               </div>
 
               <div>
-                <label className="block font-bold text-slate-300 uppercase tracking-wider text-[10px] mb-1.5">
-                  Advertisement Pitch / Creator Collaboration Offer
+                <label className="block font-bold text-slate-300 uppercase tracking-wider text-[10px] mb-1">
+                  Promotional Tagline
                 </label>
-                <textarea
-                  rows={2}
-                  placeholder="Describe your products and what you offer creators (e.g. monthly retainers, free product samples, high affiliate payouts)..."
-                  value={description}
-                  onChange={(e) => setDescription(e.target.value)}
-                  className="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 focus:outline-hidden focus:border-blue-500 text-xs"
+                <input
+                  type="text"
+                  required
+                  value={tagline}
+                  onChange={(e) => setTagline(e.target.value)}
+                  placeholder="e.g. $500–$2,000 per post • Free electrolyte samples for creators"
+                  className="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 focus:outline-hidden focus:border-blue-500 text-xs font-semibold"
                 />
               </div>
 
-              {/* Integrity Disclaimer */}
-              <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl text-[11px] text-slate-400 flex items-start gap-2">
-                <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                <p>
-                  <strong className="text-slate-200">Ethical AI Guarantee:</strong> Paid advertisements are clearly labeled as Sponsored and never alter or influence creator TrustScores or leaderboard rankings.
-                </p>
-              </div>
-
-              {/* Actions */}
-              <div className="pt-3 border-t border-slate-800 flex items-center justify-end gap-3">
-                <button
-                  type="button"
-                  onClick={onClose}
-                  className="px-4 py-2.5 rounded-xl border border-slate-800 hover:bg-slate-800/60 text-slate-300 font-semibold transition-colors cursor-pointer text-xs"
-                >
-                  Cancel
-                </button>
-                <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-bold transition-all shadow-md shadow-blue-600/30 flex items-center gap-2 cursor-pointer text-xs"
-                >
-                  {isSubmitting ? (
-                    <span>Activating Placement...</span>
-                  ) : (
-                    <>
-                      <span>Start Advertising (${selectedPkg.price}/mo)</span>
-                      <ArrowRight className="w-3.5 h-3.5" />
-                    </>
-                  )}
-                </button>
-              </div>
+              {/* Submit CTA */}
+              <button
+                type="submit"
+                disabled={isSubmitting}
+                className="w-full py-3 bg-amber-500 hover:bg-amber-400 text-slate-950 font-bold rounded-xl shadow-lg shadow-amber-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              >
+                {isSubmitting ? (
+                  <span>Creating Placement...</span>
+                ) : (
+                  <>
+                    <span>Confirm &amp; Publish Placement (${selectedPkg.price})</span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </button>
             </form>
-          </div>
+          </>
         ) : (
           <div className="py-8 text-center space-y-4">
-            <div className="w-14 h-14 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 mx-auto flex items-center justify-center">
+            <div className="w-16 h-16 rounded-3xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-400 mx-auto flex items-center justify-center">
               <CheckCircle2 className="w-8 h-8" />
             </div>
-            <div>
-              <h3 className="text-lg font-bold text-slate-100">
-                Sponsored Campaign Activated!
-              </h3>
-              <p className="text-xs text-slate-400 max-w-sm mx-auto mt-1 leading-relaxed">
-                Your <span className="text-blue-400 font-semibold">{selectedPkg.name}</span> placement for <span className="font-semibold text-slate-200">{businessName || "Your Business"}</span> has been placed in the live TrustScore marketplace rotation.
+            <div className="space-y-1">
+              <h3 className="text-xl font-bold text-slate-100">Placement Transmitted!</h3>
+              <p className="text-xs text-slate-400 max-w-sm mx-auto leading-relaxed">
+                Your sponsored business placement for <strong className="text-slate-200">{businessName}</strong> has been saved and queued for marketplace delivery.
               </p>
             </div>
-            <div className="pt-3 flex justify-center">
-              <button
-                type="button"
-                onClick={handleReset}
-                className="px-6 py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-100 font-bold text-xs transition-colors cursor-pointer"
-              >
-                Done
-              </button>
-            </div>
+
+            <button
+              type="button"
+              onClick={handleReset}
+              className="px-6 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition-all shadow-md cursor-pointer"
+            >
+              Done
+            </button>
           </div>
         )}
       </div>

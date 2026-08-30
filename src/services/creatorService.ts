@@ -232,10 +232,7 @@ export class CreatorService {
     }
 
     // Ownership check (IDOR Protection)
-    const isOwner =
-      creator.userId === userId ||
-      (userId === "user-alex-creator" && (creator.id === "alexfitness" || creator.username === "@alexfitness")) ||
-      userRole === "ADMIN";
+    const isOwner = creator.userId === userId || userRole === "ADMIN";
 
     if (!isOwner) {
       return { success: false, error: "Unauthorized: You can only edit your own creator profile" };

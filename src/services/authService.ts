@@ -33,7 +33,8 @@ export class AuthService {
    */
   public static async login(
     email: string,
-    passwordPlain: string
+    passwordPlain: string,
+    expectedRole?: "creator" | "business" | "admin"
   ): Promise<{ session: UserSession | null; error?: string }> {
     const cleanEmail = email.trim().toLowerCase();
 
@@ -51,6 +52,14 @@ export class AuthService {
         const isValid = await this.verifyPassword(passwordPlain, user.passwordHash);
         if (!isValid) {
           return { session: null, error: "Invalid email or password" };
+        }
+
+        // Role mismatch validation
+        if (expectedRole === "creator" && user.role !== "CREATOR") {
+          return { session: null, error: "These credentials belong to a Business account. Please use Business login." };
+        }
+        if (expectedRole === "business" && user.role === "CREATOR") {
+          return { session: null, error: "These credentials belong to a Creator account. Please use Creator login." };
         }
 
         const session: UserSession = {
@@ -78,6 +87,14 @@ export class AuthService {
     const isValid = await this.verifyPassword(passwordPlain, user.passwordHash);
     if (!isValid) {
       return { session: null, error: "Invalid email or password" };
+    }
+
+    // Role mismatch validation
+    if (expectedRole === "creator" && user.role !== "CREATOR") {
+      return { session: null, error: "These credentials belong to a Business account. Please use Business login." };
+    }
+    if (expectedRole === "business" && user.role === "CREATOR") {
+      return { session: null, error: "These credentials belong to a Creator account. Please use Creator login." };
     }
 
     let creatorProfileId: string | undefined = undefined;

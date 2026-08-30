@@ -18,7 +18,7 @@ interface AuthContextType {
   role: UserRole;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, passwordPlain: string) => Promise<{ success: boolean; error?: string; session?: UserSession }>;
+  login: (email: string, passwordPlain: string, accountType?: "creator" | "business") => Promise<{ success: boolean; error?: string; session?: UserSession }>;
   signup: (data: SignupParams) => Promise<{ success: boolean; error?: string; session?: UserSession }>;
   logout: () => Promise<void>;
   refreshSession: () => Promise<void>;
@@ -54,12 +54,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const role: UserRole = user?.role || "BUSINESS";
 
-  const login = async (email: string, passwordPlain: string) => {
+  const login = async (email: string, passwordPlain: string, accountType?: "creator" | "business") => {
     try {
       const res = await fetch("/api/auth/login", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ email, password: passwordPlain }),
+        body: JSON.stringify({ email, password: passwordPlain, accountType }),
       });
       const data = await res.json();
       if (!res.ok || data.error) {

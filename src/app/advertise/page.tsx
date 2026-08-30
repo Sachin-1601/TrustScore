@@ -3,8 +3,7 @@
 import React, { useState } from "react";
 import { LandingNavbar } from "@/components/landing/LandingNavbar";
 import { LandingFooter } from "@/components/landing/LandingFooter";
-import { AdPlacementModal } from "@/components/marketplace/AdPlacementModal";
-import { MOCK_AD_PACKAGES } from "@/data/mockAdvertisements";
+import { AdPlacementModal, AD_PACKAGES } from "@/components/marketplace/AdPlacementModal";
 import {
   Sparkles,
   ShieldCheck,
@@ -102,7 +101,7 @@ export default function AdvertisePage() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-            {MOCK_AD_PACKAGES.map((pkg) => (
+            {AD_PACKAGES.map((pkg) => (
               <div
                 key={pkg.id}
                 className={`relative bg-slate-900/90 rounded-3xl p-6 sm:p-8 flex flex-col justify-between space-y-6 transition-all duration-200 ${
@@ -120,23 +119,23 @@ export default function AdvertisePage() {
                 <div className="space-y-4">
                   <div>
                     <h4 className="font-extrabold text-slate-100 text-lg">{pkg.name}</h4>
-                    <p className="text-xs text-slate-400 mt-1">{pkg.tagline}</p>
+                    <p className="text-xs text-slate-400 mt-1">{pkg.placement}</p>
                   </div>
 
                   <div className="flex items-baseline gap-1">
                     <span className="text-4xl font-black text-slate-100">${pkg.price}</span>
-                    <span className="text-xs text-slate-400 font-semibold">{pkg.billingPeriod}</span>
+                    <span className="text-xs text-slate-400 font-semibold">/ {pkg.duration}</span>
                   </div>
 
                   <div className="p-3 bg-slate-950 rounded-xl border border-slate-800 text-xs font-semibold text-blue-400">
-                    {pkg.placementSummary}
+                    {pkg.impressions}
                   </div>
 
-                  <ul className="space-y-2.5 text-xs text-slate-300 pt-2">
+                  <ul className="space-y-2.5 pt-2">
                     {pkg.features.map((feat) => (
-                      <li key={feat} className="flex items-start gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
-                        <span className="text-slate-300">{feat}</span>
+                      <li key={feat} className="flex items-center gap-2 text-xs text-slate-300">
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                        <span>{feat}</span>
                       </li>
                     ))}
                   </ul>
@@ -145,13 +144,14 @@ export default function AdvertisePage() {
                 <button
                   type="button"
                   onClick={() => handleOpenModal(pkg.id)}
-                  className={`w-full py-3 rounded-xl font-bold text-xs transition-all cursor-pointer ${
+                  className={`w-full py-3 rounded-xl font-bold text-xs transition-all flex items-center justify-center gap-2 cursor-pointer ${
                     pkg.popular
                       ? "bg-blue-600 hover:bg-blue-500 text-white shadow-md shadow-blue-600/30"
                       : "bg-slate-800 hover:bg-slate-700 text-slate-200"
                   }`}
                 >
-                  Choose {pkg.name}
+                  <span>Select {pkg.name.split(" ")[0]}</span>
+                  <ArrowRight className="w-4 h-4" />
                 </button>
               </div>
             ))}
