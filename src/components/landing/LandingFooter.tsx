@@ -12,7 +12,7 @@ export function LandingFooter() {
         <div className="grid grid-cols-2 md:grid-cols-5 gap-8 mb-12">
           {/* Brand Col */}
           <div className="col-span-2 space-y-4">
-            <Logo size="md" href="/" />
+            <Logo size="md" href="/" variant="light" />
             <p className="text-xs text-slate-400 max-w-sm leading-relaxed">
               &quot;Discover creators you can trust.&quot; The authentic creator marketplace powered by sample-efficient data science and probabilistic trust intelligence.
             </p>

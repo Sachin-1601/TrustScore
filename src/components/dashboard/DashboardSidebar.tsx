@@ -102,7 +102,7 @@ export function DashboardSidebar() {
         {/* Logo Bar */}
         <div className="h-16 px-4 flex items-center justify-between border-b border-slate-800">
           {!isCollapsed ? (
-            <Logo size="md" href={role === "CREATOR" ? "/dashboard/creator" : "/dashboard"} />
+            <Logo size="md" href={role === "CREATOR" ? "/dashboard/creator" : "/dashboard"} variant="light" />
           ) : (
             <div className="mx-auto">
               <div className="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold shadow-md shadow-blue-500/20">

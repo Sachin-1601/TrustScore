@@ -120,7 +120,7 @@ function SignupContent() {
               >
                 <div className="flex items-center gap-2 mb-1">
                   <UserCheck className={`w-4 h-4 ${accountType === "creator" ? "text-blue-600" : "text-slate-400"}`} />
-                  <span className="font-bold text-xs">I am a Creator / Influencer</span>
+                  <span className="font-bold text-xs">Creator / Influencer</span>
                 </div>
                 <span className="text-[10px] text-slate-500 leading-tight">
                   Verify authenticity, showcase TrustScore &amp; get brand deals
@@ -138,7 +138,7 @@ function SignupContent() {
               >
                 <div className="flex items-center gap-2 mb-1">
                   <Building2 className={`w-4 h-4 ${accountType === "business" ? "text-blue-600" : "text-slate-400"}`} />
-                  <span className="font-bold text-xs">I represent a Business</span>
+                  <span className="font-bold text-xs">Business</span>
                 </div>
                 <span className="text-[10px] text-slate-500 leading-tight">
                   Audit creators, prevent fake follower fraud &amp; run campaigns

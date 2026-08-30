@@ -3,31 +3,24 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { Logo } from "@/components/common/Logo";
-import { useAuth } from "@/contexts/AuthContext";
-import { ArrowRight, Menu, X, Sparkles, Building2, UserCheck, LayoutDashboard } from "lucide-react";
+import { Menu, X } from "lucide-react";
 
 export function LandingNavbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-  const { user, role, isAuthenticated } = useAuth();
 
   const navLinks = [
     { label: "Discover", href: "/creators" },
-    { label: "Leaderboard", href: "/leaderboard" },
     { label: "Pricing", href: "/pricing" },
     { label: "Businesses", href: "/businesses" },
-    { label: "Advertise", href: "/advertise", highlight: true },
-    { label: "For Businesses", href: "/for-businesses" },
-    { label: "For Creators", href: "/for-creators" },
+    { label: "Creators", href: "/for-creators" },
     { label: "How It Works", href: "/how-it-works" },
   ];
-
-  const dashboardHref = role === "CREATOR" ? "/dashboard/creator" : "/dashboard";
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-slate-800/90 bg-slate-950/90 backdrop-blur-md transition-all">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
         {/* Brand Logo */}
-        <Logo size="md" href="/" showTagline={false} />
+        <Logo size="md" href="/" showTagline={false} variant="light" showBadge={false} />
 
         {/* Desktop Navigation */}
         <nav className="hidden lg:flex items-center gap-1">
@@ -35,11 +28,7 @@ export function LandingNavbar() {
             <Link
               key={link.label}
               href={link.href}
-              className={`px-3 py-1.5 text-xs font-semibold rounded-lg transition-colors ${
-                link.highlight
-                  ? "text-amber-400 hover:text-amber-300 bg-amber-500/10 border border-amber-500/20"
-                  : "text-slate-300 hover:text-white hover:bg-slate-900"
-              }`}
+              className="px-3 py-1.5 text-xs font-semibold rounded-lg text-slate-300 hover:text-white hover:bg-slate-900 transition-colors"
             >
               {link.label}
             </Link>
@@ -48,31 +37,18 @@ export function LandingNavbar() {
 
         {/* Action Buttons */}
         <div className="hidden sm:flex items-center gap-3">
-          {isAuthenticated && user ? (
-            <Link
-              href={dashboardHref}
-              className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-500 active:bg-blue-700 rounded-xl shadow-md shadow-blue-600/30 transition-all group"
-            >
-              <LayoutDashboard className="w-3.5 h-3.5" />
-              <span>{role === "CREATOR" ? "Creator Hub" : "Dashboard"}</span>
-            </Link>
-          ) : (
-            <>
-              <Link
-                href="/login"
-                className="px-3.5 py-1.5 text-xs font-semibold text-slate-300 hover:text-white transition-colors"
-              >
-                Log in
-              </Link>
-              <Link
-                href="/creators"
-                className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-500 active:bg-blue-700 rounded-xl shadow-md shadow-blue-600/30 transition-all group"
-              >
-                <span>Find a Creator</span>
-                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-              </Link>
-            </>
-          )}
+          <Link
+            href="/login"
+            className="px-3.5 py-1.5 text-xs font-semibold text-slate-300 hover:text-white transition-colors"
+          >
+            Login
+          </Link>
+          <Link
+            href="/signup"
+            className="inline-flex items-center px-4 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-500 active:bg-blue-700 rounded-xl shadow-md shadow-blue-600/30 transition-all"
+          >
+            Sign up
+          </Link>
         </div>
 
         {/* Mobile menu button */}
@@ -101,32 +77,20 @@ export function LandingNavbar() {
             ))}
           </div>
           <div className="pt-3 border-t border-slate-800 flex flex-col gap-2">
-            {isAuthenticated && user ? (
-              <Link
-                href={dashboardHref}
-                onClick={() => setMobileMenuOpen(false)}
-                className="w-full text-center py-2.5 text-xs font-bold text-white bg-blue-600 rounded-xl shadow-sm"
-              >
-                {role === "CREATOR" ? "Creator Hub" : "Dashboard"}
-              </Link>
-            ) : (
-              <>
-                <Link
-                  href="/login"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-full text-center py-2.5 text-xs font-semibold text-slate-300 bg-slate-900 rounded-xl"
-                >
-                  Log in
-                </Link>
-                <Link
-                  href="/creators"
-                  onClick={() => setMobileMenuOpen(false)}
-                  className="w-full text-center py-2.5 text-xs font-bold text-white bg-blue-600 rounded-xl shadow-sm"
-                >
-                  Find a Creator
-                </Link>
-              </>
-            )}
+            <Link
+              href="/login"
+              onClick={() => setMobileMenuOpen(false)}
+              className="w-full text-center py-2.5 text-xs font-semibold text-slate-300 bg-slate-900 rounded-xl"
+            >
+              Login
+            </Link>
+            <Link
+              href="/signup"
+              onClick={() => setMobileMenuOpen(false)}
+              className="w-full text-center py-2.5 text-xs font-bold text-white bg-blue-600 rounded-xl shadow-sm"
+            >
+              Sign up
+            </Link>
           </div>
         </div>
       )}

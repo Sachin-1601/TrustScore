@@ -6,9 +6,11 @@ interface LogoProps {
   size?: "sm" | "md" | "lg";
   href?: string;
   showTagline?: boolean;
+  variant?: "light" | "dark";
+  showBadge?: boolean;
 }
 
-export function Logo({ className = "", size = "md", href = "/", showTagline = false }: LogoProps) {
+export function Logo({ className = "", size = "md", href = "/", showTagline = false, variant = "dark", showBadge = true }: LogoProps) {
   const iconSizes = {
     sm: "w-6 h-6",
     md: "w-8 h-8",
@@ -44,12 +46,14 @@ export function Logo({ className = "", size = "md", href = "/", showTagline = fa
 
       <div className="flex flex-col">
         <div className="flex items-center">
-          <span className={`font-bold tracking-tight text-slate-900 ${textSizes[size]}`}>
+          <span className={`font-bold tracking-tight ${variant === "light" ? "text-slate-100" : "text-slate-900"} ${textSizes[size]}`}>
             Trust<span className="text-blue-600">Score</span>
           </span>
-          <span className="ml-1.5 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200/80 rounded">
-            SaaS
-          </span>
+          {showBadge && (
+            <span className="ml-1.5 px-1.5 py-0.5 text-[10px] font-semibold uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200/80 rounded">
+              SaaS
+            </span>
+          )}
         </div>
         {showTagline && (
           <span className="text-[11px] font-medium text-slate-500 -mt-0.5">
