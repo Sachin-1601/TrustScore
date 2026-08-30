@@ -1,30 +1,44 @@
 "use client";
 
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
-import { MOCK_CREATORS } from "@/data/mockCreators";
+import { Creator } from "@/types/creator";
 import { PlatformIcon } from "@/components/common/PlatformIcon";
 import { VerificationBadge } from "@/components/common/VerificationBadge";
-import { RiskBadge } from "@/components/common/RiskBadge";
 import { CollaborationModal } from "@/components/marketplace/CollaborationModal";
 import { formatNumber } from "@/lib/utils";
 import {
   Bookmark,
   Trash2,
-  Send,
-  ArrowRight,
-  ExternalLink,
   Plus,
-  Search,
+  Loader2,
 } from "lucide-react";
 
 export default function SavedCreatorsPage() {
-  const [savedCreators, setSavedCreators] = useState(MOCK_CREATORS.slice(0, 4));
-  const [selectedCollabCreator, setSelectedCollabCreator] = useState<(typeof MOCK_CREATORS)[0] | null>(null);
+  const [savedCreators, setSavedCreators] = useState<Creator[]>([]);
+  const [selectedCollabCreator, setSelectedCollabCreator] = useState<Creator | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    async function loadSaved() {
+      try {
+        const res = await fetch("/api/creators?limit=4");
+        if (res.ok) {
+          const data = await res.json();
+          setSavedCreators(data.creators || []);
+        }
+      } catch {
+        // Error
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadSaved();
+  }, []);
 
   const handleRemove = (id: string) => {
-    setSavedCreators(savedCreators.filter((c) => c.id !== id));
+    setSavedCreators((prev) => prev.filter((c) => c.id !== id));
   };
 
   return (
@@ -52,8 +66,13 @@ export default function SavedCreatorsPage() {
           </Link>
         </div>
 
-        {savedCreators.length > 0 ? (
-          <div className="bg-slate-900/90 border border-slate-800 rounded-3xl overflow-hidden shadow-sm">
+        {isLoading ? (
+          <div className="py-20 flex flex-col items-center justify-center gap-3 text-slate-400">
+            <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
+            <span className="text-xs font-semibold">Loading saved creators...</span>
+          </div>
+        ) : savedCreators.length > 0 ? (
+          <div className="bg-slate-900/90 border border-slate-800 rounded-3xl overflow-hidden shadow-xs">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
                 <thead className="bg-slate-950/80 text-slate-400 font-bold uppercase tracking-wider text-[10px] border-b border-slate-800">
@@ -78,22 +97,24 @@ export default function SavedCreatorsPage() {
                             className="w-10 h-10 rounded-xl object-cover border border-slate-700"
                           />
                           <div>
-                            <div className="flex items-center gap-1">
+                            <div className="flex items-center gap-1.5">
                               <Link
                                 href={`/creators/${creator.id}`}
-                                className="font-bold text-slate-100 hover:text-blue-400"
+                                className="font-bold text-slate-100 hover:text-blue-400 transition-colors"
                               >
                                 {creator.username}
                               </Link>
                               {creator.verifiedBadge && <VerificationBadge size="sm" showText={false} />}
                             </div>
-                            <span className="text-[11px] text-slate-400">{creator.name} • {creator.location}</span>
+                            <span className="text-[11px] text-slate-400">{creator.name}</span>
                           </div>
                         </div>
                       </td>
 
-                      <td className="py-3.5 px-4 text-slate-300 font-medium">
-                        {creator.category}
+                      <td className="py-3.5 px-4 text-slate-300">
+                        <span className="px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 text-[11px]">
+                          {creator.category}
+                        </span>
                       </td>
 
                       <td className="py-3.5 px-4 text-right font-bold text-slate-200">
@@ -105,14 +126,12 @@ export default function SavedCreatorsPage() {
                       </td>
 
                       <td className="py-3.5 px-4 text-right">
-                        <div className="inline-flex items-baseline gap-1 px-2 py-0.5 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 font-bold text-xs">
-                          <span>{creator.trustScore}</span>
-                          <span className="text-[10px] text-slate-500">/100</span>
-                        </div>
+                        <span className="font-extrabold text-slate-100">{creator.trustScore}</span>
+                        <span className="text-[10px] text-slate-500">/100</span>
                       </td>
 
                       <td className="py-3.5 px-4 text-right font-bold text-emerald-400">
-                        ${creator.startingRate} USD
+                        ${creator.startingRate}
                       </td>
 
                       <td className="py-3.5 px-4 text-center">
@@ -120,21 +139,14 @@ export default function SavedCreatorsPage() {
                           <button
                             type="button"
                             onClick={() => setSelectedCollabCreator(creator)}
-                            className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-[11px] rounded-lg transition-colors cursor-pointer"
+                            className="px-2.5 py-1 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg text-[11px] cursor-pointer"
                           >
-                            Collaborate
+                            Collab
                           </button>
-                          <Link
-                            href={`/creators/${creator.id}`}
-                            className="p-1.5 text-slate-400 hover:text-slate-200"
-                            title="View Profile"
-                          >
-                            <ExternalLink className="w-4 h-4" />
-                          </Link>
                           <button
                             type="button"
                             onClick={() => handleRemove(creator.id)}
-                            className="p-1.5 text-slate-400 hover:text-rose-400 transition-colors cursor-pointer"
+                            className="p-1 text-slate-500 hover:text-rose-400 transition-colors cursor-pointer"
                             title="Remove from saved"
                           >
                             <Trash2 className="w-4 h-4" />
@@ -149,17 +161,8 @@ export default function SavedCreatorsPage() {
           </div>
         ) : (
           <div className="bg-slate-900/60 border border-slate-800 rounded-3xl p-12 text-center space-y-3">
-            <Bookmark className="w-10 h-10 text-slate-500 mx-auto" />
-            <h4 className="font-bold text-slate-200">No saved creators yet</h4>
-            <p className="text-xs text-slate-400">
-              Browse the creator discovery marketplace to shortlist authentic candidates.
-            </p>
-            <Link
-              href="/creators"
-              className="inline-block px-4 py-2 bg-blue-600 text-white font-bold text-xs rounded-xl"
-            >
-              Browse Creators
-            </Link>
+            <h3 className="text-base font-bold text-slate-200">You haven&apos;t saved any creators yet</h3>
+            <p className="text-xs text-slate-400">Bookmark creators from the marketplace to track their authenticity and invite them to campaigns.</p>
           </div>
         )}
       </div>

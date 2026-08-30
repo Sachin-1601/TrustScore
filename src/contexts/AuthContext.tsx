@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect } from "react";
+import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
 import { UserSession, UserRole } from "@/types/schema";
 
 interface SignupParams {
@@ -17,45 +17,42 @@ interface AuthContextType {
   user: UserSession | null;
   role: UserRole;
   isAuthenticated: boolean;
+  isLoading: boolean;
   login: (email: string, passwordPlain: string) => Promise<{ success: boolean; error?: string; session?: UserSession }>;
   signup: (data: SignupParams) => Promise<{ success: boolean; error?: string; session?: UserSession }>;
-  logout: () => void;
-  switchRole: (newRole: UserRole) => void;
+  logout: () => Promise<void>;
+  refreshSession: () => Promise<void>;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
 export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<UserSession | null>(() => {
-    if (typeof window !== "undefined") {
-      try {
-        const saved = localStorage.getItem("ts_session");
-        if (saved) return JSON.parse(saved);
-      } catch (e) {
-        // ignore JSON parse error
-      }
-    }
-    return {
-      id: "user-sarah-business",
-      email: "sarah@acmebrand.com",
-      name: "Sarah Jenkins",
-      role: "BUSINESS",
-      avatar: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&auto=format&fit=crop&q=80",
-      businessProfileId: "gymfuel",
-    };
-  });
+  const [user, setUser] = useState<UserSession | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const role: UserRole = user?.role || "BUSINESS";
+  const refreshSession = useCallback(async () => {
+    try {
+      const res = await fetch("/api/auth/me");
+      if (res.ok) {
+        const data = await res.json();
+        if (data.session) {
+          setUser(data.session);
+        } else {
+          setUser(null);
+        }
+      }
+    } catch {
+      // Offline or network failure
+    } finally {
+      setIsLoading(false);
+    }
+  }, []);
 
   useEffect(() => {
-    if (typeof window !== "undefined") {
-      if (user) {
-        localStorage.setItem("ts_session", JSON.stringify(user));
-      } else {
-        localStorage.removeItem("ts_session");
-      }
-    }
-  }, [user]);
+    refreshSession();
+  }, [refreshSession]);
+
+  const role: UserRole = user?.role || "BUSINESS";
 
   const login = async (email: string, passwordPlain: string) => {
     try {
@@ -101,30 +98,13 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const logout = () => {
-    setUser(null);
-    if (typeof window !== "undefined") {
-      localStorage.removeItem("ts_session");
+  const logout = async () => {
+    try {
+      await fetch("/api/auth/logout", { method: "POST" });
+    } catch {
+      // Ignore network error on logout
     }
-  };
-
-  const switchRole = (newRole: UserRole) => {
-    if (!user) return;
-    const updated: UserSession = {
-      ...user,
-      role: newRole,
-      name:
-        newRole === "CREATOR"
-          ? "Alex Rivera"
-          : newRole === "ADMIN"
-          ? "TrustScore Admin"
-          : newRole === "AGENCY"
-          ? "David Kim"
-          : "Sarah Jenkins",
-      creatorProfileId: newRole === "CREATOR" ? "alexfitness" : undefined,
-      businessProfileId: newRole === "BUSINESS" || newRole === "AGENCY" ? "gymfuel" : undefined,
-    };
-    setUser(updated);
+    setUser(null);
   };
 
   return (
@@ -133,10 +113,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         user,
         role,
         isAuthenticated: !!user,
+        isLoading,
         login,
         signup,
         logout,
-        switchRole,
+        refreshSession,
       }}
     >
       {children}

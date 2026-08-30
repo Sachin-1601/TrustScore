@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { AuthService } from "@/services/authService";
+import { setSessionCookie } from "@/lib/session";
 
 export async function POST(req: Request) {
   try {
@@ -15,7 +16,17 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: error || "Authentication failed" }, { status: 401 });
     }
 
-    return NextResponse.json({ session }, { status: 200 });
+    await setSessionCookie({
+      userId: session.id,
+      email: session.email,
+      name: session.name,
+      role: session.role as any,
+      avatar: session.avatar,
+      creatorProfileId: session.creatorProfileId,
+      businessProfileId: session.businessProfileId,
+    });
+
+    return NextResponse.json({ session, success: true }, { status: 200 });
   } catch (err: any) {
     return NextResponse.json({ error: err.message || "Internal server error" }, { status: 500 });
   }

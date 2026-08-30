@@ -1,22 +1,18 @@
 "use client";
 
-import React, { useState, use } from "react";
+import React, { useState, useEffect, use } from "react";
 import Link from "next/link";
 import { LandingNavbar } from "@/components/landing/LandingNavbar";
 import { LandingFooter } from "@/components/landing/LandingFooter";
-import { MOCK_BUSINESSES } from "@/data/mockBusinesses";
+import { Business } from "@/types/creator";
 import {
-  Building2,
   MapPin,
-  Globe,
-  Sparkles,
   Briefcase,
   Mail,
   Send,
   CheckCircle2,
-  ArrowRight,
   ExternalLink,
-  ShieldCheck,
+  Loader2,
 } from "lucide-react";
 
 export default function BusinessProfilePage({
@@ -27,20 +23,67 @@ export default function BusinessProfilePage({
   const resolvedParams = use(params);
   const slug = resolvedParams.business.toLowerCase();
 
-  const business = MOCK_BUSINESSES.find(
-    (b) => b.slug === slug || b.id === slug
-  ) || MOCK_BUSINESSES[0];
+  const [business, setBusiness] = useState<Business | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
   const [creatorPitch, setCreatorPitch] = useState("");
   const [creatorHandle, setCreatorHandle] = useState("");
   const [creatorEmail, setCreatorEmail] = useState("");
   const [isPitchSent, setIsPitchSent] = useState(false);
 
+  useEffect(() => {
+    async function loadBusiness() {
+      try {
+        const res = await fetch(`/api/businesses/${slug}`);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.business) {
+            setBusiness(data.business);
+          }
+        }
+      } catch {
+        // Fallback
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadBusiness();
+  }, [slug]);
+
   const handleSendPitch = (e: React.FormEvent) => {
     e.preventDefault();
     setIsPitchSent(true);
-    setTimeout(() => setIsPitchSent(false), 3000);
+    setTimeout(() => setIsPitchSent(false), 4000);
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen flex flex-col bg-[#090d16] text-slate-100">
+        <LandingNavbar />
+        <main className="flex-1 flex flex-col items-center justify-center py-20 text-slate-400 gap-3">
+          <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+          <span className="text-xs font-semibold">Loading brand profile...</span>
+        </main>
+        <LandingFooter />
+      </div>
+    );
+  }
+
+  if (!business) {
+    return (
+      <div className="min-h-screen flex flex-col bg-[#090d16] text-slate-100">
+        <LandingNavbar />
+        <main className="flex-1 max-w-7xl mx-auto w-full px-4 py-16 text-center space-y-4">
+          <h2 className="text-xl font-bold text-slate-200">Business Profile Not Found</h2>
+          <p className="text-xs text-slate-400">The requested business profile does not exist or has been modified.</p>
+          <Link href="/businesses" className="inline-block px-4 py-2 bg-blue-600 text-white font-bold text-xs rounded-xl">
+            Back to Business Directory
+          </Link>
+        </main>
+        <LandingFooter />
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex flex-col bg-[#090d16] text-slate-100 selection:bg-blue-600 selection:text-white">

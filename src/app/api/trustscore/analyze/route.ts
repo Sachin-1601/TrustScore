@@ -1,9 +1,13 @@
 import { NextResponse } from "next/server";
 import { TrustScoreEngine } from "@/services/trustScoreEngine";
 import { db } from "@/db/client";
+import { getServerSession } from "@/lib/session";
 
 export async function POST(req: Request) {
   try {
+    const session = await getServerSession();
+    const userId = session?.userId || "user-sarah-business";
+
     const body = await req.json();
     const {
       creatorId,
@@ -17,8 +21,7 @@ export async function POST(req: Request) {
       isVerified,
     } = body;
 
-    // 1. Quota Check (Simulated user ID)
-    const userId = "user-sarah-business";
+    // 1. Quota Check
     const quotaAllowed = await db.decrementCreatorCheckQuota(userId);
     if (!quotaAllowed) {
       return NextResponse.json(
@@ -28,7 +31,7 @@ export async function POST(req: Request) {
     }
 
     // 2. Fetch existing creator or build evaluation telemetry
-    let existingCreator = creatorId ? await db.findCreatorById(creatorId) : null;
+    const existingCreator = creatorId ? await db.findCreatorById(creatorId) : null;
 
     const evaluation = TrustScoreEngine.evaluate({
       followers: followers || existingCreator?.followers || 15000,

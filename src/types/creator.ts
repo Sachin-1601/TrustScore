@@ -98,6 +98,7 @@ export interface SponsoredAd {
   ctaLink: string;
   placement: 'left_sidebar' | 'right_sidebar' | 'banner' | 'feed';
   impressionsCount?: number;
+  clicksCount?: number;
 }
 
 export interface CollaborationRequest {

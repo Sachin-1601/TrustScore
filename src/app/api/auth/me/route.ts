@@ -1,20 +1,18 @@
 import { NextResponse } from "next/server";
-import { db } from "@/db/client";
+import { getServerSession } from "@/lib/session";
+import { AuthService } from "@/services/authService";
 
-export async function GET(req: Request) {
-  // In a cookie/session architecture, decode the JWT/Session ID from header
-  const user = await db.findUserById("user-sarah-business");
-  if (!user) {
-    return NextResponse.json({ session: null }, { status: 200 });
+export async function GET() {
+  try {
+    const session = await getServerSession();
+    if (!session) {
+      return NextResponse.json({ session: null }, { status: 200 });
+    }
+
+    // Refresh user state from database/service
+    const userSession = await AuthService.getUserById(session.userId);
+    return NextResponse.json({ session: userSession || session }, { status: 200 });
+  } catch (err: any) {
+    return NextResponse.json({ session: null, error: err.message }, { status: 500 });
   }
-
-  return NextResponse.json({
-    session: {
-      id: user.id,
-      email: user.email,
-      name: user.name,
-      role: user.role,
-      avatar: user.avatar,
-    },
-  });
 }

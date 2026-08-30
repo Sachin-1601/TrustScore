@@ -1,17 +1,17 @@
 import { NextResponse } from "next/server";
 import { CreatorService } from "@/services/creatorService";
-import { db } from "@/db/client";
+import { getServerSession } from "@/lib/session";
 
-export async function GET(req: Request) {
+export async function GET() {
   try {
-    const { searchParams } = new URL(req.url);
-    const userId = searchParams.get("userId") || "user-alex-creator";
+    const session = await getServerSession();
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
 
-    const creator = await CreatorService.getCreatorByUserId(userId);
+    const creator = await CreatorService.getCreatorByUserId(session.userId);
     if (!creator) {
-      // Return default alexfitness for seamless experience
-      const fallback = await CreatorService.getCreatorById("alexfitness");
-      return NextResponse.json({ creator: fallback });
+      return NextResponse.json({ creator: null, message: "Creator profile not initialized" });
     }
 
     return NextResponse.json({ creator });
@@ -22,11 +22,20 @@ export async function GET(req: Request) {
 
 export async function PATCH(req: Request) {
   try {
+    const session = await getServerSession();
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    if (session.role !== "CREATOR" && session.role !== "ADMIN") {
+      return NextResponse.json(
+        { error: "Forbidden: Only creators or admins can update a creator profile" },
+        { status: 403 }
+      );
+    }
+
     const body = await req.json();
     const {
-      userId = "user-alex-creator",
-      creatorId = "alexfitness",
-      role = "CREATOR",
       name,
       avatar,
       bio,
@@ -42,17 +51,12 @@ export async function PATCH(req: Request) {
       preferredCampaignTypes,
     } = body;
 
-    // Server-side role check
-    if (role !== "CREATOR" && role !== "ADMIN") {
-      return NextResponse.json(
-        { error: "Forbidden: Only creators or admins can update a creator profile" },
-        { status: 403 }
-      );
-    }
+    const existingCreator = await CreatorService.getCreatorByUserId(session.userId);
+    const targetCreatorId = existingCreator?.id || session.creatorProfileId || "me";
 
     const result = await CreatorService.updateCreatorProfile(
-      userId,
-      creatorId,
+      session.userId,
+      targetCreatorId,
       {
         name,
         avatar,
@@ -68,11 +72,11 @@ export async function PATCH(req: Request) {
         isAvailableForCollaboration,
         preferredCampaignTypes,
       },
-      role
+      session.role
     );
 
     if (!result.success || !result.creator) {
-      return NextResponse.json({ error: result.error || "Failed to update profile" }, { status: 400 });
+      return NextResponse.json({ error: result.error || "Update failed" }, { status: 400 });
     }
 
     return NextResponse.json({ creator: result.creator, success: true });

@@ -12,13 +12,32 @@ import {
   Send,
   Megaphone,
   CheckCircle2,
-  AlertTriangle,
-  FileText,
   Lock,
+  Loader2,
 } from "lucide-react";
 
 export default function AdminDashboardPage() {
-  const [telemetry, setTelemetry] = useState({
+  const [telemetry, setTelemetry] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
+
+  useEffect(() => {
+    async function loadMetrics() {
+      try {
+        const res = await fetch("/api/admin/metrics");
+        if (res.ok) {
+          const data = await res.json();
+          setTelemetry(data);
+        }
+      } catch {
+        // Error
+      } finally {
+        setIsLoading(false);
+      }
+    }
+    loadMetrics();
+  }, []);
+
+  const metrics = telemetry || {
     totalCreators: 20,
     verifiedCreators: 18,
     totalBusinesses: 10,
@@ -38,7 +57,7 @@ export default function AdminDashboardPage() {
       moderateRisk: 2,
       highRisk: 0,
     },
-  });
+  };
 
   return (
     <div className="min-h-screen flex flex-col bg-[#090d16] text-slate-100 selection:bg-blue-600 selection:text-white">
@@ -66,94 +85,106 @@ export default function AdminDashboardPage() {
           </div>
         </div>
 
-        {/* 4 Core Platform Volume KPIs */}
-        <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
-          <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 space-y-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Total Creators</span>
-            <p className="text-3xl font-black text-slate-100">{telemetry.totalCreators}</p>
-            <span className="text-[11px] text-emerald-400 font-semibold">{telemetry.verifiedCreators} Verified</span>
+        {isLoading ? (
+          <div className="py-20 flex flex-col items-center justify-center gap-3 text-slate-400">
+            <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
+            <span className="text-xs font-semibold">Loading platform telemetry...</span>
           </div>
-
-          <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 space-y-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Active Businesses</span>
-            <p className="text-3xl font-black text-slate-100">{telemetry.totalBusinesses}</p>
-            <span className="text-[11px] text-blue-400 font-semibold">10 Brand Partners</span>
-          </div>
-
-          <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 space-y-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Collaboration Pipeline</span>
-            <p className="text-3xl font-black text-slate-100">{telemetry.totalCollaborations}</p>
-            <span className="text-[11px] text-emerald-400 font-semibold">$18.4k volume</span>
-          </div>
-
-          <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 space-y-1">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Sponsored Ads</span>
-            <p className="text-3xl font-black text-amber-400">{telemetry.activeAdvertisements}</p>
-            <span className="text-[11px] text-slate-400">Strictly Isolated</span>
-          </div>
-        </div>
-
-        {/* TrustScore Model Observability Panel */}
-        <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-sm">
-          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 pb-4 border-b border-slate-800">
-            <div className="flex items-center gap-3">
-              <div className="w-10 h-10 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center">
-                <Cpu className="w-5 h-5" />
+        ) : (
+          <>
+            {/* 4 Core Platform Volume KPIs */}
+            <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
+              <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 space-y-1 shadow-xs">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Total Creators</span>
+                <p className="text-3xl font-black text-slate-100">{metrics.totalCreators}</p>
+                <span className="text-[11px] text-emerald-400 font-semibold">{metrics.verifiedCreators} Verified</span>
               </div>
-              <div>
-                <h3 className="font-bold text-slate-100 text-base">TrustScore Model Engine Telemetry</h3>
-                <p className="text-xs text-slate-400">Model Version: {telemetry.modelHealth.currentModelVersion} (Bayesian Shrinkage Architecture)</p>
+
+              <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 space-y-1 shadow-xs">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Active Businesses</span>
+                <p className="text-3xl font-black text-slate-100">{metrics.totalBusinesses}</p>
+                <span className="text-[11px] text-blue-400 font-semibold">Brand Partners</span>
+              </div>
+
+              <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 space-y-1 shadow-xs">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Collaborations</span>
+                <p className="text-3xl font-black text-slate-100">{metrics.totalCollaborations}</p>
+                <span className="text-[11px] text-purple-400 font-semibold">Active Agreements</span>
+              </div>
+
+              <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 space-y-1 shadow-xs">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Sponsored Ads</span>
+                <p className="text-3xl font-black text-slate-100">{metrics.activeAdvertisements}</p>
+                <span className="text-[11px] text-amber-400 font-semibold">Live Placements</span>
               </div>
             </div>
 
-            <span className="px-3 py-1 rounded-full text-xs font-bold bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-              Drift Status: {telemetry.modelHealth.driftStatus}
-            </span>
-          </div>
+            {/* Model Observability Panel */}
+            <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xs">
+              <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+                <div className="flex items-center gap-2.5">
+                  <Cpu className="w-5 h-5 text-blue-400" />
+                  <h3 className="text-base font-bold text-slate-100">
+                    TrustScore Engine Calibration Metrics ({metrics.modelHealth.currentModelVersion})
+                  </h3>
+                </div>
+                <span className="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  {metrics.modelHealth.driftStatus}
+                </span>
+              </div>
 
-          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
-            <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-1">
-              <span className="text-[10px] uppercase font-bold text-slate-500 block">Cross-Validation ROC-AUC</span>
-              <span className="text-2xl font-black text-blue-400">{telemetry.modelHealth.crossValidationRocAuc}</span>
-              <p className="text-[11px] text-slate-400">Discriminative power against synthetic injection benchmarks</p>
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
+                <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-1">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Cross-Validated ROC-AUC</span>
+                  <p className="text-2xl font-black text-emerald-400">{metrics.modelHealth.crossValidationRocAuc}</p>
+                  <p className="text-[10px] text-slate-400">Discriminative power against synthetic bot pods</p>
+                </div>
+
+                <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-1">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Brier Calibration Loss</span>
+                  <p className="text-2xl font-black text-blue-400">{metrics.modelHealth.brierCalibrationLoss}</p>
+                  <p className="text-[10px] text-slate-400">Mean squared probability error across sample cohort</p>
+                </div>
+
+                <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-1">
+                  <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">30-Day Evaluation Volume</span>
+                  <p className="text-2xl font-black text-slate-100">{metrics.modelHealth.predictionCount30d.toLocaleString()}</p>
+                  <p className="text-[10px] text-slate-400">Bayesian inferences computed</p>
+                </div>
+              </div>
             </div>
 
-            <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-1">
-              <span className="text-[10px] uppercase font-bold text-slate-500 block">Brier Calibration Loss</span>
-              <span className="text-2xl font-black text-emerald-400">{telemetry.modelHealth.brierCalibrationLoss}</span>
-              <p className="text-[11px] text-slate-400">Exceptional calibration probability alignment</p>
-            </div>
+            {/* Score Distribution Breakdown */}
+            <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-4 shadow-xs">
+              <h3 className="text-base font-bold text-slate-100 flex items-center gap-2">
+                <Activity className="w-5 h-5 text-indigo-400" />
+                <span>Marketplace Creator Score Distribution</span>
+              </h3>
 
-            <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-1">
-              <span className="text-[10px] uppercase font-bold text-slate-500 block">30-Day Evaluation Volume</span>
-              <span className="text-2xl font-black text-slate-100">{telemetry.modelHealth.predictionCount30d.toLocaleString()}</span>
-              <p className="text-[11px] text-slate-400">Automated Bayesian inferences processed</p>
-            </div>
-          </div>
-        </div>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-2">
+                <div className="p-4 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 space-y-1">
+                  <span className="text-[10px] font-bold uppercase text-emerald-400 block">Very High Trust (90+)</span>
+                  <p className="text-2xl font-black text-emerald-300">{metrics.scoreDistribution.veryHighTrust}</p>
+                </div>
 
-        {/* Score Distribution Breakdown */}
-        <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-4 shadow-sm">
-          <h3 className="font-bold text-slate-100 text-base">Creator Authenticity Score Distribution</h3>
-          <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 text-center text-xs">
-            <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-1">
-              <span className="text-blue-400 font-bold block">Very High Trust (90+)</span>
-              <span className="text-2xl font-black text-slate-100">{telemetry.scoreDistribution.veryHighTrust} creators</span>
+                <div className="p-4 rounded-2xl bg-blue-500/10 border border-blue-500/20 space-y-1">
+                  <span className="text-[10px] font-bold uppercase text-blue-400 block">High Trust (75–89)</span>
+                  <p className="text-2xl font-black text-blue-300">{metrics.scoreDistribution.highTrust}</p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/20 space-y-1">
+                  <span className="text-[10px] font-bold uppercase text-amber-400 block">Moderate Risk (50–74)</span>
+                  <p className="text-2xl font-black text-amber-300">{metrics.scoreDistribution.moderateRisk}</p>
+                </div>
+
+                <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 space-y-1">
+                  <span className="text-[10px] font-bold uppercase text-rose-400 block">High Risk (&lt;50)</span>
+                  <p className="text-2xl font-black text-rose-300">{metrics.scoreDistribution.highRisk}</p>
+                </div>
+              </div>
             </div>
-            <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-1">
-              <span className="text-emerald-400 font-bold block">High Trust (75–89)</span>
-              <span className="text-2xl font-black text-slate-100">{telemetry.scoreDistribution.highTrust} creators</span>
-            </div>
-            <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-1">
-              <span className="text-amber-400 font-bold block">Moderate Risk (50–74)</span>
-              <span className="text-2xl font-black text-slate-100">{telemetry.scoreDistribution.moderateRisk} creators</span>
-            </div>
-            <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-1">
-              <span className="text-rose-400 font-bold block">High Risk (&lt;50)</span>
-              <span className="text-2xl font-black text-slate-100">{telemetry.scoreDistribution.highRisk} creators</span>
-            </div>
-          </div>
-        </div>
+          </>
+        )}
       </main>
 
       <LandingFooter />

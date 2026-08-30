@@ -187,6 +187,10 @@ class DatabaseRepository {
     return creator;
   }
 
+  async createCreator(creator: Creator): Promise<Creator> {
+    return this.createCreatorProfile(creator);
+  }
+
   // ----------------------------------------------------
   // Business Operations
   // ----------------------------------------------------
@@ -197,6 +201,13 @@ class DatabaseRepository {
   async findBusinessBySlug(slug: string): Promise<Business | null> {
     const target = slug.toLowerCase();
     return this.businesses.find((b) => b.slug.toLowerCase() === target || b.id === target) || null;
+  }
+
+  async findBusinessByUserId(userId: string): Promise<Business | null> {
+    if (userId === "user-sarah-business") {
+      return this.findBusinessBySlug("gymfuel");
+    }
+    return this.businesses.find((b) => (b as any).userId === userId) || null;
   }
 
   async createBusiness(business: Business): Promise<Business> {
@@ -261,10 +272,17 @@ class DatabaseRepository {
     return ad;
   }
 
+  async recordAdImpression(adId: string): Promise<void> {
+    const ad = this.ads.find((a) => a.id === adId);
+    if (ad) {
+      ad.impressionsCount = (ad.impressionsCount || 0) + 1;
+    }
+  }
+
   async recordAdClick(adId: string): Promise<void> {
     const ad = this.ads.find((a) => a.id === adId);
-    if (ad && ad.impressionsCount) {
-      ad.impressionsCount++;
+    if (ad) {
+      ad.clicksCount = (ad.clicksCount || 0) + 1;
     }
   }
 

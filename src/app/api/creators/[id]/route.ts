@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { CreatorService } from "@/services/creatorService";
+import { getServerSession } from "@/lib/session";
 
 export async function GET(
   req: Request,
@@ -22,15 +23,20 @@ export async function PATCH(
   { params }: { params: Promise<{ id: string }> }
 ) {
   try {
+    const session = await getServerSession();
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const resolvedParams = await params;
     const body = await req.json();
-    const { userId = "user-alex-creator", role = "CREATOR", ...updates } = body;
+    const { userId, role, ...updates } = body;
 
     const result = await CreatorService.updateCreatorProfile(
-      userId,
+      session.userId,
       resolvedParams.id,
       updates,
-      role
+      session.role
     );
 
     if (!result.success || !result.creator) {

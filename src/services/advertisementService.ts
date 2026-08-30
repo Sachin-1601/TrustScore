@@ -4,7 +4,7 @@ import { MOCK_AD_PACKAGES } from "@/data/mockAdvertisements";
 
 export class AdvertisementService {
   /**
-   * Get packages
+   * Get advertising packages
    */
   public static getPackages(): AdPackage[] {
     return MOCK_AD_PACKAGES;
@@ -26,7 +26,7 @@ export class AdvertisementService {
 
   /**
    * Create a new sponsored advertisement placement
-   * Note: This is strictly commercial and has ZERO effect on creator TrustScore calculations.
+   * Note: Commercial advertising is strictly isolated from creator TrustScore calculations.
    */
   public static async createAdvertisement(data: {
     businessName: string;
@@ -37,8 +37,6 @@ export class AdvertisementService {
     packageId: "starter" | "growth" | "premium";
     placement: SponsoredAd["placement"];
   }): Promise<SponsoredAd> {
-    const pkg = MOCK_AD_PACKAGES.find((p) => p.id === data.packageId) || MOCK_AD_PACKAGES[0];
-
     const newAd: SponsoredAd = {
       id: `ad-${Date.now()}`,
       businessId: data.businessName.toLowerCase().replace(/\s+/g, "-"),
@@ -52,12 +50,23 @@ export class AdvertisementService {
       ctaLink: data.ctaLink.startsWith("http") ? data.ctaLink : `https://${data.ctaLink}`,
       placement: data.placement,
       impressionsCount: 0,
+      clicksCount: 0,
     };
 
     return db.createAdvertisement(newAd);
   }
 
-  public static async recordImpressionOrClick(adId: string): Promise<void> {
+  /**
+   * Track ad impression without altering click count
+   */
+  public static async recordImpression(adId: string): Promise<void> {
+    return db.recordAdImpression(adId);
+  }
+
+  /**
+   * Track ad click without altering impression count
+   */
+  public static async recordClick(adId: string): Promise<void> {
     return db.recordAdClick(adId);
   }
 }

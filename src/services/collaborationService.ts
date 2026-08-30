@@ -1,18 +1,82 @@
-import { db } from "@/db/client";
+import { prisma } from "@/lib/prisma";
+import { db, DBMessage } from "@/db/client";
 import { CollaborationRequest } from "@/types/creator";
-import { DBMessage } from "@/db/client";
 
 export class CollaborationService {
-  public static async getCollaborations(): Promise<CollaborationRequest[]> {
+  /**
+   * Get collaborations for the authenticated user or specific role
+   */
+  public static async getCollaborations(creatorId?: string, businessId?: string): Promise<CollaborationRequest[]> {
+    try {
+      const where: any = {};
+      if (creatorId) where.creatorId = creatorId;
+      if (businessId) where.businessId = businessId;
+
+      const collabs = await prisma.collaboration.findMany({
+        where,
+        include: {
+          creator: true,
+          business: true,
+        },
+        orderBy: { createdAt: "desc" },
+      });
+
+      if (collabs.length > 0) {
+        return collabs.map((c) => ({
+          id: c.id,
+          creatorId: c.creatorId,
+          creatorUsername: c.creator?.username || `@${c.creatorId}`,
+          creatorAvatar: c.creator?.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+          businessName: c.business?.name || "Verified Brand",
+          campaignName: c.campaignName,
+          campaignDescription: c.campaignDescription,
+          budget: c.budget,
+          deliverables: c.deliverables,
+          timeline: c.timeline,
+          contactEmail: c.contactEmail,
+          status: (c.status.charAt(0).toUpperCase() + c.status.slice(1).toLowerCase()) as any,
+          createdAt: c.createdAt.toISOString(),
+        }));
+      }
+    } catch {
+      // fallback to db
+    }
+
     return db.listCollaborations();
   }
 
   public static async getCollaborationById(id: string): Promise<CollaborationRequest | null> {
+    try {
+      const c = await prisma.collaboration.findUnique({
+        where: { id },
+        include: { creator: true, business: true },
+      });
+      if (c) {
+        return {
+          id: c.id,
+          creatorId: c.creatorId,
+          creatorUsername: c.creator?.username || `@${c.creatorId}`,
+          creatorAvatar: c.creator?.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=150&auto=format&fit=crop&q=80",
+          businessName: c.business?.name || "Verified Brand",
+          campaignName: c.campaignName,
+          campaignDescription: c.campaignDescription,
+          budget: c.budget,
+          deliverables: c.deliverables,
+          timeline: c.timeline,
+          contactEmail: c.contactEmail,
+          status: (c.status.charAt(0).toUpperCase() + c.status.slice(1).toLowerCase()) as any,
+          createdAt: c.createdAt.toISOString(),
+        };
+      }
+    } catch {
+      // fallback
+    }
     return db.findCollaborationById(id);
   }
 
   public static async createProposal(data: {
     creatorId: string;
+    businessId?: string;
     businessName: string;
     campaignName: string;
     campaignDescription: string;
@@ -20,6 +84,7 @@ export class CollaborationService {
     deliverables: string;
     timeline: string;
     contactEmail: string;
+    senderUserId?: string;
   }): Promise<CollaborationRequest> {
     const creator = await db.findCreatorById(data.creatorId);
 
@@ -41,14 +106,15 @@ export class CollaborationService {
 
     const saved = await db.createCollaboration(newCollab);
 
-    // Also trigger in-app notification
-    await db.createNotification({
-      userId: "user-sarah-business",
-      title: "Proposal Transmitted",
-      message: `Your collaboration offer for ${data.campaignName} was sent to ${newCollab.creatorUsername}.`,
-      type: "COLLABORATION",
-      link: "/dashboard/collaborations",
-    });
+    if (data.senderUserId) {
+      await db.createNotification({
+        userId: data.senderUserId,
+        title: "Proposal Transmitted",
+        message: `Your collaboration offer for ${data.campaignName} was sent to ${newCollab.creatorUsername}.`,
+        type: "COLLABORATION",
+        link: "/dashboard/collaborations",
+      });
+    }
 
     return saved;
   }

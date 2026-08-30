@@ -1,21 +1,18 @@
 "use client";
 
-import React, { useState, useMemo, Suspense } from "react";
+import React, { useState, useEffect, useCallback, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { LandingNavbar } from "@/components/landing/LandingNavbar";
 import { LandingFooter } from "@/components/landing/LandingFooter";
 import { CreatorMarketplaceCard } from "@/components/marketplace/CreatorMarketplaceCard";
-import { MOCK_CREATORS } from "@/data/mockCreators";
 import { Creator } from "@/types/creator";
 import {
   Search,
   SlidersHorizontal,
   Sparkles,
-  ShieldCheck,
-  Award,
-  Filter,
   CheckCircle2,
   X,
+  Loader2,
 } from "lucide-react";
 
 const CATEGORIES = [
@@ -44,64 +41,34 @@ function CreatorsMarketplaceContent() {
   const [verifiedOnly, setVerifiedOnly] = useState(false);
   const [sortBy, setSortBy] = useState<"trust" | "risk" | "engagement" | "followers" | "verified">("trust");
 
-  const categories = CATEGORIES;
+  const [creators, setCreators] = useState<Creator[]>([]);
+  const [totalCount, setTotalCount] = useState<number>(0);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const filteredCreators = useMemo(() => {
-    return MOCK_CREATORS.filter((creator) => {
-      // Search query
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
-        const matchesName = creator.name.toLowerCase().includes(q);
-        const matchesUsername = creator.username.toLowerCase().includes(q);
-        const matchesCategory = creator.category.toLowerCase().includes(q);
-        const matchesBio = creator.bio.toLowerCase().includes(q);
-        const matchesLocation = creator.location.toLowerCase().includes(q);
-        if (!matchesName && !matchesUsername && !matchesCategory && !matchesBio && !matchesLocation) {
-          return false;
-        }
+  const fetchCreators = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (searchQuery.trim()) params.set("query", searchQuery.trim());
+      if (selectedCategory && selectedCategory !== "all") params.set("category", selectedCategory);
+      if (selectedPlatform && selectedPlatform !== "all") params.set("platform", selectedPlatform);
+      if (minTrustScore > 0) params.set("minTrustScore", String(minTrustScore));
+      if (followerRange !== "all") params.set("followerRange", followerRange);
+      if (locationFilter !== "all") params.set("location", locationFilter);
+      if (verifiedOnly) params.set("verifiedOnly", "true");
+      if (sortBy) params.set("sortBy", sortBy);
+
+      const res = await fetch(`/api/creators?${params.toString()}`);
+      if (res.ok) {
+        const data = await res.json();
+        setCreators(data.creators || []);
+        setTotalCount(data.total || 0);
       }
-
-      // Category
-      if (selectedCategory !== "all" && creator.category.toLowerCase() !== selectedCategory.toLowerCase()) {
-        return false;
-      }
-
-      // Platform
-      if (selectedPlatform !== "all" && creator.platform !== selectedPlatform) {
-        return false;
-      }
-
-      // TrustScore minimum
-      if (minTrustScore > 0 && creator.trustScore < minTrustScore) {
-        return false;
-      }
-
-      // Follower range
-      if (followerRange === "nano" && (creator.followers < 1000 || creator.followers > 10000)) {
-        return false;
-      }
-      if (followerRange === "micro" && (creator.followers < 10000 || creator.followers > 50000)) {
-        return false;
-      }
-
-      // Location
-      if (locationFilter === "australia" && !creator.location.includes("Australia")) return false;
-      if (locationFilter === "usa" && !creator.location.includes(", ") && !creator.location.includes("USA")) return false;
-
-      // Verified only
-      if (verifiedOnly && !creator.verifiedBadge) {
-        return false;
-      }
-
-      return true;
-    }).sort((a, b) => {
-      if (sortBy === "trust") return b.trustScore - a.trustScore;
-      if (sortBy === "risk") return a.inflatedEngagementProbability - b.inflatedEngagementProbability;
-      if (sortBy === "engagement") return b.engagementRate - a.engagementRate;
-      if (sortBy === "followers") return b.followers - a.followers;
-      if (sortBy === "verified") return (b.verifiedBadge ? 1 : 0) - (a.verifiedBadge ? 1 : 0);
-      return 0;
-    });
+    } catch {
+      // Network error
+    } finally {
+      setIsLoading(false);
+    }
   }, [
     searchQuery,
     selectedCategory,
@@ -112,6 +79,13 @@ function CreatorsMarketplaceContent() {
     verifiedOnly,
     sortBy,
   ]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchCreators();
+    }, 200);
+    return () => clearTimeout(timer);
+  }, [fetchCreators]);
 
   const handleClearFilters = () => {
     setSearchQuery("");
@@ -164,7 +138,7 @@ function CreatorsMarketplaceContent() {
 
         {/* Category Pills Bar */}
         <div className="flex items-center gap-1.5 overflow-x-auto pb-1 max-w-full">
-          {categories.map((cat) => (
+          {CATEGORIES.map((cat) => (
             <button
               key={cat}
               type="button"
@@ -288,7 +262,7 @@ function CreatorsMarketplaceContent() {
       {/* Search Stats & Clear Filters */}
       <div className="flex items-center justify-between text-xs text-slate-400 px-1">
         <span>
-          Showing <strong className="text-slate-200">{filteredCreators.length}</strong> authentic creators
+          Showing <strong className="text-slate-200">{totalCount}</strong> authentic creators
         </span>
         {(searchQuery || selectedCategory !== "all" || selectedPlatform !== "all" || minTrustScore > 0 || followerRange !== "all" || verifiedOnly) && (
           <button
@@ -301,10 +275,15 @@ function CreatorsMarketplaceContent() {
         )}
       </div>
 
-      {/* Creator Marketplace Grid */}
-      {filteredCreators.length > 0 ? (
+      {/* Loading state or Creator Marketplace Grid */}
+      {isLoading ? (
+        <div className="py-20 flex flex-col items-center justify-center gap-3 text-slate-400">
+          <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
+          <span className="text-xs font-semibold">Loading authentic creators from database...</span>
+        </div>
+      ) : creators.length > 0 ? (
         <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-5">
-          {filteredCreators.map((creator) => (
+          {creators.map((creator) => (
             <CreatorMarketplaceCard key={creator.id} creator={creator} />
           ))}
         </div>
@@ -320,7 +299,7 @@ function CreatorsMarketplaceContent() {
           </p>
           <button
             onClick={handleClearFilters}
-            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl"
+            className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold text-xs rounded-xl cursor-pointer"
           >
             Clear Filters
           </button>

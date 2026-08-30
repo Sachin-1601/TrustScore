@@ -1,22 +1,27 @@
 "use client";
 
-import React, { useState, useMemo } from "react";
-import Link from "next/link";
+import React, { useState, useEffect, useCallback } from "react";
 import { LandingNavbar } from "@/components/landing/LandingNavbar";
 import { LandingFooter } from "@/components/landing/LandingFooter";
 import { BusinessCard } from "@/components/marketplace/BusinessCard";
 import { AdPlacementModal } from "@/components/marketplace/AdPlacementModal";
-import { MOCK_BUSINESSES } from "@/data/mockBusinesses";
+import { Business } from "@/types/creator";
 import {
   Building2,
   Search,
-  Sparkles,
-  Filter,
-  Briefcase,
-  ArrowRight,
-  ShieldCheck,
   Plus,
+  Loader2,
 } from "lucide-react";
+
+const CATEGORIES = [
+  "all",
+  "Fitness & Nutrition",
+  "Fashion & Apparel",
+  "Technology & Creator Tools",
+  "Beauty & Wellness",
+  "Travel & Outdoor Gear",
+  "Food & Culinary",
+];
 
 export default function BusinessesPage() {
   const [searchQuery, setSearchQuery] = useState("");
@@ -24,37 +29,38 @@ export default function BusinessesPage() {
   const [sponsoredOnly, setSponsoredOnly] = useState(false);
   const [isAdModalOpen, setIsAdModalOpen] = useState(false);
 
-  const categories = [
-    "all",
-    "Fitness & Nutrition",
-    "Fashion & Apparel",
-    "Technology & Creator Tools",
-    "Beauty & Wellness",
-    "Travel & Outdoor Gear",
-    "Food & Culinary",
-  ];
+  const [businesses, setBusinesses] = useState<Business[]>([]);
+  const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  const filteredBusinesses = useMemo(() => {
-    return MOCK_BUSINESSES.filter((b) => {
-      if (searchQuery.trim()) {
-        const q = searchQuery.toLowerCase();
-        const matchesName = b.name.toLowerCase().includes(q);
-        const matchesDesc = b.description.toLowerCase().includes(q);
-        const matchesCategory = b.category.toLowerCase().includes(q);
-        if (!matchesName && !matchesDesc && !matchesCategory) return false;
+  const fetchBusinesses = useCallback(async () => {
+    setIsLoading(true);
+    try {
+      const params = new URLSearchParams();
+      if (searchQuery.trim()) params.set("query", searchQuery.trim());
+      if (selectedCategory && selectedCategory !== "all") params.set("category", selectedCategory);
+
+      const res = await fetch(`/api/businesses?${params.toString()}`);
+      if (res.ok) {
+        const data = await res.json();
+        let list: Business[] = data.businesses || [];
+        if (sponsoredOnly) {
+          list = list.filter((b) => b.isSponsored);
+        }
+        setBusinesses(list);
       }
-
-      if (selectedCategory !== "all" && b.category !== selectedCategory) {
-        return false;
-      }
-
-      if (sponsoredOnly && !b.isSponsored) {
-        return false;
-      }
-
-      return true;
-    });
+    } catch {
+      // Network error
+    } finally {
+      setIsLoading(false);
+    }
   }, [searchQuery, selectedCategory, sponsoredOnly]);
+
+  useEffect(() => {
+    const timer = setTimeout(() => {
+      fetchBusinesses();
+    }, 200);
+    return () => clearTimeout(timer);
+  }, [fetchBusinesses]);
 
   return (
     <div className="min-h-screen flex flex-col bg-[#090d16] text-slate-100 selection:bg-blue-600 selection:text-white">
@@ -100,49 +106,77 @@ export default function BusinessesPage() {
               <Search className="w-4 h-4 text-slate-400 absolute left-3.5 top-3 pointer-events-none" />
             </div>
 
-            <button
-              type="button"
-              onClick={() => setSponsoredOnly(!sponsoredOnly)}
-              className={`px-3.5 py-3 rounded-xl border text-xs font-bold whitespace-nowrap transition-colors cursor-pointer flex items-center gap-1.5 w-full sm:w-auto justify-center ${
-                sponsoredOnly
-                  ? "bg-amber-500/15 border-amber-500/40 text-amber-400"
-                  : "bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200"
-              }`}
-            >
-              <Sparkles className="w-3.5 h-3.5" />
-              <span>Sponsored Only</span>
-            </button>
-          </div>
+            <div className="flex items-center gap-2 w-full sm:w-auto">
+              <select
+                value={selectedCategory}
+                onChange={(e) => setSelectedCategory(e.target.value)}
+                className="w-full sm:w-auto px-3 py-3 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 text-xs font-semibold focus:outline-hidden"
+              >
+                {CATEGORIES.map((cat) => (
+                  <option key={cat} value={cat}>
+                    {cat === "all" ? "All Categories" : cat}
+                  </option>
+                ))}
+              </select>
 
-          {/* Category Filter Pills */}
-          <div className="flex items-center gap-1.5 overflow-x-auto pb-1 max-w-full">
-            {categories.map((cat) => (
               <button
-                key={cat}
                 type="button"
-                onClick={() => setSelectedCategory(cat)}
-                className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
-                  selectedCategory === cat
-                    ? "bg-blue-600 text-white font-bold shadow-xs"
-                    : "bg-slate-950 text-slate-400 hover:text-slate-200 border border-slate-800"
+                onClick={() => setSponsoredOnly(!sponsoredOnly)}
+                className={`px-3 py-3 rounded-xl border text-xs font-bold whitespace-nowrap transition-colors cursor-pointer ${
+                  sponsoredOnly
+                    ? "bg-amber-500/20 text-amber-300 border-amber-500/40"
+                    : "bg-slate-950 text-slate-400 border-slate-800 hover:text-slate-200"
                 }`}
               >
-                {cat === "all" ? "All Categories" : cat}
+                Featured Brands
               </button>
-            ))}
+            </div>
           </div>
         </div>
 
-        {/* Business Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-          {filteredBusinesses.map((b) => (
-            <BusinessCard key={b.id} business={b} />
-          ))}
+        {/* Results Counter */}
+        <div className="text-xs text-slate-400 px-1 flex items-center justify-between">
+          <span>
+            Showing <strong className="text-slate-200">{businesses.length}</strong> active businesses
+          </span>
+          {(searchQuery || selectedCategory !== "all" || sponsoredOnly) && (
+            <button
+              type="button"
+              onClick={() => {
+                setSearchQuery("");
+                setSelectedCategory("all");
+                setSponsoredOnly(false);
+              }}
+              className="text-blue-400 hover:text-blue-300 font-semibold cursor-pointer"
+            >
+              Reset filters
+            </button>
+          )}
         </div>
+
+        {/* Loading or Business Directory Grid */}
+        {isLoading ? (
+          <div className="py-20 flex flex-col items-center justify-center gap-3 text-slate-400">
+            <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
+            <span className="text-xs font-semibold">Loading verified brand directory...</span>
+          </div>
+        ) : businesses.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+            {businesses.map((business) => (
+              <BusinessCard key={business.id} business={business} />
+            ))}
+          </div>
+        ) : (
+          <div className="bg-slate-900/60 border border-slate-800 rounded-3xl p-12 text-center space-y-3">
+            <h3 className="text-base font-bold text-slate-200">No businesses match your search</h3>
+            <p className="text-xs text-slate-400">Try searching for different terms or reset your category filters.</p>
+          </div>
+        )}
       </main>
 
       <LandingFooter />
 
+      {/* Ad Placement / Business Listing Modal */}
       <AdPlacementModal
         isOpen={isAdModalOpen}
         onClose={() => setIsAdModalOpen(false)}
