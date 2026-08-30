@@ -45,7 +45,7 @@ export function DashboardSidebar() {
   const pathname = usePathname();
   const router = useRouter();
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const { user, role, switchRole, logout } = useAuth();
+  const { user, role, logout } = useAuth();
 
   const handleLogout = () => {
     logout();
@@ -88,7 +88,7 @@ export function DashboardSidebar() {
   }
 
   const secondaryNav = [
-    { label: "Settings & API", href: "/dashboard/settings", icon: Settings },
+    { label: role === "CREATOR" ? "Settings" : "Settings & API", href: "/dashboard/settings", icon: Settings },
   ];
 
   return (
@@ -119,66 +119,6 @@ export function DashboardSidebar() {
             {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
           </button>
         </div>
-
-        {/* Role Switcher Pills (for simulation/testing) */}
-        {!isCollapsed && (
-          <div className="px-3 pt-2 pb-1">
-            <div className="flex items-center justify-between text-[10px] uppercase font-bold text-slate-500 pb-1">
-              <span>Active Role:</span>
-              <span className="text-blue-400 font-extrabold">{role}</span>
-            </div>
-            <div className="grid grid-cols-4 gap-1 p-1 bg-slate-950 rounded-xl border border-slate-800 text-[10px] text-center font-bold">
-              <button
-                type="button"
-                onClick={() => {
-                  switchRole("BUSINESS");
-                  router.push("/dashboard");
-                }}
-                className={`py-1 rounded-lg cursor-pointer transition-colors ${
-                  role === "BUSINESS" ? "bg-blue-600 text-white" : "text-slate-400 hover:text-slate-200"
-                }`}
-              >
-                Brand
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  switchRole("CREATOR");
-                  router.push("/dashboard/creator");
-                }}
-                className={`py-1 rounded-lg cursor-pointer transition-colors ${
-                  role === "CREATOR" ? "bg-emerald-600 text-white" : "text-slate-400 hover:text-slate-200"
-                }`}
-              >
-                Creator
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  switchRole("AGENCY");
-                  router.push("/dashboard");
-                }}
-                className={`py-1 rounded-lg cursor-pointer transition-colors ${
-                  role === "AGENCY" ? "bg-purple-600 text-white" : "text-slate-400 hover:text-slate-200"
-                }`}
-              >
-                Agency
-              </button>
-              <button
-                type="button"
-                onClick={() => {
-                  switchRole("ADMIN");
-                  router.push("/admin");
-                }}
-                className={`py-1 rounded-lg cursor-pointer transition-colors ${
-                  role === "ADMIN" ? "bg-rose-600 text-white" : "text-slate-400 hover:text-slate-200"
-                }`}
-              >
-                Admin
-              </button>
-            </div>
-          </div>
-        )}
 
         {/* Main Navigation List */}
         <nav className="px-3 py-2 space-y-1 overflow-y-auto max-h-[calc(100vh-280px)]">

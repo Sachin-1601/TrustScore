@@ -32,27 +32,18 @@ function SignupContent() {
   );
 
   // Form fields
-  const [name, setName] = useState(isCreatorInitial ? "Alex Rivera" : "Sarah Jenkins");
-  const [handleOrCompany, setHandleOrCompany] = useState(isCreatorInitial ? "@alexfitness" : "Acme Brand Co");
+  const [name, setName] = useState("");
+  const [handleOrCompany, setHandleOrCompany] = useState("");
   const [category, setCategory] = useState("Fitness");
   const [platform, setPlatform] = useState<"instagram" | "tiktok" | "youtube">("instagram");
-  const [email, setEmail] = useState(isCreatorInitial ? "alex@fitness.example.com" : "sarah@acmebrand.com");
-  const [password, setPassword] = useState("password123!");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSelectAccountType = (type: AccountType) => {
     setAccountType(type);
     setErrorMessage(null);
-    if (type === "creator") {
-      setName("Alex Rivera");
-      setHandleOrCompany("@alexfitness");
-      setEmail("alex@fitness.example.com");
-    } else {
-      setName("Sarah Jenkins");
-      setHandleOrCompany("Acme Brand Co");
-      setEmail("sarah@acmebrand.com");
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -112,37 +103,27 @@ function SignupContent() {
               <button
                 type="button"
                 onClick={() => handleSelectAccountType("creator")}
-                className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
+                className={`py-3 px-4 rounded-2xl border text-center transition-all cursor-pointer flex items-center justify-center gap-2 font-bold text-xs sm:text-sm ${
                   accountType === "creator"
                     ? "bg-blue-50/90 border-blue-600 ring-2 ring-blue-600/20 text-blue-900 shadow-xs"
-                    : "bg-slate-50/60 border-slate-200 text-slate-600 hover:bg-slate-50"
+                    : "bg-slate-50/60 border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-slate-900"
                 }`}
               >
-                <div className="flex items-center gap-2 mb-1">
-                  <UserCheck className={`w-4 h-4 ${accountType === "creator" ? "text-blue-600" : "text-slate-400"}`} />
-                  <span className="font-bold text-xs">Creator / Influencer</span>
-                </div>
-                <span className="text-[10px] text-slate-500 leading-tight">
-                  Verify authenticity, showcase TrustScore &amp; get brand deals
-                </span>
+                <UserCheck className={`w-4 h-4 shrink-0 ${accountType === "creator" ? "text-blue-600" : "text-slate-400"}`} />
+                <span>Creator</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleSelectAccountType("business")}
-                className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
+                className={`py-3 px-4 rounded-2xl border text-center transition-all cursor-pointer flex items-center justify-center gap-2 font-bold text-xs sm:text-sm ${
                   accountType === "business"
                     ? "bg-blue-50/90 border-blue-600 ring-2 ring-blue-600/20 text-blue-900 shadow-xs"
-                    : "bg-slate-50/60 border-slate-200 text-slate-600 hover:bg-slate-50"
+                    : "bg-slate-50/60 border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-slate-900"
                 }`}
               >
-                <div className="flex items-center gap-2 mb-1">
-                  <Building2 className={`w-4 h-4 ${accountType === "business" ? "text-blue-600" : "text-slate-400"}`} />
-                  <span className="font-bold text-xs">Business</span>
-                </div>
-                <span className="text-[10px] text-slate-500 leading-tight">
-                  Audit creators, prevent fake follower fraud &amp; run campaigns
-                </span>
+                <Building2 className={`w-4 h-4 shrink-0 ${accountType === "business" ? "text-blue-600" : "text-slate-400"}`} />
+                <span>Business</span>
               </button>
             </div>
           </div>
@@ -165,7 +146,8 @@ function SignupContent() {
                     type="text"
                     value={name}
                     onChange={(e) => setName(e.target.value)}
-                    className="w-full px-3.5 py-2.5 pl-9 rounded-xl border border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-blue-600 text-sm font-medium"
+                    placeholder={accountType === "creator" ? "e.g. Alex Rivera" : "e.g. Sarah Jenkins"}
+                    className="w-full px-3.5 py-2.5 pl-9 rounded-xl border border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-blue-600 text-sm font-medium text-slate-900 bg-white placeholder:text-slate-400"
                     required
                   />
                   <User className="w-4 h-4 text-slate-400 absolute left-3 top-3.5 pointer-events-none" />
@@ -181,8 +163,8 @@ function SignupContent() {
                     type="text"
                     value={handleOrCompany}
                     onChange={(e) => setHandleOrCompany(e.target.value)}
-                    placeholder={accountType === "creator" ? "@username" : "Acme Corp"}
-                    className="w-full px-3.5 py-2.5 pl-9 rounded-xl border border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-blue-600 text-sm font-medium"
+                    placeholder={accountType === "creator" ? "@username" : "Acme Brand Co"}
+                    className="w-full px-3.5 py-2.5 pl-9 rounded-xl border border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-blue-600 text-sm font-medium text-slate-900 bg-white placeholder:text-slate-400"
                     required
                   />
                   {accountType === "creator" ? (
@@ -202,7 +184,7 @@ function SignupContent() {
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-blue-600 text-sm font-medium bg-white"
+                  className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-blue-600 text-sm font-medium text-slate-900 bg-white"
                 >
                   <option value="Fitness">Fitness &amp; Health</option>
                   <option value="Beauty">Beauty &amp; Skincare</option>
@@ -223,7 +205,7 @@ function SignupContent() {
                   <select
                     value={platform}
                     onChange={(e) => setPlatform(e.target.value as any)}
-                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-blue-600 text-sm font-medium bg-white"
+                    className="w-full px-3.5 py-2.5 rounded-xl border border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-blue-600 text-sm font-medium text-slate-900 bg-white"
                   >
                     <option value="instagram">Instagram</option>
                     <option value="tiktok">TikTok</option>
@@ -240,7 +222,8 @@ function SignupContent() {
                       type="email"
                       value={email}
                       onChange={(e) => setEmail(e.target.value)}
-                      className="w-full px-3.5 py-2.5 pl-9 rounded-xl border border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-blue-600 text-sm font-medium"
+                      placeholder="sarah@acmebrand.com"
+                      className="w-full px-3.5 py-2.5 pl-9 rounded-xl border border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-blue-600 text-sm font-medium text-slate-900 bg-white placeholder:text-slate-400"
                       required
                     />
                     <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3.5 pointer-events-none" />
@@ -259,7 +242,8 @@ function SignupContent() {
                     type="email"
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
-                    className="w-full px-3.5 py-2.5 pl-9 rounded-xl border border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-blue-600 text-sm font-medium"
+                    placeholder="alex@fitness.example.com"
+                    className="w-full px-3.5 py-2.5 pl-9 rounded-xl border border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-blue-600 text-sm font-medium text-slate-900 bg-white placeholder:text-slate-400"
                     required
                   />
                   <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3.5 pointer-events-none" />
@@ -276,7 +260,8 @@ function SignupContent() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-3.5 py-2.5 pl-9 rounded-xl border border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-blue-600 text-sm font-medium"
+                  placeholder="••••••••••••"
+                  className="w-full px-3.5 py-2.5 pl-9 rounded-xl border border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-blue-600 text-sm font-medium text-slate-900 bg-white placeholder:text-slate-400"
                   required
                 />
                 <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3.5 pointer-events-none" />

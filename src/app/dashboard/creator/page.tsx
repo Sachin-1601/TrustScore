@@ -2,7 +2,6 @@
 
 import React, { useState, useEffect } from "react";
 import Link from "next/link";
-import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { ScoreGauge } from "@/components/common/ScoreGauge";
 import { VerificationBadge } from "@/components/common/VerificationBadge";
 import { useAuth } from "@/contexts/AuthContext";
@@ -149,11 +148,6 @@ export default function CreatorDashboardPage() {
 
   return (
     <div className="min-h-full flex flex-col bg-slate-950 text-slate-100">
-      <DashboardHeader
-        title="Creator Dashboard & Authenticity Dossier"
-        subtitle="Manage your public marketplace presence, incoming brand proposals, and TrustScore telemetry"
-      />
-
       <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-8">
         {/* Creator Hero Banner */}
         <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 relative overflow-hidden shadow-xl">

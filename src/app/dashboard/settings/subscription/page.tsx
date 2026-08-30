@@ -5,20 +5,20 @@ import { useAuth } from "@/contexts/AuthContext";
 import { CreatorSettingsView } from "@/components/dashboard/CreatorSettingsView";
 import { BusinessSettingsView } from "@/components/dashboard/BusinessSettingsView";
 
-function SettingsContent() {
+function SubscriptionContent() {
   const { role } = useAuth();
 
   if (role === "CREATOR") {
-    return <CreatorSettingsView />;
+    return <CreatorSettingsView initialSection="subscription" />;
   }
 
   return <BusinessSettingsView />;
 }
 
-export default function SettingsPage() {
+export default function SubscriptionSettingsPage() {
   return (
-    <Suspense fallback={<div className="p-8 text-center text-xs text-slate-400">Loading settings...</div>}>
-      <SettingsContent />
+    <Suspense fallback={<div className="p-8 text-center text-xs text-slate-400">Loading subscription settings...</div>}>
+      <SubscriptionContent />
     </Suspense>
   );
 }

@@ -211,9 +211,12 @@ export class CreatorService {
     creatorId: string,
     updates: {
       name?: string;
+      avatar?: string;
       bio?: string;
       category?: string;
       location?: string;
+      country?: string;
+      platform?: "instagram" | "tiktok" | "youtube";
       website?: string;
       startingRate?: number;
       availabilityStatus?: "OPEN_TO_WORK" | "AVAILABLE_FOR_COLLABORATION" | "NOT_AVAILABLE";
@@ -241,9 +244,12 @@ export class CreatorService {
     // Whitelist allowed creator-editable fields (cannot touch TrustScore metrics)
     const cleanUpdates: Partial<Creator> = {};
     if (typeof updates.name === "string" && updates.name.trim()) cleanUpdates.name = updates.name.trim();
+    if (typeof updates.avatar === "string" && updates.avatar.trim()) cleanUpdates.avatar = updates.avatar.trim();
     if (typeof updates.bio === "string") cleanUpdates.bio = updates.bio.trim();
     if (typeof updates.category === "string") cleanUpdates.category = updates.category as any;
     if (typeof updates.location === "string") cleanUpdates.location = updates.location.trim();
+    if (typeof updates.country === "string") cleanUpdates.country = updates.country.trim();
+    if (typeof updates.platform === "string") cleanUpdates.platform = updates.platform;
     if (typeof updates.website === "string") cleanUpdates.website = updates.website.trim();
     if (typeof updates.startingRate === "number") cleanUpdates.startingRate = Math.max(0, updates.startingRate);
     if (updates.availabilityStatus) cleanUpdates.availabilityStatus = updates.availabilityStatus;

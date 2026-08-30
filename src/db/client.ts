@@ -72,6 +72,32 @@ class DatabaseRepository {
       currentPeriodEnd: "2026-09-28T00:00:00Z",
     },
   };
+  private creatorSubscriptions: Record<string, import("@/types/subscription").CreatorSubscriptionInfo> = {
+    "user-alex-creator": {
+      id: "sub-creator-alex",
+      userId: "user-alex-creator",
+      plan: "PRO",
+      priceMonthly: 9.99,
+      status: "ACTIVE",
+      currentPeriodStart: "2026-08-01T00:00:00Z",
+      currentPeriodEnd: "2026-09-01T00:00:00Z",
+      cancelAtPeriodEnd: false,
+      usage: {
+        trustScoreChecks: {
+          used: 12,
+          limit: 25,
+        },
+        profileViews: {
+          used: 84,
+          limit: 1000,
+        },
+        socialConnections: {
+          used: 2,
+          limit: 3,
+        },
+      },
+    },
+  };
   private notifications: DBNotification[] = [
     {
       id: "notif-1",
@@ -258,6 +284,57 @@ class DatabaseRepository {
       };
     }
     return this.subscriptions[userId];
+  }
+
+  async getCreatorSubscription(userId: string): Promise<import("@/types/subscription").CreatorSubscriptionInfo> {
+    if (!this.creatorSubscriptions[userId]) {
+      this.creatorSubscriptions[userId] = {
+        id: `sub-creator-${Date.now()}`,
+        userId,
+        plan: "PRO",
+        priceMonthly: 9.99,
+        status: "ACTIVE",
+        currentPeriodStart: new Date().toISOString(),
+        currentPeriodEnd: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString(),
+        cancelAtPeriodEnd: false,
+        usage: {
+          trustScoreChecks: {
+            used: 12,
+            limit: 25,
+          },
+          profileViews: {
+            used: 84,
+            limit: 1000,
+          },
+          socialConnections: {
+            used: 2,
+            limit: 3,
+          },
+        },
+      };
+    }
+    return this.creatorSubscriptions[userId];
+  }
+
+  async updateCreatorSubscription(
+    userId: string,
+    plan: import("@/types/subscription").CreatorPlanType
+  ): Promise<import("@/types/subscription").CreatorSubscriptionInfo> {
+    const sub = await this.getCreatorSubscription(userId);
+    sub.plan = plan;
+    sub.priceMonthly = plan === "FREE" ? 0 : plan === "PRO" ? 9.99 : 19.99;
+    sub.status = "ACTIVE";
+    if (plan === "FREE") {
+      sub.usage.trustScoreChecks.limit = 5;
+      sub.usage.socialConnections.limit = 1;
+    } else if (plan === "PRO") {
+      sub.usage.trustScoreChecks.limit = 25;
+      sub.usage.socialConnections.limit = 3;
+    } else if (plan === "VERIFIED") {
+      sub.usage.trustScoreChecks.limit = 100;
+      sub.usage.socialConnections.limit = 10;
+    }
+    return sub;
   }
 
   async decrementCreatorCheckQuota(userId: string): Promise<boolean> {

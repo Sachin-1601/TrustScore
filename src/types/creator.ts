@@ -10,6 +10,7 @@ export interface Creator {
   category: Category;
   bio: string;
   location: string;
+  country?: string;
   joinedDate: string;
   verifiedBadge: boolean;
   verifiedDate?: string;

@@ -99,37 +99,27 @@ function LoginContent() {
               <button
                 type="button"
                 onClick={() => handleSelectAccountType("creator")}
-                className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
+                className={`py-3 px-4 rounded-2xl border text-center transition-all cursor-pointer flex items-center justify-center gap-2 font-bold text-xs sm:text-sm ${
                   accountType === "creator"
                     ? "bg-blue-50/90 border-blue-600 ring-2 ring-blue-600/20 text-blue-900 shadow-xs"
-                    : "bg-slate-50/60 border-slate-200 text-slate-600 hover:bg-slate-50"
+                    : "bg-slate-50/60 border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-slate-900"
                 }`}
               >
-                <div className="flex items-center gap-2 mb-1">
-                  <UserCheck className={`w-4 h-4 ${accountType === "creator" ? "text-blue-600" : "text-slate-400"}`} />
-                  <span className="font-bold text-xs">Creator / Influencer</span>
-                </div>
-                <span className="text-[10px] text-slate-500 leading-tight">
-                  For creators &amp; talent
-                </span>
+                <UserCheck className={`w-4 h-4 shrink-0 ${accountType === "creator" ? "text-blue-600" : "text-slate-400"}`} />
+                <span>Creator</span>
               </button>
 
               <button
                 type="button"
                 onClick={() => handleSelectAccountType("business")}
-                className={`p-3.5 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
+                className={`py-3 px-4 rounded-2xl border text-center transition-all cursor-pointer flex items-center justify-center gap-2 font-bold text-xs sm:text-sm ${
                   accountType === "business"
                     ? "bg-blue-50/90 border-blue-600 ring-2 ring-blue-600/20 text-blue-900 shadow-xs"
-                    : "bg-slate-50/60 border-slate-200 text-slate-600 hover:bg-slate-50"
+                    : "bg-slate-50/60 border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-slate-900"
                 }`}
               >
-                <div className="flex items-center gap-2 mb-1">
-                  <Building2 className={`w-4 h-4 ${accountType === "business" ? "text-blue-600" : "text-slate-400"}`} />
-                  <span className="font-bold text-xs">Business</span>
-                </div>
-                <span className="text-[10px] text-slate-500 leading-tight">
-                  For brands &amp; agencies
-                </span>
+                <Building2 className={`w-4 h-4 shrink-0 ${accountType === "business" ? "text-blue-600" : "text-slate-400"}`} />
+                <span>Business</span>
               </button>
             </div>
           </div>
@@ -180,7 +170,8 @@ function LoginContent() {
                   type="email"
                   value={email}
                   onChange={(e) => setEmail(e.target.value)}
-                  className="w-full px-4 py-2.5 pl-10 rounded-xl border border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-blue-600 text-sm font-medium"
+                  placeholder={accountType === "creator" ? "alex@fitness.example.com" : "sarah@acmebrand.com"}
+                  className="w-full px-4 py-2.5 pl-10 rounded-xl border border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-blue-600 text-sm font-medium text-slate-900 bg-white placeholder:text-slate-400"
                   required
                 />
                 <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5 pointer-events-none" />
@@ -201,7 +192,8 @@ function LoginContent() {
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
-                  className="w-full px-4 py-2.5 pl-10 rounded-xl border border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-blue-600 text-sm font-medium"
+                  placeholder="••••••••••••"
+                  className="w-full px-4 py-2.5 pl-10 rounded-xl border border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-blue-600 text-sm font-medium text-slate-900 bg-white placeholder:text-slate-400"
                   required
                 />
                 <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5 pointer-events-none" />
