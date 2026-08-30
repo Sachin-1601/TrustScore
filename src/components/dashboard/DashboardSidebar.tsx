@@ -2,7 +2,7 @@
 
 import React, { useState } from "react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { Logo } from "@/components/common/Logo";
 import { useAuth } from "@/contexts/AuthContext";
 import {
@@ -28,14 +28,42 @@ import {
   MessageSquare,
   UserCheck,
   Lock,
+  Tag,
+  ShieldCheck,
+  BarChart3,
 } from "lucide-react";
+
+interface NavItem {
+  label: string;
+  href: string;
+  icon: any;
+  highlight?: boolean;
+  badge?: string;
+}
 
 export function DashboardSidebar() {
   const pathname = usePathname();
+  const router = useRouter();
   const [isCollapsed, setIsCollapsed] = useState(false);
-  const { user, role, switchRole } = useAuth();
+  const { user, role, switchRole, logout } = useAuth();
 
-  const mainNav = [
+  const handleLogout = () => {
+    logout();
+    router.push("/login");
+  };
+
+  // Dedicated Creator Navigation
+  const creatorNav: NavItem[] = [
+    { label: "Overview", href: "/dashboard/creator", icon: LayoutDashboard },
+    { label: "Profile & Tags", href: "/dashboard/creator/profile", icon: UserCheck },
+    { label: "TrustScore & Analytics", href: "/dashboard/creator/analytics", icon: Sparkles },
+    { label: "Verification", href: "/dashboard/creator/verification", icon: ShieldCheck },
+    { label: "Collaborations", href: "/dashboard/collaborations", icon: Send },
+    { label: "Messages", href: "/dashboard/messages", icon: MessageSquare },
+  ];
+
+  // Dedicated Business / Brand / Agency Navigation
+  const businessNav: NavItem[] = [
     { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
     { label: "Discover Creators", href: "/creators", icon: Users },
     { label: "Saved Creators", href: "/dashboard/saved", icon: Bookmark },
@@ -43,14 +71,21 @@ export function DashboardSidebar() {
     { label: "Messages", href: "/dashboard/messages", icon: MessageSquare },
     { label: "Active Campaigns", href: "/dashboard/campaigns", icon: Briefcase },
     { label: "Billing & Quotas", href: "/dashboard/billing", icon: CreditCard },
-    { label: "Creator View", href: "/dashboard/creator", icon: UserCheck },
     { label: "Advertise On Platform", href: "/dashboard/advertise", icon: Megaphone, highlight: true },
     { label: "Analyze Creator", href: "/dashboard/analyze", icon: Search },
     { label: "Comparisons", href: "/dashboard/compare", icon: Scale },
     { label: "Reports", href: "/dashboard/reports", icon: FileText },
     { label: "Model Insights", href: "/dashboard/model-insights", icon: Cpu, badge: "Prototype" },
-    { label: "Admin Console", href: "/admin", icon: Lock },
   ];
+
+  // Pick active nav based on role
+  let mainNav: NavItem[] = role === "CREATOR" ? creatorNav : businessNav;
+  if (role === "ADMIN") {
+    mainNav = [
+      ...businessNav,
+      { label: "Admin Console", href: "/admin", icon: Lock },
+    ];
+  }
 
   const secondaryNav = [
     { label: "Settings & API", href: "/dashboard/settings", icon: Settings },
@@ -67,7 +102,7 @@ export function DashboardSidebar() {
         {/* Logo Bar */}
         <div className="h-16 px-4 flex items-center justify-between border-b border-slate-800">
           {!isCollapsed ? (
-            <Logo size="md" href="/dashboard" />
+            <Logo size="md" href={role === "CREATOR" ? "/dashboard/creator" : "/dashboard"} />
           ) : (
             <div className="mx-auto">
               <div className="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold shadow-md shadow-blue-500/20">
@@ -85,17 +120,20 @@ export function DashboardSidebar() {
           </button>
         </div>
 
-        {/* Role Switcher Pills (for demoing SaaS roles) */}
+        {/* Role Switcher Pills (for simulation/testing) */}
         {!isCollapsed && (
           <div className="px-3 pt-2 pb-1">
             <div className="flex items-center justify-between text-[10px] uppercase font-bold text-slate-500 pb-1">
-              <span>Simulate Role:</span>
+              <span>Active Role:</span>
               <span className="text-blue-400 font-extrabold">{role}</span>
             </div>
             <div className="grid grid-cols-4 gap-1 p-1 bg-slate-950 rounded-xl border border-slate-800 text-[10px] text-center font-bold">
               <button
                 type="button"
-                onClick={() => switchRole("BUSINESS")}
+                onClick={() => {
+                  switchRole("BUSINESS");
+                  router.push("/dashboard");
+                }}
                 className={`py-1 rounded-lg cursor-pointer transition-colors ${
                   role === "BUSINESS" ? "bg-blue-600 text-white" : "text-slate-400 hover:text-slate-200"
                 }`}
@@ -104,7 +142,10 @@ export function DashboardSidebar() {
               </button>
               <button
                 type="button"
-                onClick={() => switchRole("CREATOR")}
+                onClick={() => {
+                  switchRole("CREATOR");
+                  router.push("/dashboard/creator");
+                }}
                 className={`py-1 rounded-lg cursor-pointer transition-colors ${
                   role === "CREATOR" ? "bg-emerald-600 text-white" : "text-slate-400 hover:text-slate-200"
                 }`}
@@ -113,7 +154,10 @@ export function DashboardSidebar() {
               </button>
               <button
                 type="button"
-                onClick={() => switchRole("AGENCY")}
+                onClick={() => {
+                  switchRole("AGENCY");
+                  router.push("/dashboard");
+                }}
                 className={`py-1 rounded-lg cursor-pointer transition-colors ${
                   role === "AGENCY" ? "bg-purple-600 text-white" : "text-slate-400 hover:text-slate-200"
                 }`}
@@ -122,7 +166,10 @@ export function DashboardSidebar() {
               </button>
               <button
                 type="button"
-                onClick={() => switchRole("ADMIN")}
+                onClick={() => {
+                  switchRole("ADMIN");
+                  router.push("/admin");
+                }}
                 className={`py-1 rounded-lg cursor-pointer transition-colors ${
                   role === "ADMIN" ? "bg-rose-600 text-white" : "text-slate-400 hover:text-slate-200"
                 }`}
@@ -137,7 +184,7 @@ export function DashboardSidebar() {
         <nav className="px-3 py-2 space-y-1 overflow-y-auto max-h-[calc(100vh-280px)]">
           {mainNav.map((item) => {
             const Icon = item.icon;
-            const isActive = pathname === item.href || (item.href !== "/dashboard" && pathname.startsWith(item.href));
+            const isActive = pathname === item.href || (item.href !== "/dashboard" && item.href !== "/dashboard/creator" && pathname.startsWith(item.href));
             return (
               <Link
                 key={item.label}
@@ -188,7 +235,7 @@ export function DashboardSidebar() {
           );
         })}
 
-        {/* User Card */}
+        {/* User Card & Logout */}
         <div className={`pt-2 flex items-center gap-3 px-2 ${isCollapsed ? "justify-center" : ""}`}>
           <img
             src={user?.avatar || "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80"}
@@ -198,17 +245,18 @@ export function DashboardSidebar() {
           {!isCollapsed && (
             <div className="flex-1 min-w-0">
               <p className="text-xs font-bold text-slate-100 truncate">{user?.name || "Sarah Jenkins"}</p>
-              <p className="text-[11px] text-slate-400 truncate">{role} Tier</p>
+              <p className="text-[11px] text-slate-400 truncate capitalize">{role.toLowerCase()} Account</p>
             </div>
           )}
           {!isCollapsed && (
-            <Link
-              href="/login"
-              className="text-slate-400 hover:text-slate-200 p-1 rounded transition-colors"
+            <button
+              type="button"
+              onClick={handleLogout}
+              className="text-slate-400 hover:text-rose-400 p-1 rounded transition-colors cursor-pointer"
               title="Sign out"
             >
               <LogOut className="w-4 h-4" />
-            </Link>
+            </button>
           )}
         </div>
       </div>

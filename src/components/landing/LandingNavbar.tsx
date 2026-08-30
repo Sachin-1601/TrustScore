@@ -3,10 +3,12 @@
 import React, { useState } from "react";
 import Link from "next/link";
 import { Logo } from "@/components/common/Logo";
-import { ArrowRight, Menu, X, Sparkles, Building2, UserCheck } from "lucide-react";
+import { useAuth } from "@/contexts/AuthContext";
+import { ArrowRight, Menu, X, Sparkles, Building2, UserCheck, LayoutDashboard } from "lucide-react";
 
 export function LandingNavbar() {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { user, role, isAuthenticated } = useAuth();
 
   const navLinks = [
     { label: "Discover", href: "/creators" },
@@ -18,6 +20,8 @@ export function LandingNavbar() {
     { label: "For Creators", href: "/for-creators" },
     { label: "How It Works", href: "/how-it-works" },
   ];
+
+  const dashboardHref = role === "CREATOR" ? "/dashboard/creator" : "/dashboard";
 
   return (
     <header className="sticky top-0 z-40 w-full border-b border-slate-800/90 bg-slate-950/90 backdrop-blur-md transition-all">
@@ -44,19 +48,31 @@ export function LandingNavbar() {
 
         {/* Action Buttons */}
         <div className="hidden sm:flex items-center gap-3">
-          <Link
-            href="/login"
-            className="px-3.5 py-1.5 text-xs font-semibold text-slate-300 hover:text-white transition-colors"
-          >
-            Log in
-          </Link>
-          <Link
-            href="/creators"
-            className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-500 active:bg-blue-700 rounded-xl shadow-md shadow-blue-600/30 transition-all group"
-          >
-            <span>Find a Creator</span>
-            <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
-          </Link>
+          {isAuthenticated && user ? (
+            <Link
+              href={dashboardHref}
+              className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-500 active:bg-blue-700 rounded-xl shadow-md shadow-blue-600/30 transition-all group"
+            >
+              <LayoutDashboard className="w-3.5 h-3.5" />
+              <span>{role === "CREATOR" ? "Creator Hub" : "Dashboard"}</span>
+            </Link>
+          ) : (
+            <>
+              <Link
+                href="/login"
+                className="px-3.5 py-1.5 text-xs font-semibold text-slate-300 hover:text-white transition-colors"
+              >
+                Log in
+              </Link>
+              <Link
+                href="/creators"
+                className="inline-flex items-center gap-1.5 px-4 py-2 text-xs font-bold text-white bg-blue-600 hover:bg-blue-500 active:bg-blue-700 rounded-xl shadow-md shadow-blue-600/30 transition-all group"
+              >
+                <span>Find a Creator</span>
+                <ArrowRight className="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform" />
+              </Link>
+            </>
+          )}
         </div>
 
         {/* Mobile menu button */}
@@ -85,20 +101,32 @@ export function LandingNavbar() {
             ))}
           </div>
           <div className="pt-3 border-t border-slate-800 flex flex-col gap-2">
-            <Link
-              href="/login"
-              onClick={() => setMobileMenuOpen(false)}
-              className="w-full text-center py-2.5 text-xs font-semibold text-slate-300 bg-slate-900 rounded-xl"
-            >
-              Log in
-            </Link>
-            <Link
-              href="/creators"
-              onClick={() => setMobileMenuOpen(false)}
-              className="w-full text-center py-2.5 text-xs font-bold text-white bg-blue-600 rounded-xl shadow-sm"
-            >
-              Find a Creator
-            </Link>
+            {isAuthenticated && user ? (
+              <Link
+                href={dashboardHref}
+                onClick={() => setMobileMenuOpen(false)}
+                className="w-full text-center py-2.5 text-xs font-bold text-white bg-blue-600 rounded-xl shadow-sm"
+              >
+                {role === "CREATOR" ? "Creator Hub" : "Dashboard"}
+              </Link>
+            ) : (
+              <>
+                <Link
+                  href="/login"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full text-center py-2.5 text-xs font-semibold text-slate-300 bg-slate-900 rounded-xl"
+                >
+                  Log in
+                </Link>
+                <Link
+                  href="/creators"
+                  onClick={() => setMobileMenuOpen(false)}
+                  className="w-full text-center py-2.5 text-xs font-bold text-white bg-blue-600 rounded-xl shadow-sm"
+                >
+                  Find a Creator
+                </Link>
+              </>
+            )}
           </div>
         </div>
       )}

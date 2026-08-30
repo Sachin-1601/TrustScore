@@ -35,7 +35,14 @@ function BillingContent() {
   const planParam = searchParams.get("plan") as "starter" | "growth" | "agency" | null;
   const billingParam = searchParams.get("billing");
 
-  const [currentPlanId, setCurrentPlanId] = useState<"starter" | "growth" | "agency">("growth");
+  const [currentPlanId, setCurrentPlanId] = useState<"starter" | "growth" | "agency">(() => {
+    if (planParam && ["starter", "growth", "agency"].includes(planParam)) return planParam;
+    if (typeof window !== "undefined") {
+      const savedPlan = localStorage.getItem("ts_active_plan") as "starter" | "growth" | "agency" | null;
+      if (savedPlan && ["starter", "growth", "agency"].includes(savedPlan)) return savedPlan;
+    }
+    return "growth";
+  });
   const [isAnnual, setIsAnnual] = useState(billingParam === "annual");
   const [bonusChecks, setBonusChecks] = useState(0);
   const [checksUsed, setChecksUsed] = useState(13);
@@ -50,19 +57,6 @@ function BillingContent() {
   const checksLimit = activePlan.creatorChecksMonthly + bonusChecks;
   const checksRemaining = Math.max(0, checksLimit - checksUsed);
   const usagePercentage = Math.min(100, Math.round((checksUsed / checksLimit) * 100));
-
-  // Initialize from URL or localStorage
-  useEffect(() => {
-    if (typeof window !== "undefined") {
-      const savedPlan = localStorage.getItem("ts_active_plan") as "starter" | "growth" | "agency" | null;
-      if (planParam && ["starter", "growth", "agency"].includes(planParam)) {
-        setCurrentPlanId(planParam);
-        localStorage.setItem("ts_active_plan", planParam);
-      } else if (savedPlan && ["starter", "growth", "agency"].includes(savedPlan)) {
-        setCurrentPlanId(savedPlan);
-      }
-    }
-  }, [planParam]);
 
   const handleUpgrade = async (plan: SaaSSubscriptionPlan) => {
     setIsProcessing(true);

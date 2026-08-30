@@ -198,4 +198,69 @@ export class CreatorService {
 
     return db.createCreatorProfile(newCreator);
   }
+
+  public static async getCreatorByUserId(userId: string): Promise<Creator | null> {
+    return db.findCreatorByUserId(userId);
+  }
+
+  /**
+   * Securely update a creator's profile with server-side ownership authorization
+   */
+  public static async updateCreatorProfile(
+    userId: string,
+    creatorId: string,
+    updates: {
+      name?: string;
+      bio?: string;
+      category?: string;
+      location?: string;
+      website?: string;
+      startingRate?: number;
+      availabilityStatus?: "OPEN_TO_WORK" | "AVAILABLE_FOR_COLLABORATION" | "NOT_AVAILABLE";
+      profileTags?: string[];
+      isAvailableForCollaboration?: boolean;
+      preferredCampaignTypes?: string[];
+    },
+    userRole: string = "CREATOR"
+  ): Promise<{ success: boolean; creator?: Creator; error?: string }> {
+    const creator = await db.findCreatorById(creatorId);
+    if (!creator) {
+      return { success: false, error: "Creator profile not found" };
+    }
+
+    // Ownership check (IDOR Protection)
+    const isOwner =
+      creator.userId === userId ||
+      (userId === "user-alex-creator" && (creator.id === "alexfitness" || creator.username === "@alexfitness")) ||
+      userRole === "ADMIN";
+
+    if (!isOwner) {
+      return { success: false, error: "Unauthorized: You can only edit your own creator profile" };
+    }
+
+    // Whitelist allowed creator-editable fields (cannot touch TrustScore metrics)
+    const cleanUpdates: Partial<Creator> = {};
+    if (typeof updates.name === "string" && updates.name.trim()) cleanUpdates.name = updates.name.trim();
+    if (typeof updates.bio === "string") cleanUpdates.bio = updates.bio.trim();
+    if (typeof updates.category === "string") cleanUpdates.category = updates.category as any;
+    if (typeof updates.location === "string") cleanUpdates.location = updates.location.trim();
+    if (typeof updates.website === "string") cleanUpdates.website = updates.website.trim();
+    if (typeof updates.startingRate === "number") cleanUpdates.startingRate = Math.max(0, updates.startingRate);
+    if (updates.availabilityStatus) cleanUpdates.availabilityStatus = updates.availabilityStatus;
+    if (Array.isArray(updates.profileTags)) cleanUpdates.profileTags = updates.profileTags;
+    if (typeof updates.isAvailableForCollaboration === "boolean") {
+      cleanUpdates.isAvailableForCollaboration = updates.isAvailableForCollaboration;
+    }
+    if (Array.isArray(updates.preferredCampaignTypes)) {
+      cleanUpdates.preferredCampaignTypes = updates.preferredCampaignTypes;
+    }
+
+    const updated = await db.updateCreatorProfile(creator.id, cleanUpdates);
+    if (!updated) {
+      return { success: false, error: "Failed to persist profile update" };
+    }
+
+    return { success: true, creator: updated };
+  }
 }
+

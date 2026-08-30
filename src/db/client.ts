@@ -126,6 +126,24 @@ class DatabaseRepository {
     return creator;
   }
 
+  async findCreatorByUserId(userId: string): Promise<Creator | null> {
+    const creator = this.creators.find((c) => c.userId === userId);
+    if (creator) return creator;
+    // Default fallback mapping for demo seed account
+    if (userId === "user-alex-creator") {
+      return this.findCreatorById("alexfitness");
+    }
+    return null;
+  }
+
+  async updateCreatorProfile(idOrUsername: string, updates: Partial<Creator>): Promise<Creator | null> {
+    const creator = await this.findCreatorById(idOrUsername);
+    if (!creator) return null;
+
+    Object.assign(creator, updates);
+    return creator;
+  }
+
   async updateCreatorTrustScore(creatorId: string, evaluation: TrustScoreEvaluation): Promise<Creator | null> {
     const creator = await this.findCreatorById(creatorId);
     if (!creator) return null;

@@ -105,6 +105,25 @@ export function CreatorMarketplaceCard({
               </span>
             </div>
           </div>
+
+          {/* Profile Tags */}
+          {creator.profileTags && creator.profileTags.length > 0 && (
+            <div className="flex flex-wrap gap-1 mb-3">
+              {creator.profileTags.slice(0, 2).map((tag) => (
+                <span
+                  key={tag}
+                  className="px-2 py-0.5 rounded-md bg-slate-950 border border-slate-800 text-[10px] font-semibold text-slate-300 truncate max-w-[150px]"
+                >
+                  {tag}
+                </span>
+              ))}
+              {creator.profileTags.length > 2 && (
+                <span className="px-1.5 py-0.5 rounded-md bg-slate-950 border border-slate-800 text-[10px] text-slate-500">
+                  +{creator.profileTags.length - 2}
+                </span>
+              )}
+            </div>
+          )}
         </div>
 
         {/* Action Buttons */}

@@ -18,6 +18,18 @@ import {
   X,
 } from "lucide-react";
 
+const CATEGORIES = [
+  "all",
+  "Fitness",
+  "Beauty",
+  "Fashion",
+  "Travel",
+  "Food",
+  "Technology",
+  "Gaming",
+  "Lifestyle",
+];
+
 function CreatorsMarketplaceContent() {
   const searchParams = useSearchParams();
   const initialQuery = searchParams.get("q") || "";
@@ -32,17 +44,7 @@ function CreatorsMarketplaceContent() {
   const [verifiedOnly, setVerifiedOnly] = useState(false);
   const [sortBy, setSortBy] = useState<"trust" | "risk" | "engagement" | "followers" | "verified">("trust");
 
-  const categories = [
-    "all",
-    "Fitness",
-    "Beauty",
-    "Fashion",
-    "Travel",
-    "Food",
-    "Technology",
-    "Gaming",
-    "Lifestyle",
-  ];
+  const categories = CATEGORIES;
 
   const filteredCreators = useMemo(() => {
     return MOCK_CREATORS.filter((creator) => {

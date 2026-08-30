@@ -142,6 +142,39 @@ function CreatorProfileView({ creator }: { creator: (typeof MOCK_CREATORS)[0] })
                 <p className="text-xs sm:text-sm text-slate-300/90 max-w-xl leading-relaxed pt-1">
                   {creator.bio}
                 </p>
+
+                {/* Availability Status & Profile Tags */}
+                <div className="flex flex-wrap items-center gap-2 pt-2">
+                  <span
+                    className={`inline-flex items-center gap-1.5 px-2.5 py-0.5 rounded-lg text-xs font-bold border ${
+                      creator.availabilityStatus === "NOT_AVAILABLE"
+                        ? "bg-rose-500/10 text-rose-400 border-rose-500/20"
+                        : "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
+                    }`}
+                  >
+                    <span className="w-1.5 h-1.5 rounded-full bg-current" />
+                    <span>
+                      {creator.availabilityStatus === "NOT_AVAILABLE"
+                        ? "Not Currently Available"
+                        : creator.availabilityStatus === "AVAILABLE_FOR_COLLABORATION"
+                        ? "Available for Collaboration"
+                        : "Open to Work"}
+                    </span>
+                  </span>
+
+                  {creator.profileTags && creator.profileTags.length > 0 && (
+                    <div className="flex flex-wrap gap-1.5">
+                      {creator.profileTags.map((tag) => (
+                        <span
+                          key={tag}
+                          className="px-2.5 py-0.5 rounded-lg bg-slate-900 border border-slate-800 text-[11px] font-semibold text-blue-300"
+                        >
+                          {tag}
+                        </span>
+                      ))}
+                    </div>
+                  )}
+                </div>
               </div>
             </div>
 

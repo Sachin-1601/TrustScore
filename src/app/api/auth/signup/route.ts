@@ -4,7 +4,7 @@ import { AuthService } from "@/services/authService";
 export async function POST(req: Request) {
   try {
     const body = await req.json();
-    const { email, password, name, role } = body;
+    const { email, password, name, role, handleOrCompany, category, platform } = body;
 
     if (!email || !password || !name) {
       return NextResponse.json({ error: "Missing required signup fields" }, { status: 400 });
@@ -15,6 +15,9 @@ export async function POST(req: Request) {
       passwordPlain: password,
       name,
       role: role || "BUSINESS",
+      handleOrCompany,
+      category,
+      platform,
     });
 
     if (error || !session) {

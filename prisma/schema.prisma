@@ -134,6 +134,9 @@ model CreatorProfile {
   engagementRate        Float               @default(0.0)
   startingRate          Int                 @default(300)
   isAvailable           Boolean             @default(true)
+  availabilityStatus    String              @default("OPEN_TO_WORK")
+  profileTags           String[]            @default(["Open to Work", "Available for Collaboration", "Open to Brand Deals"])
+  website               String?
   verifiedBadge         Boolean             @default(false)
   verifiedAt            DateTime?
   dataCoverage          DataCoverage        @default(GOOD)

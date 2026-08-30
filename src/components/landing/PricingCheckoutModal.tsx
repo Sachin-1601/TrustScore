@@ -41,11 +41,7 @@ export function PricingCheckoutModal({
   const [isProcessing, setIsProcessing] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
 
-  // Sync state if default changes
-  React.useEffect(() => {
-    setSelectedPlanId(defaultPlanId);
-    setIsAnnual(defaultIsAnnual);
-  }, [defaultPlanId, defaultIsAnnual]);
+  // Initial state setup
 
   const selectedPlan = SAAS_PLANS.find((p) => p.id === selectedPlanId) || SAAS_PLANS[1];
   const unitPrice = isAnnual ? selectedPlan.priceAnnual : selectedPlan.priceMonthly;

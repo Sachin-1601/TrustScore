@@ -36,7 +36,11 @@ export interface Creator {
   engagementConsistencyScore: number; // e.g. 92/100
 
   // Marketplace & Collaboration Details
+  userId?: string;
+  website?: string;
   isAvailableForCollaboration: boolean;
+  availabilityStatus?: "OPEN_TO_WORK" | "AVAILABLE_FOR_COLLABORATION" | "NOT_AVAILABLE";
+  profileTags?: string[];
   startingRate: number; // e.g. $450 USD
   preferredCampaignTypes: string[];
   pastBrandCollaborations?: string[];
