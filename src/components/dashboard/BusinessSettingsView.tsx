@@ -395,7 +395,7 @@ export function BusinessSettingsView() {
               </div>
             )}
 
-            {/* 4. Subscription Plan */}
+            {/* 4. Subscription */}
             {activeSection === "subscription" && (
               <div className="bg-slate-900/90 rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-md space-y-6">
                 <div className="pb-4 border-b border-slate-800 flex items-center justify-between">
@@ -416,18 +416,18 @@ export function BusinessSettingsView() {
                 <div className="p-5 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
                   <div className="flex items-center justify-between">
                     <div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Current Plan</span>
-                      <h4 className="text-xl font-black text-slate-100">Growth Plan ($249/mo)</h4>
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Subscription Management</span>
+                      <h4 className="text-xl font-black text-slate-100">B2B SaaS Plan &amp; Quotas</h4>
                     </div>
                     <Link
                       href="/dashboard/billing"
                       className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow-xs transition-colors"
                     >
-                      Change Plan
+                      Open Billing Dashboard
                     </Link>
                   </div>
                   <p className="text-xs text-slate-400 leading-relaxed">
-                    Includes 50 creator authenticity checks per month, unlimited saved creators, and priority Bayesian fraud detection.
+                    View your active plan tier, upgrade or downgrade tiers, top up authenticity audits, and manage Stripe payment methods in the billing console.
                   </p>
                 </div>
               </div>
@@ -436,37 +436,35 @@ export function BusinessSettingsView() {
             {/* 5. Usage & Limits */}
             {activeSection === "usage" && (
               <div className="bg-slate-900/90 rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-md space-y-6">
-                <div className="pb-4 border-b border-slate-800">
-                  <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-                    <Zap className="w-5 h-5 text-amber-400" />
-                    <span>Monthly Usage &amp; Quotas</span>
-                  </h3>
-                  <p className="text-xs text-slate-400 mt-0.5">
-                    Real-time quota tracking for creator authenticity audits
-                  </p>
+                <div className="pb-4 border-b border-slate-800 flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
+                      <Zap className="w-5 h-5 text-amber-400" />
+                      <span>Monthly Usage &amp; Quotas</span>
+                    </h3>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      Real-time quota tracking for creator authenticity audits
+                    </p>
+                  </div>
+                  <Link
+                    href="/dashboard/billing"
+                    className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow-xs transition-colors"
+                  >
+                    Top Up Credits
+                  </Link>
                 </div>
 
-                <div className="space-y-4">
-                  <div>
-                    <div className="flex items-center justify-between text-xs font-semibold mb-2">
-                      <span className="text-slate-300">Creator Authenticity Audits Used</span>
-                      <span className="text-blue-400">13 / 50 used (37 remaining)</span>
-                    </div>
-                    <div className="w-full h-2.5 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
-                      <div className="h-full bg-blue-600 rounded-full" style={{ width: "26%" }} />
-                    </div>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs pt-2">
-                    <div className="p-3.5 bg-slate-950 rounded-xl border border-slate-800">
-                      <span className="text-[10px] text-slate-500 uppercase font-bold block">Next Quota Reset</span>
-                      <strong className="text-slate-200">September 30, 2026</strong>
-                    </div>
-                    <div className="p-3.5 bg-slate-950 rounded-xl border border-slate-800">
-                      <span className="text-[10px] text-slate-500 uppercase font-bold block">Saved Creator Capacity</span>
-                      <strong className="text-emerald-400">Unlimited</strong>
-                    </div>
-                  </div>
+                <div className="p-5 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
+                  <p className="text-xs text-slate-300">
+                    Audit quotas are managed and tracked per billing cycle. Track detailed breakdown and quota reset schedule in the dedicated billing hub.
+                  </p>
+                  <Link
+                    href="/dashboard/billing"
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-400 hover:text-blue-300"
+                  >
+                    <span>Go to Billing &amp; Quota Tracker</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
                 </div>
               </div>
             )}
@@ -474,30 +472,35 @@ export function BusinessSettingsView() {
             {/* 6. Payment History */}
             {activeSection === "invoices" && (
               <div className="bg-slate-900/90 rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-md space-y-6">
-                <div className="pb-4 border-b border-slate-800">
-                  <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-                    <Download className="w-5 h-5 text-blue-400" />
-                    <span>Payment History &amp; Invoices</span>
-                  </h3>
-                  <p className="text-xs text-slate-400 mt-0.5">
-                    Download official VAT receipts and transaction records
-                  </p>
+                <div className="pb-4 border-b border-slate-800 flex items-center justify-between">
+                  <div>
+                    <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
+                      <Download className="w-5 h-5 text-blue-400" />
+                      <span>Payment History &amp; Invoices</span>
+                    </h3>
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      Download official VAT receipts and Stripe transaction records
+                    </p>
+                  </div>
+                  <Link
+                    href="/dashboard/billing"
+                    className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold text-xs rounded-xl"
+                  >
+                    Billing Center
+                  </Link>
                 </div>
 
-                <div className="divide-y divide-slate-800/60 text-xs">
-                  <div className="py-3 flex items-center justify-between">
-                    <div>
-                      <strong className="text-slate-200 block">Growth Plan Subscription ($249.00)</strong>
-                      <span className="text-[11px] text-slate-500">August 1, 2026 • Stripe #INV-82910</span>
-                    </div>
-                    <button
-                      type="button"
-                      onClick={() => window.print()}
-                      className="px-3 py-1.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 rounded-lg text-[11px] font-semibold cursor-pointer"
-                    >
-                      Receipt PDF
-                    </button>
-                  </div>
+                <div className="p-5 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
+                  <p className="text-xs text-slate-300">
+                    Official Stripe invoice receipts, PDF downloads, and billing records are available in your centralized billing dashboard.
+                  </p>
+                  <Link
+                    href="/dashboard/billing"
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-400 hover:text-blue-300"
+                  >
+                    <span>View All Invoices in Billing Hub</span>
+                    <ArrowRight className="w-3.5 h-3.5" />
+                  </Link>
                 </div>
               </div>
             )}

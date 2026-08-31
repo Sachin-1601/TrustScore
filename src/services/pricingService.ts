@@ -45,6 +45,7 @@ export const SAAS_PLANS: SaaSSubscriptionPlan[] = [
     priceAnnual: 29,
     creatorChecksMonthly: 25,
     popular: false,
+    badge: "Save 26%",
     description: "Ideal for boutique brands and emerging agencies verifying initial creator rosters.",
     features: [
       "25 Creator Authenticity Audits / month",
@@ -55,8 +56,8 @@ export const SAAS_PLANS: SaaSSubscriptionPlan[] = [
       "Direct collaboration messaging",
       "Standard email support",
     ],
-    stripePriceIdMonthly: "price_starter_monthly",
-    stripePriceIdAnnual: "price_starter_annual",
+    stripePriceIdMonthly: process.env.STRIPE_PRICE_STARTER_MONTHLY || "",
+    stripePriceIdAnnual: process.env.STRIPE_PRICE_STARTER_ANNUAL || "",
     teamSeats: 1,
     radarLimit: 2,
     apiAccess: false,
@@ -69,7 +70,7 @@ export const SAAS_PLANS: SaaSSubscriptionPlan[] = [
     priceAnnual: 79,
     creatorChecksMonthly: 100,
     popular: true,
-    badge: "Most Popular",
+    badge: "Most Popular • Save 20%",
     description: "For scaling direct-to-consumer brands running active multi-creator campaigns.",
     features: [
       "100 Creator Authenticity Audits / month",
@@ -82,8 +83,8 @@ export const SAAS_PLANS: SaaSSubscriptionPlan[] = [
       "Team workspace (up to 3 seats)",
       "Priority live support",
     ],
-    stripePriceIdMonthly: "price_growth_monthly",
-    stripePriceIdAnnual: "price_growth_annual",
+    stripePriceIdMonthly: process.env.STRIPE_PRICE_GROWTH_MONTHLY || "",
+    stripePriceIdAnnual: process.env.STRIPE_PRICE_GROWTH_ANNUAL || "",
     teamSeats: 3,
     radarLimit: 4,
     apiAccess: false,
@@ -96,6 +97,7 @@ export const SAAS_PLANS: SaaSSubscriptionPlan[] = [
     priceAnnual: 199,
     creatorChecksMonthly: 300,
     popular: false,
+    badge: "Save 20%",
     description: "For talent agencies and enterprise media planners managing hundreds of creators.",
     features: [
       "300 Creator Authenticity Audits / month",
@@ -107,8 +109,8 @@ export const SAAS_PLANS: SaaSSubscriptionPlan[] = [
       "Dedicated account manager",
       "99.9% uptime SLA & custom feature requests",
     ],
-    stripePriceIdMonthly: "price_agency_monthly",
-    stripePriceIdAnnual: "price_agency_annual",
+    stripePriceIdMonthly: process.env.STRIPE_PRICE_AGENCY_MONTHLY || "",
+    stripePriceIdAnnual: process.env.STRIPE_PRICE_AGENCY_ANNUAL || "",
     teamSeats: 999,
     radarLimit: 999,
     apiAccess: true,
@@ -291,6 +293,42 @@ export class PricingService {
     if (checksNeeded <= 25) return SAAS_PLANS[0]; // Starter
     if (checksNeeded <= 100) return SAAS_PLANS[1]; // Growth
     return SAAS_PLANS[2]; // Agency
+  }
+
+  /**
+   * Calculate exact annual billed total ($/year)
+   */
+  public static getAnnualBilledTotal(plan: SaaSSubscriptionPlan): number {
+    return plan.priceAnnual * 12;
+  }
+
+  /**
+   * Calculate exact savings percentage compared to 12 months of monthly pricing
+   */
+  public static getSavingsPercentage(plan: SaaSSubscriptionPlan): number {
+    const fullMonthlyAnnualized = plan.priceMonthly * 12;
+    const annualCost = plan.priceAnnual * 12;
+    return Math.round(((fullMonthlyAnnualized - annualCost) / fullMonthlyAnnualized) * 100);
+  }
+
+  /**
+   * Resolve configured Stripe Price ID from server environment
+   */
+  public static getStripePriceId(
+    planId: "starter" | "growth" | "agency",
+    billingCycle: "monthly" | "annual"
+  ): string | undefined {
+    const isAnnual = billingCycle === "annual";
+    if (planId === "starter") {
+      return isAnnual ? process.env.STRIPE_PRICE_STARTER_ANNUAL : process.env.STRIPE_PRICE_STARTER_MONTHLY;
+    }
+    if (planId === "growth") {
+      return isAnnual ? process.env.STRIPE_PRICE_GROWTH_ANNUAL : process.env.STRIPE_PRICE_GROWTH_MONTHLY;
+    }
+    if (planId === "agency") {
+      return isAnnual ? process.env.STRIPE_PRICE_AGENCY_ANNUAL : process.env.STRIPE_PRICE_AGENCY_MONTHLY;
+    }
+    return undefined;
   }
 
   /**

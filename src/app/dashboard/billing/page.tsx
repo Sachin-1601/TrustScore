@@ -8,6 +8,7 @@ import {
   ADDON_CREDIT_PACKS,
   SaaSSubscriptionPlan,
   AddonCreditPack,
+  PricingService,
 } from "@/services/pricingService";
 import { Modal } from "@/components/common/Modal";
 import { useToast } from "@/contexts/ToastContext";
@@ -25,41 +26,115 @@ import {
   FileText,
   AlertCircle,
   Lock,
+  ExternalLink,
+  Loader2,
+  RefreshCw,
 } from "lucide-react";
 import { formatCurrency } from "@/lib/utils";
 
+interface SubscriptionData {
+  planId: string;
+  planName: string;
+  status: string;
+  billingCycle: string;
+  creatorChecksLimit: number;
+  creatorChecksRemaining: number;
+  checksUsed: number;
+  usagePercentage: number;
+  currentPeriodStart: string;
+  currentPeriodEnd: string;
+  cancelAtPeriodEnd: boolean;
+  stripeCustomerId: string | null;
+  stripeSubscriptionId: string | null;
+}
+
+interface PaymentMethodData {
+  brand: string;
+  last4: string;
+  expMonth: number;
+  expYear: number;
+}
+
+interface InvoiceData {
+  id: string;
+  date: string;
+  description: string;
+  amount: number;
+  currency: string;
+  status: string;
+  hostedInvoiceUrl?: string;
+  invoicePdfUrl?: string;
+}
+
 function BillingContent() {
   const searchParams = useSearchParams();
-  const { success, info } = useToast();
+  const { success, error: toastError, info } = useToast();
 
-  const planParam = searchParams.get("plan") as "starter" | "growth" | "agency" | null;
-  const billingParam = searchParams.get("billing");
-
-  const [currentPlanId, setCurrentPlanId] = useState<"starter" | "growth" | "agency">(() => {
-    if (planParam && ["starter", "growth", "agency"].includes(planParam)) return planParam;
-    if (typeof window !== "undefined") {
-      const savedPlan = localStorage.getItem("ts_active_plan") as "starter" | "growth" | "agency" | null;
-      if (savedPlan && ["starter", "growth", "agency"].includes(savedPlan)) return savedPlan;
-    }
-    return "growth";
-  });
-  const [isAnnual, setIsAnnual] = useState(billingParam === "annual");
-  const [bonusChecks, setBonusChecks] = useState(0);
-  const [checksUsed, setChecksUsed] = useState(13);
+  const [isLoading, setIsLoading] = useState(true);
+  const [subData, setSubData] = useState<SubscriptionData | null>(null);
+  const [paymentMethod, setPaymentMethod] = useState<PaymentMethodData | null>(null);
+  const [invoices, setInvoices] = useState<InvoiceData[]>([]);
+  const [isAnnual, setIsAnnual] = useState(false);
   const [isProcessing, setIsProcessing] = useState(false);
+  const [isPortalLoading, setIsPortalLoading] = useState(false);
 
   // Modals state
   const [isAddonModalOpen, setIsAddonModalOpen] = useState(false);
-  const [selectedInvoice, setSelectedInvoice] = useState<any | null>(null);
+  const [selectedInvoice, setSelectedInvoice] = useState<InvoiceData | null>(null);
 
-  // Active plan details
+  // Load subscription and invoice data from server
+  const loadBillingData = async () => {
+    try {
+      setIsLoading(true);
+      const [subRes, invRes] = await Promise.all([
+        fetch("/api/payments/subscription"),
+        fetch("/api/payments/invoices"),
+      ]);
+
+      if (subRes.ok) {
+        const data = await subRes.json();
+        if (data.subscription) {
+          setSubData(data.subscription);
+          setPaymentMethod(data.paymentMethod || null);
+          setIsAnnual(data.subscription.billingCycle === "annual");
+        }
+      }
+
+      if (invRes.ok) {
+        const data = await invRes.json();
+        setInvoices(data.invoices || []);
+      }
+    } catch (err) {
+      console.error("Failed to load billing data:", err);
+    } finally {
+      setIsLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    loadBillingData();
+  }, []);
+
+  const currentPlanId = (subData?.planId?.toLowerCase() as "starter" | "growth" | "agency") || "growth";
   const activePlan = SAAS_PLANS.find((p) => p.id === currentPlanId) || SAAS_PLANS[1];
-  const checksLimit = activePlan.creatorChecksMonthly + bonusChecks;
-  const checksRemaining = Math.max(0, checksLimit - checksUsed);
-  const usagePercentage = Math.min(100, Math.round((checksUsed / checksLimit) * 100));
+  const checksLimit = subData?.creatorChecksLimit ?? activePlan.creatorChecksMonthly;
+  const checksRemaining = subData?.creatorChecksRemaining ?? activePlan.creatorChecksMonthly;
+  const checksUsed = subData?.checksUsed ?? 0;
+  const usagePercentage = subData?.usagePercentage ?? 0;
+
+  // Format cycle dates
+  const formatDate = (isoString?: string) => {
+    if (!isoString) return "Active";
+    return new Date(isoString).toLocaleDateString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+    });
+  };
 
   const handleUpgrade = async (plan: SaaSSubscriptionPlan) => {
     setIsProcessing(true);
+    info("Redirecting to Checkout", "Preparing secure Stripe Checkout session...");
     try {
       const res = await fetch("/api/payments/checkout", {
         method: "POST",
@@ -68,55 +143,73 @@ function BillingContent() {
           itemType: "SUBSCRIPTION",
           itemId: plan.id,
           billingCycle: isAnnual ? "annual" : "monthly",
-          successUrl: window.location.href,
         }),
       });
-      await res.json();
-      setCurrentPlanId(plan.id);
-      if (typeof window !== "undefined") {
-        localStorage.setItem("ts_active_plan", plan.id);
+
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        toastError("Checkout Error", data.error || "Could not create Stripe Checkout session.");
+        return;
       }
-      success(
-        `Switched to ${plan.name} Plan!`,
-        `Your creator audit quota has been updated to ${plan.creatorChecksMonthly + bonusChecks} audits.`
-      );
-    } catch (e) {
-      setCurrentPlanId(plan.id);
-      info("Plan Updated", `Active tier set to ${plan.name}`);
+
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+      }
+    } catch (err: any) {
+      toastError("Error", err.message || "Failed to initiate Stripe Checkout.");
     } finally {
       setIsProcessing(false);
     }
   };
 
-  const handlePurchaseAddon = (pack: AddonCreditPack) => {
-    setBonusChecks((prev) => prev + pack.checksCount);
-    setIsAddonModalOpen(false);
-    success(
-      `Added +${pack.checksCount} Creator Checks!`,
-      `Your total audit quota is now ${activePlan.creatorChecksMonthly + bonusChecks + pack.checksCount}.`
-    );
+  const handlePurchaseAddon = async (pack: AddonCreditPack) => {
+    setIsProcessing(true);
+    info("Redirecting to Checkout", `Preparing checkout for ${pack.name}...`);
+    try {
+      const res = await fetch("/api/payments/checkout", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          itemType: "CREDIT_TOP_UP",
+          itemId: pack.id,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        toastError("Checkout Error", data.error || "Could not initiate add-on purchase.");
+        return;
+      }
+
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
+      }
+    } catch (err: any) {
+      toastError("Error", err.message || "Failed to initiate add-on purchase.");
+    } finally {
+      setIsProcessing(false);
+      setIsAddonModalOpen(false);
+    }
   };
 
-  const invoices = [
-    {
-      id: "INV-2026-0829",
-      date: "Aug 29, 2026",
-      description: `${activePlan.name} Plan (${isAnnual ? "Annual" : "Monthly"})`,
-      amount: isAnnual ? activePlan.priceAnnual * 12 : activePlan.priceMonthly,
-      status: "Paid",
-      tax: isAnnual ? 0 : 0,
-      paymentMethod: "Visa ending in 4242",
-    },
-    {
-      id: "INV-2026-0729",
-      date: "Jul 29, 2026",
-      description: "Growth Plan (Monthly)",
-      amount: 99.0,
-      status: "Paid",
-      tax: 0,
-      paymentMethod: "Visa ending in 4242",
-    },
-  ];
+  const handleOpenCustomerPortal = async () => {
+    setIsPortalLoading(true);
+    try {
+      const res = await fetch("/api/payments/portal", { method: "POST" });
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        toastError("Portal Error", data.error || "Could not open Stripe Billing Portal.");
+        return;
+      }
+      if (data.portalUrl) {
+        window.location.href = data.portalUrl;
+      }
+    } catch (err: any) {
+      toastError("Error", err.message || "Failed to open Stripe Billing Portal.");
+    } finally {
+      setIsPortalLoading(false);
+    }
+  };
 
   return (
     <div className="min-h-full flex flex-col bg-slate-950 text-slate-100">
@@ -132,18 +225,20 @@ function BillingContent() {
             <div>
               <div className="flex items-center gap-2">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-blue-400 bg-blue-500/10 px-2.5 py-0.5 rounded-full border border-blue-500/20">
-                  {activePlan.name} Tier Active
+                  {subData?.status === "TRIALING" ? "14-Day Trial Active" : `${activePlan.name} Tier Active`}
                 </span>
-                <span className="text-[10px] text-slate-500">
-                  Cycle: Aug 29 – Sep 28, 2026
-                </span>
+                {subData?.currentPeriodEnd && (
+                  <span className="text-[10px] text-slate-500">
+                    Cycle: {formatDate(subData.currentPeriodStart)} – {formatDate(subData.currentPeriodEnd)}
+                  </span>
+                )}
               </div>
               <h3 className="text-xl font-bold text-slate-100 mt-1">
                 Creator Authenticity Audit Quota
               </h3>
             </div>
 
-            <div className="flex items-center gap-4">
+            <div className="flex items-center gap-3">
               <div className="text-left sm:text-right">
                 <span className="text-3xl font-black text-blue-400">{checksRemaining}</span>
                 <span className="text-sm font-semibold text-slate-400"> / {checksLimit} Checks Remaining</span>
@@ -157,6 +252,21 @@ function BillingContent() {
                 <Plus className="w-3.5 h-3.5" />
                 <span>Top Up Audits</span>
               </button>
+
+              <button
+                type="button"
+                onClick={handleOpenCustomerPortal}
+                disabled={isPortalLoading}
+                className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold text-xs rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
+                title="Manage billing details, cards, and invoices via Stripe"
+              >
+                {isPortalLoading ? (
+                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                ) : (
+                  <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
+                )}
+                <span>Manage Billing</span>
+              </button>
             </div>
           </div>
 
@@ -164,9 +274,10 @@ function BillingContent() {
             <div className="flex justify-between text-xs font-semibold text-slate-400">
               <span>
                 {checksUsed} of {checksLimit} Audits Consumed ({usagePercentage}%)
-                {bonusChecks > 0 && <span className="text-blue-400 ml-1">({bonusChecks} bonus credits active)</span>}
               </span>
-              <span className="text-emerald-400 font-bold">Quota Resets in 30 Days</span>
+              <span className="text-emerald-400 font-bold">
+                {subData?.currentPeriodEnd ? `Quota Resets on ${formatDate(subData.currentPeriodEnd)}` : "Quota Resets Monthly"}
+              </span>
             </div>
             <div className="w-full bg-slate-950 rounded-full h-3 overflow-hidden border border-slate-800">
               <div
@@ -206,7 +317,7 @@ function BillingContent() {
               >
                 <span>Annual</span>
                 <span className="text-[10px] text-emerald-300 font-extrabold bg-emerald-500/20 px-1.5 py-0.2 rounded">
-                  Save 20%
+                  Save 20–26%
                 </span>
               </button>
             </div>
@@ -216,6 +327,7 @@ function BillingContent() {
             {SAAS_PLANS.map((plan) => {
               const isCurrent = currentPlanId === plan.id;
               const price = isAnnual ? plan.priceAnnual : plan.priceMonthly;
+              const billedTotal = isAnnual ? plan.priceAnnual * 12 : plan.priceMonthly;
 
               return (
                 <div
@@ -233,7 +345,14 @@ function BillingContent() {
                   )}
 
                   <div className="space-y-2">
-                    <h4 className="font-bold text-slate-100 text-lg">{plan.name}</h4>
+                    <div className="flex items-center justify-between">
+                      <h4 className="font-bold text-slate-100 text-lg">{plan.name}</h4>
+                      {isAnnual && (
+                        <span className="text-[10px] font-extrabold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
+                          Save {PricingService.getSavingsPercentage(plan)}%
+                        </span>
+                      )}
+                    </div>
                     <p className="text-xs text-slate-400 leading-relaxed min-h-[36px]">
                       {plan.description}
                     </p>
@@ -241,6 +360,11 @@ function BillingContent() {
                       <span className="text-3xl font-black text-slate-100">${price}</span>
                       <span className="text-xs text-slate-400 font-semibold">/ month</span>
                     </div>
+                    {isAnnual && (
+                      <p className="text-[11px] text-slate-400">
+                        Billed annually at <strong className="text-slate-200">${billedTotal}/yr</strong>
+                      </p>
+                    )}
                   </div>
 
                   <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 text-xs font-semibold text-blue-300">
@@ -276,55 +400,80 @@ function BillingContent() {
 
         {/* Invoices History Table */}
         <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-sm">
-          <div className="flex items-center justify-between">
+          <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
               <h4 className="font-bold text-slate-100 text-base">Invoice &amp; Billing History</h4>
-              <p className="text-xs text-slate-400">Download official PDF receipts for your accounting department</p>
+              <p className="text-xs text-slate-400">Download official receipts and Stripe transaction records</p>
             </div>
-            <div className="flex items-center gap-1 text-xs text-slate-400">
+            <div className="flex items-center gap-2 text-xs text-slate-400">
               <CreditCard className="w-3.5 h-3.5 text-blue-400" />
-              <span>Default Card: Visa •••• 4242</span>
+              <span>
+                {paymentMethod ? (
+                  `${paymentMethod.brand} •••• ${paymentMethod.last4} (Exp ${paymentMethod.expMonth}/${paymentMethod.expYear})`
+                ) : (
+                  "No payment method on file"
+                )}
+              </span>
             </div>
           </div>
 
           <div className="overflow-x-auto">
-            <table className="w-full text-left text-xs">
-              <thead className="bg-slate-950 text-slate-400 font-bold uppercase tracking-wider text-[10px] border-b border-slate-800">
-                <tr>
-                  <th className="py-3 px-4">Invoice ID</th>
-                  <th className="py-3 px-4">Date</th>
-                  <th className="py-3 px-4">Description</th>
-                  <th className="py-3 px-4">Amount</th>
-                  <th className="py-3 px-4">Status</th>
-                  <th className="py-3 px-4 text-right">Receipt</th>
-                </tr>
-              </thead>
-              <tbody className="divide-y divide-slate-800/60 text-slate-300">
-                {invoices.map((inv) => (
-                  <tr key={inv.id} className="hover:bg-slate-800/30 transition-colors">
-                    <td className="py-3 px-4 font-mono font-bold text-slate-100">{inv.id}</td>
-                    <td className="py-3 px-4">{inv.date}</td>
-                    <td className="py-3 px-4">{inv.description}</td>
-                    <td className="py-3 px-4 font-bold text-slate-100">{formatCurrency(inv.amount)} USD</td>
-                    <td className="py-3 px-4">
-                      <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-                        {inv.status}
-                      </span>
-                    </td>
-                    <td className="py-3 px-4 text-right">
-                      <button
-                        type="button"
-                        onClick={() => setSelectedInvoice(inv)}
-                        className="text-blue-400 hover:text-blue-300 font-semibold flex items-center gap-1 ml-auto cursor-pointer"
-                      >
-                        <Download className="w-3.5 h-3.5" />
-                        <span>PDF Receipt</span>
-                      </button>
-                    </td>
+            {invoices.length > 0 ? (
+              <table className="w-full text-left text-xs">
+                <thead className="bg-slate-950 text-slate-400 font-bold uppercase tracking-wider text-[10px] border-b border-slate-800">
+                  <tr>
+                    <th className="py-3 px-4">Invoice / Record</th>
+                    <th className="py-3 px-4">Date</th>
+                    <th className="py-3 px-4">Description</th>
+                    <th className="py-3 px-4">Amount</th>
+                    <th className="py-3 px-4">Status</th>
+                    <th className="py-3 px-4 text-right">Receipt</th>
                   </tr>
-                ))}
-              </tbody>
-            </table>
+                </thead>
+                <tbody className="divide-y divide-slate-800/60 text-slate-300">
+                  {invoices.map((inv) => (
+                    <tr key={inv.id} className="hover:bg-slate-800/30 transition-colors">
+                      <td className="py-3 px-4 font-mono font-bold text-slate-100">{inv.id}</td>
+                      <td className="py-3 px-4">{inv.date}</td>
+                      <td className="py-3 px-4">{inv.description}</td>
+                      <td className="py-3 px-4 font-bold text-slate-100">{formatCurrency(inv.amount)} {inv.currency}</td>
+                      <td className="py-3 px-4">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                          {inv.status}
+                        </span>
+                      </td>
+                      <td className="py-3 px-4 text-right">
+                        {inv.hostedInvoiceUrl || inv.invoicePdfUrl ? (
+                          <a
+                            href={inv.hostedInvoiceUrl || inv.invoicePdfUrl}
+                            target="_blank"
+                            rel="noreferrer"
+                            className="text-blue-400 hover:text-blue-300 font-semibold inline-flex items-center gap-1 cursor-pointer"
+                          >
+                            <Download className="w-3.5 h-3.5" />
+                            <span>Stripe Receipt</span>
+                          </a>
+                        ) : (
+                          <button
+                            type="button"
+                            onClick={() => setSelectedInvoice(inv)}
+                            className="text-blue-400 hover:text-blue-300 font-semibold inline-flex items-center gap-1 cursor-pointer"
+                          >
+                            <Download className="w-3.5 h-3.5" />
+                            <span>PDF Receipt</span>
+                          </button>
+                        )}
+                      </td>
+                    </tr>
+                  ))}
+                </tbody>
+              </table>
+            ) : (
+              <div className="py-8 text-center text-xs text-slate-400 space-y-1">
+                <p>No billing invoices recorded yet.</p>
+                <p className="text-[11px] text-slate-500">Official invoice receipts will appear here after your first Stripe subscription payment.</p>
+              </div>
+            )}
           </div>
         </div>
       </div>
@@ -370,8 +519,9 @@ function BillingContent() {
 
                 <button
                   type="button"
+                  disabled={isProcessing}
                   onClick={() => handlePurchaseAddon(pack)}
-                  className="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow-xs transition-colors cursor-pointer"
+                  className="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow-xs transition-colors cursor-pointer disabled:opacity-50"
                 >
                   Buy +{pack.checksCount} Checks
                 </button>
@@ -409,13 +559,13 @@ function BillingContent() {
             <div className="grid grid-cols-2 gap-3 text-xs">
               <div>
                 <span className="text-slate-500 block">Billed To:</span>
-                <span className="font-bold text-slate-100 block">Sarah Jenkins (Acme Brand)</span>
-                <span className="text-slate-400">sarah@acmebrand.com</span>
+                <span className="font-bold text-slate-100 block">Verified Business Account</span>
+                <span className="text-slate-400">{paymentMethod ? `${paymentMethod.brand} •••• ${paymentMethod.last4}` : "Stripe Payment"}</span>
               </div>
               <div className="text-right">
                 <span className="text-slate-500 block">Invoice Date:</span>
                 <span className="font-bold text-slate-100 block">{selectedInvoice.date}</span>
-                <span className="text-slate-400">Paid via {selectedInvoice.paymentMethod}</span>
+                <span className="text-slate-400">Status: {selectedInvoice.status}</span>
               </div>
             </div>
 
@@ -438,7 +588,7 @@ function BillingContent() {
                 <span>$0.00</span>
               </div>
               <div className="flex justify-between font-bold text-sm text-emerald-400 pt-2 border-t border-slate-800">
-                <span>Total Paid (USD)</span>
+                <span>Total Paid ({selectedInvoice.currency})</span>
                 <span>{formatCurrency(selectedInvoice.amount)}</span>
               </div>
             </div>
@@ -456,13 +606,13 @@ function BillingContent() {
               <button
                 type="button"
                 onClick={() => {
-                  success("Receipt Downloaded", "PDF saved to your downloads.");
+                  success("Receipt Exported", "Receipt details printed.");
                   setSelectedInvoice(null);
                 }}
                 className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 cursor-pointer"
               >
                 <Download className="w-3.5 h-3.5" />
-                <span>Download PDF</span>
+                <span>Done</span>
               </button>
             </div>
           </div>

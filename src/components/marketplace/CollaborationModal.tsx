@@ -3,6 +3,8 @@
 import React, { useState } from "react";
 import { Creator } from "@/types/creator";
 import { Modal } from "@/components/common/Modal";
+import { useAuth } from "@/contexts/AuthContext";
+import { useToast } from "@/contexts/ToastContext";
 import {
   Send,
   CheckCircle2,
@@ -13,6 +15,8 @@ import {
   Mail,
   Building2,
   Layers,
+  Loader2,
+  AlertCircle,
 } from "lucide-react";
 
 interface CollaborationModalProps {
@@ -26,28 +30,60 @@ export function CollaborationModal({
   isOpen,
   onClose,
 }: CollaborationModalProps) {
-  const [businessName, setBusinessName] = useState("");
+  const { user } = useAuth();
+  const { success, error: toastError } = useToast();
+
+  const [businessName, setBusinessName] = useState(user?.name || "");
   const [campaignName, setCampaignName] = useState("");
   const [campaignDesc, setCampaignDesc] = useState("");
   const [budget, setBudget] = useState(creator.startingRate ? `${creator.startingRate}` : "500");
-  const [deliverables, setDeliverables] = useState(creator.preferredCampaignTypes[0] || "1 Dedicated Reel + Story Series");
+  const [deliverables, setDeliverables] = useState(
+    creator.preferredCampaignTypes?.[0] || "1 Dedicated Reel + Story Series"
+  );
   const [timeline, setTimeline] = useState("2 Weeks");
-  const [contactEmail, setContactEmail] = useState("");
+  const [contactEmail, setContactEmail] = useState(user?.email || "");
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSubmitted, setIsSubmitted] = useState(false);
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
 
-    setTimeout(() => {
-      setIsSubmitting(false);
+    try {
+      const res = await fetch("/api/collaborations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          creatorId: creator.id,
+          businessName,
+          campaignName,
+          campaignDescription: campaignDesc || "Brand sponsorship proposal via TrustScore Discover.",
+          budget: Number(budget),
+          deliverables,
+          timeline,
+          contactEmail,
+        }),
+      });
+
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        toastError("Submission Error", data.error || "Failed to submit collaboration proposal.");
+        return;
+      }
+
       setIsSubmitted(true);
-    }, 800);
+      success("Proposal Sent", `Collaboration offer dispatched to ${creator.username}.`);
+    } catch (err: any) {
+      toastError("Error", err.message || "Failed to submit collaboration proposal.");
+    } finally {
+      setIsSubmitting(false);
+    }
   };
 
   const handleReset = () => {
     setIsSubmitted(false);
+    setCampaignName("");
+    setCampaignDesc("");
     onClose();
   };
 
@@ -61,18 +97,20 @@ export function CollaborationModal({
               <img
                 src={creator.avatar}
                 alt={creator.name}
-                className="w-12 h-12 rounded-2xl object-cover border border-slate-700"
+                className="w-13 h-13 rounded-2xl object-cover border border-slate-700 shrink-0"
               />
-              <div>
+              <div className="min-w-0 flex-1">
                 <div className="flex items-center gap-2">
-                  <h3 className="text-base font-bold text-slate-100">
+                  <h3 className="text-base font-bold text-slate-100 truncate">
                     Collaborate with {creator.username}
                   </h3>
-                  <span className="px-2 py-0.5 rounded-md text-[11px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20">
-                    {creator.trustScore} TrustScore
-                  </span>
+                  {creator.trustScore > 0 && (
+                    <span className="px-2 py-0.5 rounded-md text-[10px] font-bold bg-blue-500/10 text-blue-400 border border-blue-500/20 shrink-0">
+                      {creator.trustScore} TrustScore
+                    </span>
+                  )}
                 </div>
-                <p className="text-xs text-slate-400">
+                <p className="text-xs text-slate-400 truncate mt-0.5">
                   {creator.category} • {creator.location} • Est. Rate: ${creator.startingRate} USD
                 </p>
               </div>
@@ -80,7 +118,7 @@ export function CollaborationModal({
 
             {/* Collaboration Request Form */}
             <form onSubmit={handleSubmit} className="mt-5 space-y-4 text-xs">
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block font-bold text-slate-300 uppercase tracking-wider text-[10px] mb-1.5">
                     Your Business / Brand Name
@@ -89,7 +127,7 @@ export function CollaborationModal({
                     <input
                       type="text"
                       required
-                      placeholder="e.g. GymFuel Nutrition"
+                      placeholder="e.g. Acme Brand"
                       value={businessName}
                       onChange={(e) => setBusinessName(e.target.value)}
                       className="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 focus:outline-hidden focus:border-blue-500 text-xs"
@@ -123,14 +161,14 @@ export function CollaborationModal({
                 <input
                   type="text"
                   required
-                  placeholder="e.g. Autumn Product Launch & Workout Showcase"
+                  placeholder="e.g. Autumn Product Launch & Creator Showcase"
                   value={campaignName}
                   onChange={(e) => setCampaignName(e.target.value)}
                   className="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 focus:outline-hidden focus:border-blue-500 text-xs"
                 />
               </div>
 
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                 <div>
                   <label className="block font-bold text-slate-300 uppercase tracking-wider text-[10px] mb-1.5">
                     Proposed Budget (USD)
@@ -186,18 +224,18 @@ export function CollaborationModal({
                 </label>
                 <textarea
                   rows={2}
-                  placeholder="Describe your brand, target goals, key talking points, and product shipping details..."
+                  placeholder="Describe your brand, campaign objectives, key messaging points, and shipping details..."
                   value={campaignDesc}
                   onChange={(e) => setCampaignDesc(e.target.value)}
                   className="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 focus:outline-hidden focus:border-blue-500 text-xs"
                 />
               </div>
 
-              {/* TrustScore Guaranteed Escrow Note */}
+              {/* TrustScore Collaboration Protection Notice */}
               <div className="p-3 bg-blue-950/40 border border-blue-800/40 rounded-xl flex items-start gap-2 text-[11px] text-blue-200">
                 <ShieldCheck className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
                 <p>
-                  TrustScore protects brand collaborations with data-backed escrow and authenticity tracking throughout campaign delivery.
+                  TrustScore protects brand collaborations with data-backed tracking and authenticity validation throughout campaign delivery.
                 </p>
               </div>
 
@@ -213,10 +251,13 @@ export function CollaborationModal({
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-bold transition-all shadow-md shadow-blue-600/30 flex items-center gap-2 cursor-pointer text-xs"
+                  className="px-5 py-2.5 rounded-xl bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-bold transition-all shadow-md shadow-blue-600/30 flex items-center gap-2 cursor-pointer text-xs disabled:opacity-50"
                 >
                   {isSubmitting ? (
-                    <span>Sending Offer...</span>
+                    <>
+                      <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                      <span>Sending Proposal...</span>
+                    </>
                   ) : (
                     <>
                       <Send className="w-3.5 h-3.5" />
@@ -238,7 +279,7 @@ export function CollaborationModal({
                 Collaboration Request Sent!
               </h3>
               <p className="text-xs text-slate-400 max-w-sm mx-auto mt-1 leading-relaxed">
-                Your proposal for <span className="text-blue-400 font-semibold">{campaignName || "Campaign"}</span> has been transmitted to <span className="font-semibold text-slate-200">{creator.username}</span>. You will receive an email response at <span className="text-slate-200 font-semibold">{contactEmail}</span>.
+                Your proposal for <span className="text-blue-400 font-semibold">{campaignName || "Campaign"}</span> has been transmitted to <span className="font-semibold text-slate-200">{creator.username}</span>. You will receive updates at <span className="text-slate-200 font-semibold">{contactEmail}</span>.
               </p>
             </div>
 

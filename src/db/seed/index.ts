@@ -2,6 +2,7 @@ import { MOCK_CREATORS } from "@/data/mockCreators";
 import { MOCK_BUSINESSES } from "@/data/mockBusinesses";
 import { MOCK_SPONSORED_ADS, MOCK_AD_PACKAGES } from "@/data/mockAdvertisements";
 import { MOCK_COLLABORATION_REQUESTS } from "@/data/mockCollaborations";
+import { Creator } from "@/types/creator";
 
 export interface SeedUser {
   id: string;
@@ -47,7 +48,7 @@ export const SEED_USERS: SeedUser[] = [
   },
 ];
 
-export const SEED_CREATORS = MOCK_CREATORS;
+export const SEED_CREATORS: Creator[] = [];
 export const SEED_BUSINESSES = MOCK_BUSINESSES;
 export const SEED_ADS = MOCK_SPONSORED_ADS;
 export const SEED_COLLABORATIONS = MOCK_COLLABORATION_REQUESTS;

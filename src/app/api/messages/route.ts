@@ -4,6 +4,11 @@ import { getServerSession } from "@/lib/session";
 
 export async function GET(req: Request) {
   try {
+    const session = await getServerSession();
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const { searchParams } = new URL(req.url);
     const collaborationId = searchParams.get("collaborationId");
 
@@ -21,6 +26,10 @@ export async function GET(req: Request) {
 export async function POST(req: Request) {
   try {
     const session = await getServerSession();
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
     const body = await req.json();
     const { collaborationId, text } = body;
 
@@ -28,13 +37,10 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing required message parameters" }, { status: 400 });
     }
 
-    const senderId = session?.userId || "user-sarah-business";
-    const senderName = session?.name || "Member";
-
     const message = await MessageService.sendMessage(
       collaborationId,
-      senderId,
-      senderName,
+      session.userId,
+      session.name || "Member",
       text
     );
 

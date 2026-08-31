@@ -44,6 +44,7 @@ import {
   Zap,
   Calendar,
   AlertCircle,
+  ShieldCheck,
 } from "lucide-react";
 
 type SettingsSection =
@@ -1127,25 +1128,26 @@ export function CreatorSettingsView({ initialSection }: CreatorSettingsViewProps
             )}
 
             {/* ------------------------------------------------------------- */}
-            {/* SECTION: Subscription & Billing */}
+            {/* ------------------------------------------------------------- */}
+            {/* SECTION: Creator Account & Platform Benefits */}
             {/* ------------------------------------------------------------- */}
             {activeSection === "subscription" && (
               <div className="space-y-8">
-                {/* 1. Header & Current Plan Hero Card */}
+                {/* 1. Header & Free Creator Account Hero Card */}
                 <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6">
                   <div className="pb-4 border-b border-slate-100 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                     <div>
                       <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
-                        <CreditCard className="w-5 h-5 text-amber-600" />
-                        <span>Creator Subscription &amp; Plans</span>
+                        <Sparkles className="w-5 h-5 text-indigo-600" />
+                        <span>Creator Account &amp; Platform Access</span>
                       </h3>
                       <p className="text-xs text-slate-500 mt-0.5">
-                        Manage your TrustScore plan tier, monthly quotas, and billing settings
+                        Creators access TrustScore authenticity verification and marketplace discovery 100% free
                       </p>
                     </div>
                     <span className="self-start sm:self-auto px-3 py-1 bg-emerald-50 text-emerald-700 font-bold text-xs rounded-full border border-emerald-200 flex items-center gap-1.5">
-                      <span className="w-2 h-2 rounded-full bg-emerald-500 animate-pulse" />
-                      Active Plan
+                      <span className="w-2 h-2 rounded-full bg-emerald-500" />
+                      Free Creator Tier
                     </span>
                   </div>
 
@@ -1158,322 +1160,76 @@ export function CreatorSettingsView({ initialSection }: CreatorSettingsViewProps
                         <div>
                           <div className="flex items-center gap-2">
                             <span className="text-[11px] font-extrabold uppercase tracking-wider text-blue-400">
-                              Your Current Plan
+                              Your Account Tier
                             </span>
-                            <span className="px-2 py-0.5 rounded-md bg-blue-500/20 text-blue-300 text-[10px] font-bold border border-blue-400/30">
-                              {currentSub.plan === "PRO" ? "Pro Creator" : currentSub.plan === "VERIFIED" ? "Verified Creator" : "Free"}
+                            <span className="px-2 py-0.5 rounded-md bg-emerald-500/20 text-emerald-300 text-[10px] font-bold border border-emerald-400/30">
+                              Free Lifetime Access
                             </span>
                           </div>
                           <h4 className="text-2xl sm:text-3xl font-black tracking-tight text-white mt-1">
-                            {currentSub.plan === "PRO" ? "Pro Creator" : currentSub.plan === "VERIFIED" ? "Verified Creator" : "Free Plan"}
+                            Creator Marketplace Access
                           </h4>
-                          <p className="text-xs text-slate-300 mt-1">
-                            {currentSub.plan === "PRO"
-                              ? "Designed for creators who want more visibility and deeper analytics."
-                              : currentSub.plan === "VERIFIED"
-                              ? "For creators who want enhanced credibility with brands."
-                              : "For creators building their TrustScore profile."}
+                          <p className="text-xs text-slate-300 mt-1 max-w-lg">
+                            As a creator, your profile, authenticity analytics, badge verification, and brand collaboration requests are completely free.
                           </p>
                         </div>
 
                         <div className="text-left sm:text-right shrink-0">
                           <div className="text-2xl sm:text-3xl font-black text-white">
-                            ${currentSub.priceMonthly}
+                            $0
                             <span className="text-xs font-normal text-slate-400"> / month</span>
                           </div>
-                          <p className="text-[11px] text-slate-400 mt-0.5 flex items-center sm:justify-end gap-1">
-                            <Calendar className="w-3.5 h-3.5 text-slate-400" />
-                            <span>Renewal: September 01, 2026</span>
+                          <p className="text-[11px] text-emerald-400 mt-0.5 font-semibold">
+                            No payment required
                           </p>
                         </div>
                       </div>
 
                       <div className="pt-4 border-t border-slate-700/60">
-                        <p className="text-xs text-slate-300 font-semibold mb-3">Plan Features Included:</p>
-                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 text-xs text-slate-200">
-                          {(
-                            CREATOR_PLANS.find((p) => p.id === currentSub.plan)?.features ||
-                            CREATOR_PLANS[1].features
-                          ).map((feat, idx) => (
-                            <div key={idx} className="flex items-center gap-2">
-                              <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
-                              <span>{feat}</span>
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-
-                      <div className="pt-3 flex flex-wrap items-center gap-3">
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const el = document.getElementById("available-plans-section");
-                            el?.scrollIntoView({ behavior: "smooth" });
-                          }}
-                          className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow-xs transition-colors cursor-pointer"
-                        >
-                          Change Plan
-                        </button>
-                        <button
-                          type="button"
-                          onClick={() => {
-                            const el = document.getElementById("creator-billing-section");
-                            el?.scrollIntoView({ behavior: "smooth" });
-                          }}
-                          className="px-4 py-2 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-semibold text-xs rounded-xl transition-colors cursor-pointer"
-                        >
-                          Manage Billing
-                        </button>
-                      </div>
-                    </div>
-                  </div>
-                </div>
-
-                {/* 2. Usage & Limits */}
-                <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6">
-                  <div className="pb-4 border-b border-slate-100 flex items-center justify-between">
-                    <div>
-                      <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                        <Zap className="w-4 h-4 text-blue-600" />
-                        <span>Usage &amp; Creator Quotas</span>
-                      </h3>
-                      <p className="text-xs text-slate-500 mt-0.5">
-                        Track your monthly TrustScore audits and platform capacity
-                      </p>
-                    </div>
-                    <span className="text-[11px] font-semibold text-slate-400 hidden sm:inline">
-                      Resets next billing cycle
-                    </span>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-5">
-                    {/* Quota 1: TrustScore checks */}
-                    <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-slate-700">TrustScore Checks</span>
-                        <span className="text-xs font-black text-slate-900">
-                          {currentSub.usage.trustScoreChecks.used} / {currentSub.usage.trustScoreChecks.limit}
-                        </span>
-                      </div>
-                      <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
-                        <div
-                          className="bg-blue-600 h-full rounded-full transition-all"
-                          style={{
-                            width: `${Math.min(100, (currentSub.usage.trustScoreChecks.used / currentSub.usage.trustScoreChecks.limit) * 100)}%`,
-                          }}
-                        />
-                      </div>
-                      <p className="text-[10px] text-slate-400">
-                        Audits run this cycle
-                      </p>
-                    </div>
-
-                    {/* Quota 2: Profile views */}
-                    <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-slate-700">Profile Views</span>
-                        <span className="text-xs font-black text-slate-900">
-                          {currentSub.usage.profileViews.used} / {currentSub.usage.profileViews.limit}
-                        </span>
-                      </div>
-                      <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
-                        <div
-                          className="bg-emerald-600 h-full rounded-full transition-all"
-                          style={{
-                            width: `${Math.min(100, (currentSub.usage.profileViews.used / currentSub.usage.profileViews.limit) * 100)}%`,
-                          }}
-                        />
-                      </div>
-                      <p className="text-[10px] text-slate-400">
-                        Brand discovery views
-                      </p>
-                    </div>
-
-                    {/* Quota 3: Connected accounts */}
-                    <div className="p-4 rounded-2xl bg-slate-50 border border-slate-200/80 space-y-3">
-                      <div className="flex items-center justify-between">
-                        <span className="text-xs font-bold text-slate-700">Social Connections</span>
-                        <span className="text-xs font-black text-slate-900">
-                          {currentSub.usage.socialConnections.used} / {currentSub.usage.socialConnections.limit}
-                        </span>
-                      </div>
-                      <div className="w-full bg-slate-200 h-2 rounded-full overflow-hidden">
-                        <div
-                          className="bg-purple-600 h-full rounded-full transition-all"
-                          style={{
-                            width: `${Math.min(100, (currentSub.usage.socialConnections.used / currentSub.usage.socialConnections.limit) * 100)}%`,
-                          }}
-                        />
-                      </div>
-                      <p className="text-[10px] text-slate-400">
-                        Linked social platforms
-                      </p>
-                    </div>
-                  </div>
-
-                  <div className="p-3.5 bg-blue-50/60 border border-blue-100 rounded-xl text-xs text-blue-800 flex items-start gap-2">
-                    <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
-                    <span>
-                      Usage limits reset automatically at the start of each billing cycle.
-                    </span>
-                  </div>
-                </div>
-
-                {/* 3. Available Plans & Upgrade Comparison */}
-                <div id="available-plans-section" className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6">
-                  <div className="pb-4 border-b border-slate-100">
-                    <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                      <Sparkles className="w-4 h-4 text-indigo-600" />
-                      <span>Upgrade Your Creator Plan</span>
-                    </h3>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      Select the tier that best supports your brand partnerships and verification goals
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                    {CREATOR_PLANS.map((plan) => {
-                      const isCurrent = currentSub.plan === plan.id;
-                      return (
-                        <div
-                          key={plan.id}
-                          className={`rounded-2xl p-5 sm:p-6 border flex flex-col justify-between transition-all ${
-                            isCurrent
-                              ? "border-blue-600 ring-2 ring-blue-500/20 bg-blue-50/20 shadow-xs"
-                              : "border-slate-200 bg-white hover:border-slate-300"
-                          }`}
-                        >
-                          <div className="space-y-4">
-                            <div className="flex items-center justify-between">
-                              <span className="font-bold text-slate-900 text-sm">{plan.name}</span>
-                              {plan.badge && (
-                                <span
-                                  className={`px-2 py-0.5 rounded-full text-[10px] font-extrabold ${
-                                    plan.id === "PRO"
-                                      ? "bg-blue-100 text-blue-700"
-                                      : "bg-purple-100 text-purple-700"
-                                  }`}
-                                >
-                                  {plan.badge}
-                                </span>
-                              )}
-                            </div>
-
-                            <div>
-                              <div className="text-2xl font-black text-slate-900">
-                                ${plan.priceMonthly}
-                                <span className="text-xs font-normal text-slate-500"> / month</span>
-                              </div>
-                              <p className="text-xs text-slate-500 mt-1 leading-relaxed">
-                                {plan.description}
-                              </p>
-                            </div>
-
-                            <div className="pt-3 border-t border-slate-100 space-y-2">
-                              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
-                                What's included:
-                              </span>
-                              {plan.features.map((f, i) => (
-                                <div key={i} className="flex items-start gap-2 text-xs text-slate-700">
-                                  <Check className="w-3.5 h-3.5 text-emerald-600 shrink-0 mt-0.5" />
-                                  <span>{f}</span>
-                                </div>
-                              ))}
-                            </div>
+                        <p className="text-xs text-slate-300 font-semibold mb-3">Included Creator Capabilities:</p>
+                        <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5 text-xs text-slate-200">
+                          <div className="flex items-center gap-2">
+                            <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                            <span>Public verified creator profile on marketplace</span>
                           </div>
-
-                          <div className="pt-6 mt-6 border-t border-slate-100">
-                            {isCurrent ? (
-                              <button
-                                type="button"
-                                disabled
-                                className="w-full py-2.5 bg-slate-100 text-slate-500 font-bold text-xs rounded-xl cursor-default text-center"
-                              >
-                                Current Plan
-                              </button>
-                            ) : (
-                              <button
-                                type="button"
-                                disabled={isUpgrading}
-                                onClick={() => handleUpgradePlan(plan.id)}
-                                className={`w-full py-2.5 font-bold text-xs rounded-xl shadow-xs transition-colors cursor-pointer text-center ${
-                                  plan.id === "FREE"
-                                    ? "bg-slate-100 hover:bg-slate-200 text-slate-700"
-                                    : "bg-blue-600 hover:bg-blue-700 text-white"
-                                }`}
-                              >
-                                {isUpgrading
-                                  ? "Updating..."
-                                  : plan.id === "FREE"
-                                  ? "Downgrade to Free"
-                                  : `Upgrade to ${plan.name}`}
-                              </button>
-                            )}
+                          <div className="flex items-center gap-2">
+                            <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                            <span>Bayesian TrustScore authenticity score (0–100)</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                            <span>Open to Work marketplace tags and status badges</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                            <span>Direct collaboration proposals &amp; brand messaging</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                            <span>Social account connection (Instagram, TikTok, YouTube)</span>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <Check className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                            <span>Public discovery ranking on verified leaderboards</span>
                           </div>
                         </div>
-                      );
-                    })}
+                      </div>
+                    </div>
                   </div>
                 </div>
 
-                {/* 4. Billing & Payment Management */}
-                <div id="creator-billing-section" className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6">
-                  <div className="pb-4 border-b border-slate-100">
-                    <h3 className="text-base font-bold text-slate-900 flex items-center gap-2">
-                      <CreditCard className="w-4 h-4 text-slate-700" />
-                      <span>Billing &amp; Payment Details</span>
-                    </h3>
-                    <p className="text-xs text-slate-500 mt-0.5">
-                      Payment methods, invoice receipts, and automated renewal terms
-                    </p>
-                  </div>
-
-                  <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 text-xs">
-                    <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-1">
-                      <span className="text-slate-400 font-medium">Payment Method</span>
-                      <p className="font-bold text-slate-900">Direct Account Billing</p>
-                      <p className="text-[10px] text-slate-400">No external credit card attached</p>
-                    </div>
-
-                    <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-1">
-                      <span className="text-slate-400 font-medium">Next Billing Date</span>
-                      <p className="font-bold text-slate-900">September 01, 2026</p>
-                      <p className="text-[10px] text-slate-400">Auto-renews monthly</p>
-                    </div>
-
-                    <div className="p-4 bg-slate-50 rounded-2xl border border-slate-200/80 space-y-1">
-                      <span className="text-slate-400 font-medium">Billing History</span>
-                      <p className="font-bold text-slate-900">0 Invoices</p>
-                      <p className="text-[10px] text-slate-400">Past invoices will appear here</p>
-                    </div>
-                  </div>
-
-                  {/* Honest Notice about Stripe connection */}
-                  <div className="p-4 rounded-2xl bg-amber-50/70 border border-amber-200/70 flex items-start gap-3">
-                    <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
-                    <div className="text-xs space-y-1">
-                      <span className="font-bold text-amber-900">Payment Gateway Notice</span>
-                      <p className="text-amber-800 leading-relaxed">
-                        Billing management will be available once payments are connected.
+                {/* 2. Platform Policy Notice */}
+                <div className="bg-white rounded-3xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-4">
+                  <div className="flex items-start gap-3">
+                    <ShieldCheck className="w-5 h-5 text-blue-600 shrink-0 mt-0.5" />
+                    <div className="space-y-1 text-xs text-slate-700">
+                      <h4 className="font-bold text-slate-900 text-sm">
+                        TrustScore Two-Sided Marketplace Model
+                      </h4>
+                      <p className="text-slate-600 leading-relaxed">
+                        Brands and talent agencies pay for team subscriptions to audit creator authenticity, detect pods, and access deep audience telemetry. Creators never pay for profile visibility or verification badges.
                       </p>
                     </div>
-                  </div>
-
-                  <div className="flex flex-wrap items-center gap-3 pt-2">
-                    <button
-                      type="button"
-                      onClick={() => success("Billing Info", "Billing management will be available once payments are connected.")}
-                      className="px-4 py-2.5 bg-slate-900 hover:bg-slate-800 text-white font-bold text-xs rounded-xl shadow-xs transition-colors cursor-pointer"
-                    >
-                      Manage Billing
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() => success("Invoices", "No billing history available yet.")}
-                      className="px-4 py-2.5 bg-slate-100 hover:bg-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition-colors cursor-pointer"
-                    >
-                      View Billing History
-                    </button>
                   </div>
                 </div>
               </div>

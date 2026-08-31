@@ -90,28 +90,35 @@ export function AdPlacementModal({
     setIsSubmitting(true);
 
     try {
-      const res = await fetch("/api/advertisements", {
+      const res = await fetch("/api/payments/checkout", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          businessName,
-          headline: tagline || `${businessName} Partnerships`,
-          description: description || "Direct-to-consumer brand collaborating with creators.",
-          destinationUrl: website.startsWith("http") ? website : `https://${website}`,
-          businessLogo: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=160&auto=format&fit=crop&q=80",
-          placement: selectedPkg.id === "growth" ? "left_sidebar" : "right_sidebar",
-          tier: selectedPkg.name,
-          category,
-          cost: selectedPkg.price,
+          itemType: "ADVERTISEMENT",
+          itemId: selectedPkg.id,
+          adDetails: {
+            businessName,
+            category,
+            tagline: tagline || `${businessName} Partnerships`,
+            description: description || "Direct-to-consumer brand collaborating with creators.",
+            ctaLink: website.startsWith("http") ? website : `https://${website}`,
+            placement: selectedPkg.id === "growth" ? "LEFT_SIDEBAR" : "RIGHT_SIDEBAR",
+          },
         }),
       });
 
-      if (res.ok) {
-        setIsSuccess(true);
+      const data = await res.json();
+      if (!res.ok || data.error) {
+        // Fallback for unauthenticated visitors
+        window.location.href = `/signup?role=BUSINESS&redirect=/dashboard/advertise`;
+        return;
+      }
+
+      if (data.checkoutUrl) {
+        window.location.href = data.checkoutUrl;
       }
     } catch {
-      // safe fallback
-      setIsSuccess(true);
+      window.location.href = `/signup?role=BUSINESS&redirect=/dashboard/advertise`;
     } finally {
       setIsSubmitting(false);
     }

@@ -86,11 +86,22 @@ cp .env.example .env.local
 | `NEXT_PUBLIC_APP_URL` | Base application URL (`http://localhost:3001` or production domain) |
 | `DATABASE_URL` | PostgreSQL connection string |
 | `AUTH_SECRET` | 32-character secret for signing session tokens |
-| `STRIPE_SECRET_KEY` | Stripe Secret API key |
-| `STRIPE_WEBHOOK_SECRET` | Stripe Webhook signing secret |
-| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Stripe publishable client key |
+| `STRIPE_SECRET_KEY` | Stripe Secret API key (`sk_test_...` or `sk_live_...`) |
+| `STRIPE_WEBHOOK_SECRET` | Stripe Webhook signing secret (`whsec_...`) |
+| `NEXT_PUBLIC_STRIPE_PUBLISHABLE_KEY` | Stripe publishable client key (`pk_test_...` or `pk_live_...`) |
+| `STRIPE_PRICE_STARTER_MONTHLY` | Stripe Price ID for Starter Monthly ($39/mo) |
+| `STRIPE_PRICE_STARTER_ANNUAL` | Stripe Price ID for Starter Annual ($29/mo, $348/yr) |
+| `STRIPE_PRICE_GROWTH_MONTHLY` | Stripe Price ID for Growth Monthly ($99/mo) |
+| `STRIPE_PRICE_GROWTH_ANNUAL` | Stripe Price ID for Growth Annual ($79/mo, $948/yr) |
+| `STRIPE_PRICE_AGENCY_MONTHLY` | Stripe Price ID for Agency Monthly ($249/mo) |
+| `STRIPE_PRICE_AGENCY_ANNUAL` | Stripe Price ID for Agency Annual ($199/mo, $2,388/yr) |
 
----
+### Stripe Webhook Forwarding (Local Development)
+To test real Stripe Checkout webhooks locally:
+```bash
+stripe listen --forward-to localhost:3001/api/payments/webhook
+```
+Copy the printed `whsec_...` secret to your `STRIPE_WEBHOOK_SECRET` environment variable.
 
 ## 🚀 Getting Started
 

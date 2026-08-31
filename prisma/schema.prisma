@@ -422,10 +422,14 @@ model Subscription {
   user                  User               @relation(fields: [userId], references: [id], onDelete: Cascade)
   planId                String             // "starter" | "growth" | "agency"
   status                SubscriptionStatus @default(ACTIVE)
+  billingCycle          String             @default("monthly") // "monthly" | "annual"
   stripeCustomerId      String?
-  stripeSubscriptionId  String?
-  creatorChecksRemaining Int              @default(50)
-  creatorChecksLimit    Int                @default(50)
+  stripeSubscriptionId  String?            @unique
+  stripePriceId         String?
+  stripeCheckoutSessionId String?
+  cancelAtPeriodEnd     Boolean            @default(false)
+  creatorChecksRemaining Int              @default(25)
+  creatorChecksLimit    Int                @default(25)
   currentPeriodStart    DateTime           @default(now())
   currentPeriodEnd      DateTime
   createdAt             DateTime           @default(now())
@@ -434,20 +438,44 @@ model Subscription {
   payments              PaymentRecord[]
 
   @@index([userId])
+  @@index([stripeCustomerId])
+  @@index([stripeSubscriptionId])
 }
 
 model PaymentRecord {
   id                    String         @id @default(cuid())
   subscriptionId        String?
   subscription          Subscription?  @relation(fields: [subscriptionId], references: [id], onDelete: SetNull)
+  userId                String?
   amount                Float
   currency              String         @default("usd")
-  stripePaymentIntentId String?
   status                String         // "succeeded" | "failed" | "pending"
   purpose               String         // "SUBSCRIPTION" | "ADVERTISEMENT" | "CREDIT_TOP_UP"
+  description           String?
+  stripeCustomerId      String?
+  stripeSubscriptionId  String?
+  stripeCheckoutSessionId String?
+  stripeInvoiceId       String?
+  stripePaymentIntentId String?
+  invoicePdfUrl         String?
+  receiptUrl            String?
+  hostedInvoiceUrl      String?
   createdAt             DateTime       @default(now())
 
   @@index([subscriptionId])
+  @@index([userId])
+  @@index([stripeCustomerId])
+  @@index([stripeInvoiceId])
+  @@index([stripePaymentIntentId])
+}
+
+model ProcessedStripeEvent {
+  id            String   @id @default(cuid())
+  stripeEventId String   @unique
+  eventType     String
+  processedAt   DateTime @default(now())
+
+  @@index([stripeEventId])
 }
 
 // ------------------------------------------------------------
