@@ -89,7 +89,7 @@ export function CollaborationModal({
 
   return (
     <Modal isOpen={isOpen} onClose={handleReset} title="" maxWidth="lg">
-      <div className="text-slate-100">
+      <div className="text-slate-100" data-testid="collaborate-modal">
         {!isSubmitted ? (
           <div>
             {/* Header with Creator Info */}

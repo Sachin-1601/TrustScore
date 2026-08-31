@@ -5,7 +5,7 @@ import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Logo } from "@/components/common/Logo";
 import { useAuth } from "@/contexts/AuthContext";
-import { ArrowRight, Lock, Mail, UserCheck, Building2, Sparkles, AlertCircle } from "lucide-react";
+import { ArrowRight, Lock, Mail, UserCheck, Building2, AlertCircle } from "lucide-react";
 
 type AccountType = "creator" | "business";
 
@@ -19,21 +19,14 @@ function LoginContent() {
   const [accountType, setAccountType] = useState<AccountType>(
     isCreatorInitial ? "creator" : "business"
   );
-  const [email, setEmail] = useState(
-    isCreatorInitial ? "alex@fitness.example.com" : "sarah@acmebrand.com"
-  );
-  const [password, setPassword] = useState("password123!");
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
 
   const handleSelectAccountType = (type: AccountType) => {
     setAccountType(type);
     setErrorMessage(null);
-    if (type === "creator") {
-      setEmail("alex@fitness.example.com");
-    } else {
-      setEmail("sarah@acmebrand.com");
-    }
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -54,19 +47,6 @@ function LoginContent() {
       }
     } else {
       setErrorMessage(res.error || "Invalid login credentials. Please try again.");
-    }
-  };
-
-  const handleQuickDemo = (roleChoice: "business" | "creator" | "admin") => {
-    if (roleChoice === "creator") {
-      setAccountType("creator");
-      setEmail("alex@fitness.example.com");
-    } else if (roleChoice === "admin") {
-      setAccountType("business");
-      setEmail("admin@trustscore.io");
-    } else {
-      setAccountType("business");
-      setEmail("sarah@acmebrand.com");
     }
   };
 
@@ -120,35 +100,6 @@ function LoginContent() {
               >
                 <Building2 className={`w-4 h-4 shrink-0 ${accountType === "business" ? "text-blue-600" : "text-slate-400"}`} />
                 <span>Business</span>
-              </button>
-            </div>
-          </div>
-
-          {/* Quick 1-Click Demo Fill */}
-          <div className="p-2.5 bg-slate-50 border border-slate-200/80 rounded-2xl flex items-center justify-between text-xs">
-            <span className="text-[11px] font-bold text-slate-500">Demo Fill:</span>
-            <div className="flex items-center gap-1">
-              <button
-                type="button"
-                onClick={() => handleQuickDemo("creator")}
-                className={`px-2 py-1 rounded-lg text-[11px] font-bold transition-colors cursor-pointer ${
-                  accountType === "creator"
-                    ? "bg-blue-600 text-white shadow-2xs"
-                    : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-100"
-                }`}
-              >
-                Creator (@alexfitness)
-              </button>
-              <button
-                type="button"
-                onClick={() => handleQuickDemo("business")}
-                className={`px-2 py-1 rounded-lg text-[11px] font-bold transition-colors cursor-pointer ${
-                  accountType === "business" && email.includes("acme")
-                    ? "bg-blue-600 text-white shadow-2xs"
-                    : "bg-white text-slate-600 border border-slate-200 hover:bg-slate-100"
-                }`}
-              >
-                Brand (Sarah)
               </button>
             </div>
           </div>

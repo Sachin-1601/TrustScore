@@ -40,8 +40,11 @@ export async function POST(req: Request) {
 
     let businessId = session.businessProfileId;
     if (!businessId) {
-      const business = await BusinessService.getBusinesses();
-      businessId = business[0]?.id || "gymfuel";
+      const bp = await BusinessService.getBusinessProfileByUserId(session.userId);
+      businessId = bp?.id;
+    }
+    if (!businessId) {
+      return NextResponse.json({ error: "Only business accounts can create campaigns" }, { status: 403 });
     }
 
     const campaign = await CampaignService.createCampaign({

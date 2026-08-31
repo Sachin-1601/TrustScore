@@ -1,72 +1,137 @@
-import { db } from "@/db/client";
+import { prisma } from "@/lib/prisma";
 import { SponsoredAd, AdPackage } from "@/types/creator";
-import { MOCK_AD_PACKAGES } from "@/data/mockAdvertisements";
+import { AD_PACKAGES } from "@/data/adPackages";
+import { AdPlacement, AdStatus } from "@prisma/client";
 
+const PLACEMENT_TO_ENUM: Record<string, AdPlacement> = {
+  left_sidebar: "LEFT_SIDEBAR",
+  right_sidebar: "RIGHT_SIDEBAR",
+  banner: "BANNER",
+  feed: "FEED",
+};
+const ENUM_TO_PLACEMENT: Record<AdPlacement, SponsoredAd["placement"]> = {
+  LEFT_SIDEBAR: "left_sidebar",
+  RIGHT_SIDEBAR: "right_sidebar",
+  BANNER: "banner",
+  FEED: "feed",
+};
+
+function mapToSponsoredAd(ad: any): SponsoredAd {
+  return {
+    id: ad.id,
+    businessId: ad.business?.slug || ad.businessId,
+    businessName: ad.business?.name || "Business",
+    businessLogo: ad.business?.logo || "",
+    category: ad.business?.category || "",
+    tagline: ad.tagline,
+    description: ad.description,
+    badgeText: (ad.badgeText as any) || "Sponsored",
+    ctaText: ad.ctaText || "View Business",
+    ctaLink: ad.ctaLink,
+    placement: ENUM_TO_PLACEMENT[ad.placement as AdPlacement],
+    impressionsCount: ad.impressions,
+    clicksCount: ad.clicks,
+  };
+}
+
+/**
+ * AdvertisementService — Prisma-backed. Only ACTIVE (paid & non-expired)
+ * advertisements are ever exposed publicly. Commercial advertising is strictly
+ * isolated from creator TrustScore calculations.
+ */
 export class AdvertisementService {
-  /**
-   * Get advertising packages
-   */
   public static getPackages(): AdPackage[] {
-    return MOCK_AD_PACKAGES;
+    return AD_PACKAGES;
   }
 
-  /**
-   * Get all active advertisements
-   */
+  private static activeWhere() {
+    return { status: AdStatus.ACTIVE, endDate: { gte: new Date() } };
+  }
+
   public static async getAdvertisements(): Promise<SponsoredAd[]> {
-    return db.listAdvertisements();
+    const ads = await prisma.advertisement.findMany({
+      where: this.activeWhere(),
+      include: { business: true },
+      orderBy: { createdAt: "desc" },
+    });
+    return ads.map(mapToSponsoredAd);
   }
 
-  /**
-   * Get ads for a specific placement slot
-   */
   public static async getAdsByPlacement(placement: SponsoredAd["placement"]): Promise<SponsoredAd[]> {
-    return db.listAdvertisementsByPlacement(placement);
+    const enumPlacement = PLACEMENT_TO_ENUM[placement];
+    if (!enumPlacement) return [];
+    const ads = await prisma.advertisement.findMany({
+      where: { ...this.activeWhere(), placement: enumPlacement },
+      include: { business: true },
+      orderBy: { createdAt: "desc" },
+    });
+    return ads.map(mapToSponsoredAd);
   }
 
   /**
-   * Create a new sponsored advertisement placement
-   * Note: Commercial advertising is strictly isolated from creator TrustScore calculations.
+   * Create an advertisement DRAFT for a business. It is created as
+   * PENDING_REVIEW and does NOT appear publicly until payment is verified
+   * (activation happens in the Stripe webhook handler).
    */
-  public static async createAdvertisement(data: {
-    businessName: string;
-    category: string;
+  public static async createDraft(data: {
+    businessProfileId: string;
+    packageId: string;
     tagline: string;
     description: string;
     ctaLink: string;
-    packageId: "starter" | "growth" | "premium";
     placement: SponsoredAd["placement"];
-  }): Promise<SponsoredAd> {
-    const newAd: SponsoredAd = {
-      id: `ad-${Date.now()}`,
-      businessId: data.businessName.toLowerCase().replace(/\s+/g, "-"),
-      businessName: data.businessName,
-      businessLogo: "https://images.unsplash.com/photo-1571019613454-1cb2f99b2d8b?w=100&auto=format&fit=crop&q=80",
-      tagline: data.tagline,
-      description: data.description,
-      category: data.category,
-      badgeText: "Sponsored",
-      ctaText: "Learn More",
-      ctaLink: data.ctaLink.startsWith("http") ? data.ctaLink : `https://${data.ctaLink}`,
-      placement: data.placement,
-      impressionsCount: 0,
-      clicksCount: 0,
-    };
+  }) {
+    const enumPlacement = PLACEMENT_TO_ENUM[data.placement] || "LEFT_SIDEBAR";
+    const ctaLink = /^https?:\/\//.test(data.ctaLink) ? data.ctaLink : `https://${data.ctaLink}`;
 
-    return db.createAdvertisement(newAd);
+    const ad = await prisma.advertisement.create({
+      data: {
+        businessId: data.businessProfileId,
+        packageId: data.packageId,
+        tagline: data.tagline,
+        description: data.description,
+        ctaLink,
+        placement: enumPlacement as AdPlacement,
+        status: AdStatus.PENDING_REVIEW,
+        startDate: new Date(),
+        endDate: new Date(Date.now() + 30 * 86400000),
+      },
+      include: { business: true },
+    });
+    return mapToSponsoredAd(ad);
   }
 
-  /**
-   * Track ad impression without altering click count
-   */
-  public static async recordImpression(adId: string): Promise<void> {
-    return db.recordAdImpression(adId);
+  /** Record a de-duplicated impression via AdEvent + counter increment. */
+  public static async recordImpression(adId: string, ipAddress?: string, userAgent?: string): Promise<void> {
+    const ad = await prisma.advertisement.findUnique({ where: { id: adId }, select: { id: true } });
+    if (!ad) return;
+
+    // Basic de-duplication: skip if same IP recorded an impression in last 60s.
+    if (ipAddress) {
+      const recent = await prisma.adEvent.findFirst({
+        where: {
+          advertisementId: adId,
+          eventType: "IMPRESSION",
+          ipAddress,
+          createdAt: { gte: new Date(Date.now() - 60_000) },
+        },
+      });
+      if (recent) return;
+    }
+
+    await prisma.$transaction([
+      prisma.adEvent.create({ data: { advertisementId: adId, eventType: "IMPRESSION", ipAddress, userAgent } }),
+      prisma.advertisement.update({ where: { id: adId }, data: { impressions: { increment: 1 } } }),
+    ]);
   }
 
-  /**
-   * Track ad click without altering impression count
-   */
-  public static async recordClick(adId: string): Promise<void> {
-    return db.recordAdClick(adId);
+  /** Record a click via AdEvent + counter increment. */
+  public static async recordClick(adId: string, ipAddress?: string, userAgent?: string): Promise<void> {
+    const ad = await prisma.advertisement.findUnique({ where: { id: adId }, select: { id: true } });
+    if (!ad) return;
+    await prisma.$transaction([
+      prisma.adEvent.create({ data: { advertisementId: adId, eventType: "CLICK", ipAddress, userAgent } }),
+      prisma.advertisement.update({ where: { id: adId }, data: { clicks: { increment: 1 } } }),
+    ]);
   }
 }

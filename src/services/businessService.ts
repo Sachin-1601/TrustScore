@@ -1,65 +1,124 @@
-import { db } from "@/db/client";
+import { prisma } from "@/lib/prisma";
 import { Business } from "@/types/creator";
+import { getServerSession } from "@/lib/session";
 
+/**
+ * BusinessService — backed exclusively by PostgreSQL/Prisma.
+ */
 export class BusinessService {
+  private static mapToBusiness(bp: any): Business {
+    return {
+      id: bp.slug,
+      slug: bp.slug,
+      name: bp.name,
+      logo: bp.logo,
+      category: bp.category,
+      location: bp.location || "Global",
+      tagline: bp.tagline || "",
+      description: bp.description || "",
+      website: bp.website || "",
+      isSponsored: bp.isSponsored ?? false,
+      activeCampaignsCount: bp._count?.campaigns ?? bp.activeCampaignsCount ?? 0,
+      productsOrServices: [],
+      openOpportunities: (bp.campaigns || [])
+        .filter((c: any) => c.status === "ACTIVE" || c.status === "PENDING")
+        .map((c: any) => ({
+          title: c.title,
+          budget: `$${Math.round(c.budget).toLocaleString()}`,
+          deliverables: c.deliverables,
+          category: c.category as any,
+        })),
+      contactEmail: bp.user?.email || "",
+      joinedDate: bp.createdAt
+        ? new Date(bp.createdAt).toLocaleDateString("en-US", { month: "long", year: "numeric" })
+        : "",
+    };
+  }
+
   public static async getBusinesses(query?: string, category?: string): Promise<Business[]> {
-    let all = await db.listBusinesses();
-
+    const where: any = {};
     if (query?.trim()) {
-      const q = query.toLowerCase();
-      all = all.filter(
-        (b) =>
-          b.name.toLowerCase().includes(q) ||
-          b.description.toLowerCase().includes(q) ||
-          b.category.toLowerCase().includes(q)
-      );
+      const q = query.trim();
+      where.OR = [
+        { name: { contains: q, mode: "insensitive" } },
+        { description: { contains: q, mode: "insensitive" } },
+        { category: { contains: q, mode: "insensitive" } },
+        { tagline: { contains: q, mode: "insensitive" } },
+      ];
     }
-
     if (category && category !== "all") {
-      all = all.filter((b) => b.category.toLowerCase() === category.toLowerCase());
+      where.category = { equals: category, mode: "insensitive" };
     }
 
-    return all;
+    const businesses = await prisma.businessProfile.findMany({
+      where,
+      include: {
+        user: { select: { email: true } },
+        campaigns: true,
+        _count: { select: { campaigns: true } },
+      },
+      orderBy: [{ isSponsored: "desc" }, { createdAt: "desc" }],
+    });
+
+    return businesses.map(BusinessService.mapToBusiness);
   }
 
   public static async getBusinessBySlug(slug: string): Promise<Business | null> {
-    return db.findBusinessBySlug(slug);
+    const bp = await prisma.businessProfile.findFirst({
+      where: { OR: [{ slug }, { id: slug }] },
+      include: {
+        user: { select: { email: true } },
+        campaigns: true,
+        _count: { select: { campaigns: true } },
+      },
+    });
+    if (!bp) return null;
+    return BusinessService.mapToBusiness(bp);
   }
 
-  public static async onboardBusiness(data: {
-    name: string;
-    category: string;
-    location: string;
-    website: string;
-    tagline: string;
-    description: string;
-  }): Promise<Business> {
-    const slug = data.name.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-");
-    const newBusiness: Business = {
-      id: slug,
-      slug,
-      name: data.name,
-      logo: "https://images.unsplash.com/photo-1517838277536-f5f99be501cd?w=120&auto=format&fit=crop&q=80",
-      category: data.category,
-      location: data.location,
-      tagline: data.tagline,
-      description: data.description,
-      website: data.website,
-      isSponsored: false,
-      activeCampaignsCount: 1,
-      productsOrServices: ["Custom Partnerships", "Creator Retainers"],
-      openOpportunities: [
-        {
-          title: "Creator Brand Ambassador Program",
-          budget: "$500 – $1,200 / month",
-          deliverables: "Monthly Dedicated Content + Event Gifting",
-          category: data.category as any,
-        },
-      ],
-      contactEmail: `partnerships@${slug}.example.com`,
-      joinedDate: "August 2026",
-    };
+  public static async getBusinessProfileByUserId(userId: string) {
+    return prisma.businessProfile.findUnique({ where: { userId } });
+  }
 
-    return db.createBusiness(newBusiness);
+  /**
+   * Update the authenticated user's own business profile (real, user-entered data).
+   */
+  public static async updateOwnBusiness(
+    userId: string,
+    updates: {
+      name?: string;
+      logo?: string;
+      category?: string;
+      location?: string;
+      tagline?: string;
+      description?: string;
+      website?: string;
+    }
+  ): Promise<{ success: boolean; business?: Business; error?: string }> {
+    const bp = await prisma.businessProfile.findUnique({ where: { userId } });
+    if (!bp) return { success: false, error: "Business profile not found" };
+
+    const data: any = {};
+    if (typeof updates.name === "string" && updates.name.trim()) data.name = updates.name.trim();
+    if (typeof updates.logo === "string" && updates.logo.trim()) data.logo = updates.logo.trim();
+    if (typeof updates.category === "string" && updates.category.trim()) data.category = updates.category.trim();
+    if (typeof updates.location === "string") data.location = updates.location.trim();
+    if (typeof updates.tagline === "string") data.tagline = updates.tagline.trim();
+    if (typeof updates.description === "string") data.description = updates.description.trim();
+    if (typeof updates.website === "string") {
+      const w = updates.website.trim();
+      if (w && !/^https?:\/\/.+/.test(w)) {
+        return { success: false, error: "Website must be a valid URL starting with http(s)://" };
+      }
+      data.website = w;
+    }
+
+    const updated = await prisma.businessProfile.update({
+      where: { id: bp.id },
+      data,
+      include: { user: { select: { email: true } }, campaigns: true, _count: { select: { campaigns: true } } },
+    });
+
+    return { success: true, business: BusinessService.mapToBusiness(updated) };
   }
 }

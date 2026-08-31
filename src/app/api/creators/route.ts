@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { CreatorService } from "@/services/creatorService";
+import { getServerSession } from "@/lib/session";
 
 export async function GET(req: Request) {
   try {
@@ -19,50 +20,43 @@ export async function GET(req: Request) {
     const offset = searchParams.get("offset") ? Number(searchParams.get("offset")) : undefined;
 
     const result = await CreatorService.getCreators({
-      query,
-      category,
-      platform,
-      minTrustScore,
-      followerRange,
-      location,
-      verifiedOnly,
-      socialVerifiedOnly,
-      availableOnly,
-      sortBy,
-      limit,
-      page,
-      offset,
+      query, category, platform, minTrustScore, followerRange, location,
+      verifiedOnly, socialVerifiedOnly, availableOnly, sortBy, limit, page, offset,
     });
 
     return NextResponse.json(result);
-  } catch (err: any) {
+  } catch (err) {
     console.error("Creators API GET error:", err);
-    return NextResponse.json({ error: err.message || "Failed to fetch creators" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to fetch creators" }, { status: 500 });
   }
 }
 
+/**
+ * Authenticated creator onboarding — creates an EMPTY (pending) creator profile
+ * tied to the current session. No telemetry / TrustScore is fabricated.
+ */
 export async function POST(req: Request) {
   try {
-    const body = await req.json();
-    const { name, username, category, location, platform, followers, bio } = body;
+    const session = await getServerSession();
+    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (session.role !== "CREATOR" && session.role !== "ADMIN") {
+      return NextResponse.json({ error: "Only creator accounts can create a creator profile" }, { status: 403 });
+    }
 
+    const body = await req.json();
+    const { name, username, category, location, platform, bio } = body;
     if (!name || !username || !category || !location || !platform) {
       return NextResponse.json({ error: "Missing required creator onboarding fields" }, { status: 400 });
     }
 
     const creator = await CreatorService.onboardCreator({
-      name,
-      username,
-      category,
-      location,
-      platform,
-      followers: followers ? Number(followers) : undefined,
-      bio,
+      userId: session.userId,
+      name, username, category, location, platform, bio,
     });
 
     return NextResponse.json({ creator }, { status: 201 });
-  } catch (err: any) {
+  } catch (err) {
     console.error("Creators API POST error:", err);
-    return NextResponse.json({ error: err.message || "Failed to onboard creator" }, { status: 500 });
+    return NextResponse.json({ error: "Failed to onboard creator" }, { status: 500 });
   }
 }

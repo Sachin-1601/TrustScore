@@ -6,8 +6,25 @@ export const SESSION_COOKIE_NAME = "trustscore_session";
 const SESSION_EXPIRY = "30d";
 const SESSION_MAX_AGE_SECONDS = 30 * 24 * 60 * 60; // 30 days
 
-const getSecretKey = () => {
-  const secret = process.env.AUTH_SECRET || "trustscore-super-secure-jwt-signing-secret-key-32-chars";
+/**
+ * Resolve the signing secret. In production a strong AUTH_SECRET is mandatory —
+ * we never fall back to a hardcoded secret. In non-production environments a
+ * clearly-labelled development secret is permitted only when AUTH_SECRET is unset.
+ */
+const getSecretKey = (): Uint8Array => {
+  const secret = process.env.AUTH_SECRET;
+
+  if (!secret || secret.length < 32) {
+    if (process.env.NODE_ENV === "production") {
+      throw new Error(
+        "AUTH_SECRET is missing or too short (min 32 chars). Refusing to sign sessions in production."
+      );
+    }
+    return new TextEncoder().encode(
+      secret || "dev-only-insecure-secret-change-me-please-32chars"
+    );
+  }
+
   return new TextEncoder().encode(secret);
 };
 
@@ -23,9 +40,6 @@ export interface SessionPayload {
   businessProfileId?: string;
 }
 
-/**
- * Sign a new JWT session token
- */
 export async function createSessionToken(payload: SessionPayload): Promise<string> {
   const secretKey = getSecretKey();
   return new SignJWT({ ...payload })
@@ -35,9 +49,6 @@ export async function createSessionToken(payload: SessionPayload): Promise<strin
     .sign(secretKey);
 }
 
-/**
- * Verify and decode an existing JWT session token
- */
 export async function verifySessionToken(token: string): Promise<SessionPayload | null> {
   try {
     const secretKey = getSecretKey();
@@ -48,9 +59,6 @@ export async function verifySessionToken(token: string): Promise<SessionPayload 
   }
 }
 
-/**
- * Retrieve the current authenticated server session from cookies (Server Components, Route Handlers, Server Actions)
- */
 export async function getServerSession(): Promise<SessionPayload | null> {
   try {
     const cookieStore = await cookies();
@@ -62,9 +70,6 @@ export async function getServerSession(): Promise<SessionPayload | null> {
   }
 }
 
-/**
- * Set the HTTP-only secure session cookie on a response or cookie store
- */
 export async function setSessionCookie(payload: SessionPayload): Promise<string> {
   const token = await createSessionToken(payload);
   const cookieStore = await cookies();
@@ -78,9 +83,6 @@ export async function setSessionCookie(payload: SessionPayload): Promise<string>
   return token;
 }
 
-/**
- * Clear session cookie on logout
- */
 export async function clearSessionCookie(): Promise<void> {
   try {
     const cookieStore = await cookies();

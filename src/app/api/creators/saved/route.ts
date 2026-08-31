@@ -1,158 +1,114 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
-import { db } from "@/db/client";
 import { getServerSession } from "@/lib/session";
+
+/**
+ * SavedCreator ownership is always scoped to the authenticated business profile.
+ * Business A saving a creator never affects Business B.
+ */
+async function requireBusinessProfileId(userId: string): Promise<string | null> {
+  const bp = await prisma.businessProfile.findUnique({ where: { userId }, select: { id: true } });
+  return bp?.id || null;
+}
 
 export async function GET() {
   try {
     const session = await getServerSession();
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const businessProfileId = await requireBusinessProfileId(session.userId);
+    if (!businessProfileId) {
+      // Non-business accounts have no saved list.
+      return NextResponse.json({ saved: [], success: true });
     }
 
-    try {
-      // Find business profile or query saved creators directly
-      let businessProfileId = session.businessProfileId;
-      if (!businessProfileId) {
-        const bp = await prisma.businessProfile.findUnique({ where: { userId: session.userId } });
-        businessProfileId = bp?.id;
-      }
+    const records = await prisma.savedCreator.findMany({
+      where: { businessId: businessProfileId },
+      include: { creator: true },
+      orderBy: { savedAt: "desc" },
+    });
 
-      if (businessProfileId) {
-        const savedRecords = await prisma.savedCreator.findMany({
-          where: { businessId: businessProfileId },
-          include: { creator: true },
-          orderBy: { savedAt: "desc" },
-        });
-
-        const saved = savedRecords.map((r) => r.creator.username.replace("@", ""));
-        return NextResponse.json({ saved, success: true });
-      }
-    } catch (dbErr) {
-      console.warn("Prisma saved creators query failed, using fallback:", dbErr);
-    }
-
-    const saved = await db.listSavedCreators(session.userId);
+    const saved = records.map((r) => r.creator.username.replace("@", ""));
     return NextResponse.json({ saved, success: true });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message || "Failed to fetch saved creators" }, { status: 500 });
+  } catch (err) {
+    console.error("Saved creators GET error:", err);
+    return NextResponse.json({ error: "Failed to fetch saved creators" }, { status: 500 });
   }
 }
 
 export async function POST(req: Request) {
   try {
     const session = await getServerSession();
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const businessProfileId = await requireBusinessProfileId(session.userId);
+    if (!businessProfileId) {
+      return NextResponse.json({ error: "Only business accounts can save creators" }, { status: 403 });
     }
 
-    const body = await req.json();
-    const { creatorId } = body;
+    const { creatorId } = await req.json();
+    if (!creatorId) return NextResponse.json({ error: "Missing creatorId" }, { status: 400 });
 
-    if (!creatorId) {
-      return NextResponse.json({ error: "Missing creatorId" }, { status: 400 });
-    }
+    const cleanCreatorId = String(creatorId).replace("@", "").toLowerCase();
+    const creatorProfile = await prisma.creatorProfile.findFirst({
+      where: {
+        OR: [
+          { id: cleanCreatorId },
+          { username: { equals: cleanCreatorId, mode: "insensitive" } },
+          { username: { equals: `@${cleanCreatorId}`, mode: "insensitive" } },
+        ],
+      },
+      select: { id: true },
+    });
+    if (!creatorProfile) return NextResponse.json({ error: "Creator not found" }, { status: 404 });
 
-    const cleanCreatorId = creatorId.replace("@", "").toLowerCase();
+    await prisma.savedCreator.upsert({
+      where: { businessId_creatorId: { businessId: businessProfileId, creatorId: creatorProfile.id } },
+      create: { businessId: businessProfileId, creatorId: creatorProfile.id },
+      update: { savedAt: new Date() },
+    });
 
-    try {
-      let businessProfileId = session.businessProfileId;
-      if (!businessProfileId) {
-        const bp = await prisma.businessProfile.findUnique({ where: { userId: session.userId } });
-        businessProfileId = bp?.id;
-      }
-
-      // Look up target creator profile
-      const creatorProfile = await prisma.creatorProfile.findFirst({
-        where: {
-          OR: [
-            { id: cleanCreatorId },
-            { username: { equals: cleanCreatorId, mode: "insensitive" } },
-            { username: { equals: `@${cleanCreatorId}`, mode: "insensitive" } },
-          ],
-        },
-      });
-
-      if (businessProfileId && creatorProfile) {
-        await prisma.savedCreator.upsert({
-          where: {
-            businessId_creatorId: {
-              businessId: businessProfileId,
-              creatorId: creatorProfile.id,
-            },
-          },
-          create: {
-            businessId: businessProfileId,
-            creatorId: creatorProfile.id,
-          },
-          update: {
-            savedAt: new Date(),
-          },
-        });
-
-        return NextResponse.json({ success: true });
-      }
-    } catch (dbErr) {
-      console.warn("Prisma save creator failed, using fallback:", dbErr);
-    }
-
-    await db.saveCreator(session.userId, cleanCreatorId);
     return NextResponse.json({ success: true });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message || "Failed to save creator" }, { status: 500 });
+  } catch (err) {
+    console.error("Saved creators POST error:", err);
+    return NextResponse.json({ error: "Failed to save creator" }, { status: 500 });
   }
 }
 
 export async function DELETE(req: Request) {
   try {
     const session = await getServerSession();
-    if (!session) {
-      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    if (!session) return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+
+    const businessProfileId = await requireBusinessProfileId(session.userId);
+    if (!businessProfileId) {
+      return NextResponse.json({ error: "Only business accounts can modify saved creators" }, { status: 403 });
     }
 
     const { searchParams } = new URL(req.url);
     const creatorId = searchParams.get("creatorId");
-
-    if (!creatorId) {
-      return NextResponse.json({ error: "Missing creatorId" }, { status: 400 });
-    }
+    if (!creatorId) return NextResponse.json({ error: "Missing creatorId" }, { status: 400 });
 
     const cleanCreatorId = creatorId.replace("@", "").toLowerCase();
+    const creatorProfile = await prisma.creatorProfile.findFirst({
+      where: {
+        OR: [
+          { id: cleanCreatorId },
+          { username: { equals: cleanCreatorId, mode: "insensitive" } },
+          { username: { equals: `@${cleanCreatorId}`, mode: "insensitive" } },
+        ],
+      },
+      select: { id: true },
+    });
+    if (!creatorProfile) return NextResponse.json({ success: true });
 
-    try {
-      let businessProfileId = session.businessProfileId;
-      if (!businessProfileId) {
-        const bp = await prisma.businessProfile.findUnique({ where: { userId: session.userId } });
-        businessProfileId = bp?.id;
-      }
+    await prisma.savedCreator.deleteMany({
+      where: { businessId: businessProfileId, creatorId: creatorProfile.id },
+    });
 
-      const creatorProfile = await prisma.creatorProfile.findFirst({
-        where: {
-          OR: [
-            { id: cleanCreatorId },
-            { username: { equals: cleanCreatorId, mode: "insensitive" } },
-            { username: { equals: `@${cleanCreatorId}`, mode: "insensitive" } },
-          ],
-        },
-      });
-
-      if (businessProfileId && creatorProfile) {
-        await prisma.savedCreator.deleteMany({
-          where: {
-            businessId: businessProfileId,
-            creatorId: creatorProfile.id,
-          },
-        });
-
-        return NextResponse.json({ success: true });
-      }
-    } catch (dbErr) {
-      console.warn("Prisma remove saved creator failed, using fallback:", dbErr);
-    }
-
-    await db.removeSavedCreator(session.userId, cleanCreatorId);
     return NextResponse.json({ success: true });
-  } catch (err: any) {
-    return NextResponse.json({ error: err.message || "Failed to remove saved creator" }, { status: 500 });
+  } catch (err) {
+    console.error("Saved creators DELETE error:", err);
+    return NextResponse.json({ error: "Failed to remove saved creator" }, { status: 500 });
   }
 }

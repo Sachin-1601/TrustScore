@@ -174,6 +174,7 @@ export function CreatorMarketplaceCard({
                 {/* Save Bookmark Button */}
                 <button
                   type="button"
+                  data-testid={`save-creator-${creator.id}`}
                   onClick={handleBookmarkToggle}
                   disabled={isSaving}
                   title={isSaved ? "Saved to shortlist" : "Save to shortlist"}

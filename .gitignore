@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# Local dev PostgreSQL data (must live under /app to persist)
+.pgdata/
