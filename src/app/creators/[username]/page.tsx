@@ -140,6 +140,26 @@ function CreatorProfileDetailView({ creator }: { creator: Creator }) {
     { name: "Repeated Patterns", value: creator.commentQuality?.repeatedPatternsPercent || 5, color: "#ef4444" },
   ];
 
+  const handleToggleSave = async () => {
+    const nextState = !isSaved;
+    setIsSaved(nextState);
+    try {
+      if (nextState) {
+        await fetch("/api/creators/saved", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ creatorId: creator.id }),
+        });
+      } else {
+        await fetch(`/api/creators/saved?creatorId=${encodeURIComponent(creator.id)}`, {
+          method: "DELETE",
+        });
+      }
+    } catch {
+      // rollback if failed
+    }
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-[#090d16] text-slate-100 selection:bg-blue-600 selection:text-white">
       <LandingNavbar />
@@ -227,7 +247,7 @@ function CreatorProfileDetailView({ creator }: { creator: Creator }) {
 
               <button
                 type="button"
-                onClick={() => setIsSaved(!isSaved)}
+                onClick={handleToggleSave}
                 className={`py-2.5 px-4 rounded-xl border text-xs font-bold transition-colors flex items-center gap-1.5 cursor-pointer ${
                   isSaved
                     ? "bg-purple-600/20 border-purple-500/40 text-purple-300"

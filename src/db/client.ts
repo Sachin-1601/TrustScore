@@ -41,6 +41,9 @@ class DatabaseRepository {
   private businesses: Business[] = [...SEED_BUSINESSES];
   private ads: SponsoredAd[] = [...SEED_ADS];
   private collaborations: CollaborationRequest[] = [...SEED_COLLABORATIONS];
+  private savedCreators: Record<string, string[]> = {
+    "user-sarah-business": ["alexfitness", "beautybymia", "jordantravel"],
+  };
   private messages: DBMessage[] = [
     {
       id: "msg-1",
@@ -378,6 +381,38 @@ class DatabaseRepository {
     };
     this.notifications.unshift(newNotif);
     return newNotif;
+  }
+
+  // ----------------------------------------------------
+  // Saved Creators Operations
+  // ----------------------------------------------------
+  async listSavedCreators(userId: string): Promise<Creator[]> {
+    const creatorIds = this.savedCreators[userId] || this.savedCreators["user-sarah-business"] || [];
+    const all = await this.listCreators();
+    return all.filter((c) => creatorIds.includes(c.id) || creatorIds.includes(c.username.replace("@", "")));
+  }
+
+  async saveCreator(userId: string, creatorId: string): Promise<boolean> {
+    if (!this.savedCreators[userId]) {
+      this.savedCreators[userId] = [];
+    }
+    if (!this.savedCreators[userId].includes(creatorId)) {
+      this.savedCreators[userId].push(creatorId);
+    }
+    return true;
+  }
+
+  async removeSavedCreator(userId: string, creatorId: string): Promise<boolean> {
+    if (!this.savedCreators[userId]) {
+      this.savedCreators[userId] = [];
+    }
+    this.savedCreators[userId] = this.savedCreators[userId].filter((id) => id !== creatorId && id !== creatorId.replace("@", ""));
+    return true;
+  }
+
+  async isCreatorSaved(userId: string, creatorId: string): Promise<boolean> {
+    const list = this.savedCreators[userId] || [];
+    return list.includes(creatorId) || list.includes(creatorId.replace("@", ""));
   }
 }
 

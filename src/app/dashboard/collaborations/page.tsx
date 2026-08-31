@@ -4,6 +4,7 @@ import React, { useState, useEffect, useCallback } from "react";
 import Link from "next/link";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { CollaborationRequest } from "@/types/creator";
+import { useAuth } from "@/contexts/AuthContext";
 import {
   FileText,
   DollarSign,
@@ -11,10 +12,16 @@ import {
   ArrowRight,
   Plus,
   Loader2,
+  Send,
+  CheckCircle2,
+  XCircle,
+  Clock,
+  Briefcase,
 } from "lucide-react";
 
 export default function CollaborationsPage() {
-  const [activeTab, setActiveTab] = useState<"all" | "Active" | "Pending" | "Accepted" | "Completed">("all");
+  const { role } = useAuth();
+  const [activeTab, setActiveTab] = useState<"all" | "Active" | "Pending" | "Accepted" | "Completed" | "Declined">("all");
   const [requests, setRequests] = useState<CollaborationRequest[]>([]);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
@@ -70,22 +77,28 @@ export default function CollaborationsPage() {
       case "Completed":
         return <span className="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase bg-slate-800 text-slate-300 border border-slate-700">Completed</span>;
       default:
-        return <span className="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase bg-rose-500/10 text-rose-400 border border-rose-500/20">Declined</span>;
+        return <span className="px-2.5 py-1 rounded-md text-[10px] font-bold uppercase bg-rose-500/10 text-rose-400 border border-rose-500/20">{status || "Declined"}</span>;
     }
   };
+
+  const isCreator = role === "CREATOR";
 
   return (
     <div className="min-h-full flex flex-col bg-slate-950 text-slate-100">
       <DashboardHeader
-        title="Collaboration Pipeline"
-        subtitle="Manage brand sponsorship proposals, milestone deliverables, and campaign agreements"
+        title={isCreator ? "Inbound Collaboration Proposals" : "Campaign Collaboration Pipeline"}
+        subtitle={
+          isCreator
+            ? "Review sponsorship offers, deliverables, and commercial partnership terms from brands"
+            : "Manage creator proposals, milestone deliverables, and active campaign agreements"
+        }
       />
 
       <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-6">
         {/* Top Controls & Tab Switcher */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
           <div className="flex items-center gap-1.5 overflow-x-auto p-1 bg-slate-900 border border-slate-800 rounded-2xl">
-            {(["all", "Active", "Pending", "Accepted", "Completed"] as const).map((tab) => (
+            {(["all", "Pending", "Accepted", "Active", "Completed", "Declined"] as const).map((tab) => (
               <button
                 key={tab}
                 type="button"
@@ -96,18 +109,20 @@ export default function CollaborationsPage() {
                     : "text-slate-400 hover:text-slate-200"
                 }`}
               >
-                {tab === "all" ? "All Requests" : tab}
+                {tab === "all" ? "All Proposals" : tab}
               </button>
             ))}
           </div>
 
-          <Link
-            href="/creators"
-            className="py-2.5 px-4 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition-colors flex items-center gap-1.5 self-start sm:self-auto shadow-xs"
-          >
-            <Plus className="w-4 h-4" />
-            <span>New Collaboration Request</span>
-          </Link>
+          {!isCreator && (
+            <Link
+              href="/creators"
+              className="py-2.5 px-4 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition-colors flex items-center gap-1.5 self-start sm:self-auto shadow-xs"
+            >
+              <Plus className="w-4 h-4" />
+              <span>New Collaboration Request</span>
+            </Link>
+          )}
         </div>
 
         {/* Requests List */}
@@ -176,23 +191,25 @@ export default function CollaborationsPage() {
                         <button
                           type="button"
                           onClick={() => handleUpdateStatus(req.id, "Accepted")}
-                          className="px-3 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition-colors cursor-pointer"
+                          className="px-3.5 py-1.5 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition-colors cursor-pointer flex items-center gap-1"
                         >
-                          Accept
+                          <CheckCircle2 className="w-3.5 h-3.5" />
+                          <span>Accept</span>
                         </button>
                         <button
                           type="button"
                           onClick={() => handleUpdateStatus(req.id, "Declined")}
-                          className="px-3 py-1.5 bg-slate-800 hover:bg-rose-950 hover:text-rose-400 text-slate-300 font-semibold rounded-xl transition-colors cursor-pointer"
+                          className="px-3.5 py-1.5 bg-slate-800 hover:bg-rose-950 hover:text-rose-400 text-slate-300 font-semibold rounded-xl transition-colors cursor-pointer flex items-center gap-1"
                         >
-                          Decline
+                          <XCircle className="w-3.5 h-3.5" />
+                          <span>Decline</span>
                         </button>
                       </>
                     )}
 
                     <Link
                       href={`/dashboard/messages?collaborationId=${req.id}`}
-                      className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl transition-colors flex items-center gap-1"
+                      className="px-3.5 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold rounded-xl transition-colors flex items-center gap-1"
                     >
                       <span>Messages</span>
                       <ArrowRight className="w-3.5 h-3.5" />
@@ -203,18 +220,25 @@ export default function CollaborationsPage() {
             ))}
           </div>
         ) : (
-          <div className="bg-slate-900/60 border border-slate-800 rounded-3xl p-12 text-center space-y-4">
-            <h3 className="text-base font-bold text-slate-200">No collaborations in this view</h3>
+          <div className="bg-slate-900/60 border border-slate-800 rounded-3xl p-16 text-center space-y-4">
+            <Briefcase className="w-8 h-8 text-slate-500 mx-auto" />
+            <h3 className="text-base font-bold text-slate-200">No collaboration proposals in this view</h3>
             <p className="text-xs text-slate-400 max-w-sm mx-auto">
-              Find authentic creators on the marketplace to send direct sponsorship agreements.
+              {isCreator
+                ? "When businesses discover your profile and send campaign offers, they will appear here for your review."
+                : "Find authentic creators on the marketplace to send direct sponsorship agreements."}
             </p>
-            <Link
-              href="/creators"
-              className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl"
-            >
-              <Plus className="w-4 h-4" />
-              <span>Browse Creators</span>
-            </Link>
+            {!isCreator && (
+              <div className="pt-2">
+                <Link
+                  href="/creators"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl"
+                >
+                  <Plus className="w-4 h-4" />
+                  <span>Browse Creator Marketplace</span>
+                </Link>
+              </div>
+            )}
           </div>
         )}
       </div>

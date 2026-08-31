@@ -4,7 +4,6 @@ import React, { useState, useEffect } from "react";
 import Link from "next/link";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { Creator } from "@/types/creator";
-import { PlatformIcon } from "@/components/common/PlatformIcon";
 import { VerificationBadge } from "@/components/common/VerificationBadge";
 import { CollaborationModal } from "@/components/marketplace/CollaborationModal";
 import { formatNumber } from "@/lib/utils";
@@ -13,6 +12,8 @@ import {
   Trash2,
   Plus,
   Loader2,
+  Send,
+  ArrowRight,
 } from "lucide-react";
 
 export default function SavedCreatorsPage() {
@@ -20,25 +21,33 @@ export default function SavedCreatorsPage() {
   const [selectedCollabCreator, setSelectedCollabCreator] = useState<Creator | null>(null);
   const [isLoading, setIsLoading] = useState<boolean>(true);
 
-  useEffect(() => {
-    async function loadSaved() {
-      try {
-        const res = await fetch("/api/creators?limit=4");
-        if (res.ok) {
-          const data = await res.json();
-          setSavedCreators(data.creators || []);
-        }
-      } catch {
-        // Error
-      } finally {
-        setIsLoading(false);
+  const loadSaved = async () => {
+    try {
+      const res = await fetch("/api/creators/saved");
+      if (res.ok) {
+        const data = await res.json();
+        setSavedCreators(data.saved || []);
       }
+    } catch {
+      // safe ignore
+    } finally {
+      setIsLoading(false);
     }
+  };
+
+  useEffect(() => {
     loadSaved();
   }, []);
 
-  const handleRemove = (id: string) => {
+  const handleRemove = async (id: string) => {
     setSavedCreators((prev) => prev.filter((c) => c.id !== id));
+    try {
+      await fetch(`/api/creators/saved?creatorId=${encodeURIComponent(id)}`, {
+        method: "DELETE",
+      });
+    } catch {
+      // rollback if needed
+    }
   };
 
   return (
@@ -59,7 +68,7 @@ export default function SavedCreatorsPage() {
 
           <Link
             href="/creators"
-            className="py-2 px-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition-colors flex items-center gap-1.5 self-start sm:self-auto"
+            className="py-2 px-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition-colors flex items-center gap-1.5 self-start sm:self-auto shadow-xs"
           >
             <Plus className="w-4 h-4" />
             <span>Discover More Creators</span>
@@ -126,7 +135,7 @@ export default function SavedCreatorsPage() {
                       </td>
 
                       <td className="py-3.5 px-4 text-right">
-                        <span className="font-extrabold text-slate-100">{creator.trustScore}</span>
+                        <span className="font-extrabold text-blue-400">{creator.trustScore}</span>
                         <span className="text-[10px] text-slate-500">/100</span>
                       </td>
 
@@ -139,17 +148,18 @@ export default function SavedCreatorsPage() {
                           <button
                             type="button"
                             onClick={() => setSelectedCollabCreator(creator)}
-                            className="px-2.5 py-1 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg text-[11px] cursor-pointer"
+                            className="px-2.5 py-1 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg text-[11px] cursor-pointer flex items-center gap-1"
                           >
-                            Collab
+                            <Send className="w-3 h-3" />
+                            <span>Collab</span>
                           </button>
                           <button
                             type="button"
                             onClick={() => handleRemove(creator.id)}
-                            className="p-1 text-slate-500 hover:text-rose-400 transition-colors cursor-pointer"
+                            className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-rose-950/30 rounded-lg transition-colors cursor-pointer"
                             title="Remove from saved"
                           >
-                            <Trash2 className="w-4 h-4" />
+                            <Trash2 className="w-3.5 h-3.5" />
                           </button>
                         </div>
                       </td>
@@ -160,9 +170,21 @@ export default function SavedCreatorsPage() {
             </div>
           </div>
         ) : (
-          <div className="bg-slate-900/60 border border-slate-800 rounded-3xl p-12 text-center space-y-3">
+          <div className="bg-slate-900/60 border border-slate-800 rounded-3xl p-16 text-center space-y-3">
+            <Bookmark className="w-8 h-8 text-slate-500 mx-auto" />
             <h3 className="text-base font-bold text-slate-200">You haven&apos;t saved any creators yet</h3>
-            <p className="text-xs text-slate-400">Bookmark creators from the marketplace to track their authenticity and invite them to campaigns.</p>
+            <p className="text-xs text-slate-400 max-w-md mx-auto">
+              Bookmark creators from the marketplace or leaderboard to track their authenticity and invite them to collaboration campaigns.
+            </p>
+            <div className="pt-2">
+              <Link
+                href="/creators"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl"
+              >
+                <span>Browse Creator Marketplace</span>
+                <ArrowRight className="w-3.5 h-3.5" />
+              </Link>
+            </div>
           </div>
         )}
       </div>
