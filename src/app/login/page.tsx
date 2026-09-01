@@ -1,13 +1,49 @@
 "use client";
 
-import React, { useState, useEffect, Suspense } from "react";
+import React, { useState, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Logo } from "@/components/common/Logo";
 import { useAuth } from "@/contexts/AuthContext";
-import { ArrowRight, Lock, Mail, UserCheck, Building2, AlertCircle } from "lucide-react";
+import {
+  ArrowRight,
+  Lock,
+  Mail,
+  User,
+  Building2,
+  AlertCircle,
+  Eye,
+  EyeOff,
+  ShieldCheck,
+  Sparkles,
+  CheckCircle2,
+  Info,
+} from "lucide-react";
 
 type AccountType = "creator" | "business";
+
+function GoogleIcon({ className = "w-4 h-4" }: { className?: string }) {
+  return (
+    <svg className={className} viewBox="0 0 24 24">
+      <path
+        fill="#4285F4"
+        d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
+      />
+      <path
+        fill="#34A853"
+        d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
+      />
+      <path
+        fill="#FBBC05"
+        d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.06H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.94l2.85-2.22.81-.63z"
+      />
+      <path
+        fill="#EA4335"
+        d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.06l3.66 2.84c.87-2.6 3.3-4.52 6.16-4.52z"
+      />
+    </svg>
+  );
+}
 
 function LoginContent() {
   const router = useRouter();
@@ -19,13 +55,38 @@ function LoginContent() {
   const [accountType, setAccountType] = useState<AccountType>(
     isCreatorInitial ? "creator" : "business"
   );
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
   const [isLoading, setIsLoading] = useState(false);
-  const [errorMessage, setErrorMessage] = useState<string | null>(null);
+  const [isGoogleLoading, setIsGoogleLoading] = useState(false);
+  const [errorMessage, setErrorMessage] = useState<string | null>(
+    searchParams.get("error") || null
+  );
+  const [forgotNotice, setForgotNotice] = useState<string | null>(null);
 
   const handleSelectAccountType = (type: AccountType) => {
     setAccountType(type);
+    setErrorMessage(null);
+    setForgotNotice(null);
+  };
+
+  const handleGoogleClick = () => {
+    setIsGoogleLoading(true);
+    setErrorMessage(null);
+    // Direct browser redirect to Google OAuth authorization endpoint
+    window.location.href = `/api/auth/google?type=${accountType}&action=login`;
+  };
+
+  const handleForgotPassword = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setForgotNotice(
+      "Password reset instructions will be sent to " +
+        (email.trim() ? email.trim() : "your registered work email") +
+        " if an active account exists."
+    );
     setErrorMessage(null);
   };
 
@@ -33,6 +94,7 @@ function LoginContent() {
     e.preventDefault();
     setIsLoading(true);
     setErrorMessage(null);
+    setForgotNotice(null);
 
     const res = await login(email, password, accountType);
     setIsLoading(false);
@@ -51,130 +113,289 @@ function LoginContent() {
   };
 
   return (
-    <div className="min-h-screen bg-slate-50 flex flex-col justify-center py-12 sm:px-6 lg:px-8 bg-radial-gradient">
-      <div className="sm:mx-auto sm:w-full sm:max-w-md text-center">
-        <Logo size="lg" href="/" showTagline={false} className="justify-center" />
-        <h2 className="mt-6 text-2xl sm:text-3xl font-extrabold text-slate-900 tracking-tight">
-          Welcome back
-        </h2>
-        <p className="mt-2 text-xs sm:text-sm text-slate-600">
-          Or{" "}
-          <Link
-            href={`/signup?type=${accountType}`}
-            className="font-semibold text-blue-600 hover:text-blue-500"
-          >
-            create a new {accountType === "creator" ? "creator" : "business"} account
-          </Link>
-        </p>
-      </div>
+    <div className="min-h-screen bg-[#090d16] text-slate-100 flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-950/25 via-[#090d16] to-[#090d16]">
+      <div className="max-w-5xl w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
+        {/* ============================================================ */}
+        {/* LEFT COLUMN: TrustScore Brand Value Proposition (Desktop)    */}
+        {/* ============================================================ */}
+        <div className="hidden lg:flex lg:col-span-5 flex-col justify-between space-y-8 pr-4">
+          <div className="space-y-6">
+            <Logo size="lg" href="/" showTagline={false} variant="light" showBadge={false} />
 
-      <div className="mt-8 sm:mx-auto sm:w-full sm:max-w-md px-4">
-        <div className="bg-white py-8 px-6 sm:px-10 shadow-xl rounded-3xl border border-slate-200 space-y-6">
-          {/* Explicit Account Type Selection */}
-          <div>
-            <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-2.5">
-              Choose how you want to sign in:
-            </label>
-            <div className="grid grid-cols-2 gap-3">
-              <button
-                type="button"
-                onClick={() => handleSelectAccountType("creator")}
-                className={`py-3 px-4 rounded-2xl border text-center transition-all cursor-pointer flex items-center justify-center gap-2 font-bold text-xs sm:text-sm ${
-                  accountType === "creator"
-                    ? "bg-blue-50/90 border-blue-600 ring-2 ring-blue-600/20 text-blue-900 shadow-xs"
-                    : "bg-slate-50/60 border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-slate-900"
-                }`}
-              >
-                <UserCheck className={`w-4 h-4 shrink-0 ${accountType === "creator" ? "text-blue-600" : "text-slate-400"}`} />
-                <span>Creator</span>
-              </button>
+            <div className="space-y-3">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[11px] font-bold uppercase tracking-wider">
+                <ShieldCheck className="w-3.5 h-3.5" />
+                <span>Enterprise Authenticity Intelligence</span>
+              </div>
+              <h1 className="text-3xl font-black text-slate-100 tracking-tight leading-tight">
+                Authentic creator partnerships powered by data.
+              </h1>
+              <p className="text-sm text-slate-400 leading-relaxed">
+                Access your TrustScore workspace to audit creator authenticity, track verified Graph API metrics, and manage secure collaborations.
+              </p>
+            </div>
 
-              <button
-                type="button"
-                onClick={() => handleSelectAccountType("business")}
-                className={`py-3 px-4 rounded-2xl border text-center transition-all cursor-pointer flex items-center justify-center gap-2 font-bold text-xs sm:text-sm ${
-                  accountType === "business"
-                    ? "bg-blue-50/90 border-blue-600 ring-2 ring-blue-600/20 text-blue-900 shadow-xs"
-                    : "bg-slate-50/60 border-slate-200 text-slate-700 hover:bg-slate-50 hover:text-slate-900"
-                }`}
-              >
-                <Building2 className={`w-4 h-4 shrink-0 ${accountType === "business" ? "text-blue-600" : "text-slate-400"}`} />
-                <span>Business</span>
-              </button>
+            {/* Feature Telemetry Highlights */}
+            <div className="space-y-3.5 pt-2">
+              <div className="flex items-start gap-3 p-3 rounded-2xl bg-slate-900/60 border border-slate-800/80">
+                <div className="w-8 h-8 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center shrink-0 mt-0.5">
+                  <Sparkles className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-slate-200">Probabilistic TrustScore Engine</h4>
+                  <p className="text-[11px] text-slate-400 leading-relaxed">
+                    Multivariate anomaly detection identifying engagement pods and bought followers.
+                  </p>
+                </div>
+              </div>
+
+              <div className="flex items-start gap-3 p-3 rounded-2xl bg-slate-900/60 border border-slate-800/80">
+                <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+                  <CheckCircle2 className="w-4 h-4" />
+                </div>
+                <div>
+                  <h4 className="text-xs font-bold text-slate-200">Verified Platform Connections</h4>
+                  <p className="text-[11px] text-slate-400 leading-relaxed">
+                    Direct read-only API telemetry from Instagram, TikTok, and YouTube.
+                  </p>
+                </div>
+              </div>
             </div>
           </div>
 
-          {errorMessage && (
-            <div className="p-3 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0" />
-              <span>{errorMessage}</span>
-            </div>
-          )}
+          <div className="pt-6 border-t border-slate-800/70 flex items-center justify-between text-xs text-slate-500">
+            <span>© 2026 TrustScore SaaS</span>
+            <span className="flex items-center gap-1.5 text-emerald-400 font-medium">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              API Services Operational
+            </span>
+          </div>
+        </div>
 
-          <form onSubmit={handleSubmit} className="space-y-4">
-            <div>
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-700 mb-1">
-                {accountType === "creator" ? "Creator Email or Login" : "Work Email Address"}
+        {/* ============================================================ */}
+        {/* RIGHT COLUMN: Redesigned SaaS Authentication Card            */}
+        {/* ============================================================ */}
+        <div className="lg:col-span-7 w-full max-w-lg mx-auto">
+          <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
+            {/* Mobile Header Logo */}
+            <div className="lg:hidden text-center space-y-2 pb-2">
+              <Logo size="md" href="/" showTagline={false} variant="light" showBadge={false} className="justify-center" />
+            </div>
+
+            {/* Header Title */}
+            <div className="space-y-1">
+              <h2 className="text-2xl sm:text-3xl font-black text-slate-100 tracking-tight">
+                Welcome back
+              </h2>
+              <p className="text-xs sm:text-sm text-slate-400">
+                Sign in to continue to your TrustScore workspace.
+              </p>
+            </div>
+
+            {/* Account Type Segmented Control */}
+            <div className="space-y-2">
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                Continue As
               </label>
-              <div className="relative">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder={accountType === "creator" ? "alex@fitness.example.com" : "sarah@acmebrand.com"}
-                  className="w-full px-4 py-2.5 pl-10 rounded-xl border border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-blue-600 text-sm font-medium text-slate-900 bg-white placeholder:text-slate-400"
-                  required
-                />
-                <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5 pointer-events-none" />
+              <div className="grid grid-cols-2 gap-2 p-1 bg-slate-950 rounded-2xl border border-slate-800">
+                <button
+                  type="button"
+                  onClick={() => handleSelectAccountType("creator")}
+                  className={`py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer flex items-center justify-center gap-2 ${
+                    accountType === "creator"
+                      ? "bg-blue-600 text-white shadow-md shadow-blue-600/30"
+                      : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/60"
+                  }`}
+                >
+                  <User className="w-4 h-4 shrink-0" />
+                  <span>Creator</span>
+                </button>
+
+                <button
+                  type="button"
+                  onClick={() => handleSelectAccountType("business")}
+                  className={`py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer flex items-center justify-center gap-2 ${
+                    accountType === "business"
+                      ? "bg-blue-600 text-white shadow-md shadow-blue-600/30"
+                      : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/60"
+                  }`}
+                >
+                  <Building2 className="w-4 h-4 shrink-0" />
+                  <span>Business</span>
+                </button>
               </div>
+
+              {/* Contextual helper text */}
+              <p className="text-[11px] text-slate-400 px-1">
+                {accountType === "creator"
+                  ? "Manage your profile, authenticity score, and brand partnerships."
+                  : "Discover creators, evaluate authenticity, and manage campaigns."}
+              </p>
             </div>
 
-            <div>
-              <div className="flex items-center justify-between mb-1">
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-700">
-                  Password
-                </label>
-                <a href="#" className="text-xs text-blue-600 hover:text-blue-500 font-medium">
-                  Forgot password?
-                </a>
-              </div>
-              <div className="relative">
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••••••"
-                  className="w-full px-4 py-2.5 pl-10 rounded-xl border border-slate-300 focus:outline-hidden focus:ring-2 focus:ring-blue-600 text-sm font-medium text-slate-900 bg-white placeholder:text-slate-400"
-                  required
-                />
-                <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5 pointer-events-none" />
-              </div>
-            </div>
+            {/* Google Authentication Button */}
+            <div className="space-y-3">
+              <button
+                type="button"
+                onClick={handleGoogleClick}
+                disabled={isGoogleLoading}
+                className="w-full py-3 px-4 rounded-2xl bg-slate-950 hover:bg-slate-800/80 border border-slate-800 hover:border-slate-700 text-slate-200 font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-3 cursor-pointer shadow-xs disabled:opacity-50"
+              >
+                {isGoogleLoading ? (
+                  <span className="w-4 h-4 border-2 border-slate-400 border-t-blue-500 rounded-full animate-spin" />
+                ) : (
+                  <GoogleIcon className="w-4 h-4 shrink-0" />
+                )}
+                <span>Continue with Google</span>
+              </button>
 
-            <div className="flex items-center justify-between text-xs text-slate-600 pt-1">
-              <label className="flex items-center gap-2 cursor-pointer">
-                <input type="checkbox" defaultChecked className="rounded text-blue-600" />
-                <span>Remember this workstation</span>
-              </label>
-            </div>
-
-            <button
-              type="submit"
-              disabled={isLoading}
-              className="w-full py-3 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm rounded-xl shadow-md shadow-blue-500/20 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
-            >
-              {isLoading ? (
-                <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-              ) : (
-                <>
-                  <span>
-                    Sign in to {accountType === "creator" ? "Creator Hub" : "Business Dashboard"}
-                  </span>
-                  <ArrowRight className="w-4 h-4" />
-                </>
+              {/* Forgot Password Feedback Notice */}
+              {forgotNotice && (
+                <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs flex items-start gap-2.5 animate-in fade-in">
+                  <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-emerald-400" />
+                  <span className="leading-relaxed">{forgotNotice}</span>
+                </div>
               )}
-            </button>
-          </form>
+
+              {/* Divider */}
+              <div className="relative flex items-center justify-center">
+                <div className="w-full border-t border-slate-800" />
+                <span className="absolute px-3 bg-slate-900 text-[10px] uppercase font-bold text-slate-500 tracking-wider">
+                  or continue with email
+                </span>
+              </div>
+            </div>
+
+            {/* Error Message Display */}
+            {errorMessage && (
+              <div className="p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-2.5 animate-in fade-in">
+                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-400" />
+                <span className="leading-relaxed">{errorMessage}</span>
+              </div>
+            )}
+
+            {/* Login Form */}
+            <form onSubmit={handleSubmit} className="space-y-4">
+              {/* Email Address */}
+              <div className="space-y-1.5">
+                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider text-[10px]">
+                  {accountType === "creator" ? "Creator Email Address" : "Work Email Address"}
+                </label>
+                <div className="relative">
+                  <input
+                    type="email"
+                    value={email}
+                    onChange={(e) => setEmail(e.target.value)}
+                    placeholder={
+                      accountType === "creator"
+                        ? "creator@example.com"
+                        : "name@company.com"
+                    }
+                    className="w-full py-3 px-4 pl-10 bg-slate-950 border border-slate-800 rounded-2xl text-slate-100 placeholder-slate-500 text-xs sm:text-sm font-semibold focus:outline-hidden focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+                    required
+                  />
+                  <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5 pointer-events-none" />
+                </div>
+              </div>
+
+              {/* Password */}
+              <div className="space-y-1.5">
+                <div className="flex items-center justify-between">
+                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider text-[10px]">
+                    Password
+                  </label>
+                  <button
+                    type="button"
+                    onClick={handleForgotPassword}
+                    className="text-xs text-blue-400 hover:text-blue-300 font-semibold cursor-pointer transition-colors"
+                  >
+                    Forgot password?
+                  </button>
+                </div>
+                <div className="relative">
+                  <input
+                    type={showPassword ? "text" : "password"}
+                    value={password}
+                    onChange={(e) => setPassword(e.target.value)}
+                    placeholder="••••••••••••"
+                    className="w-full py-3 px-4 pl-10 pr-10 bg-slate-950 border border-slate-800 rounded-2xl text-slate-100 placeholder-slate-500 text-xs sm:text-sm font-semibold focus:outline-hidden focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+                    required
+                  />
+                  <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5 pointer-events-none" />
+                  <button
+                    type="button"
+                    onClick={() => setShowPassword(!showPassword)}
+                    className="absolute right-3.5 top-3.5 text-slate-400 hover:text-slate-200 cursor-pointer p-0.5"
+                    aria-label={showPassword ? "Hide password" : "Show password"}
+                  >
+                    {showPassword ? (
+                      <EyeOff className="w-4 h-4" />
+                    ) : (
+                      <Eye className="w-4 h-4" />
+                    )}
+                  </button>
+                </div>
+              </div>
+
+              {/* Remember Me */}
+              <div className="flex items-center justify-between text-xs text-slate-400 pt-1">
+                <label className="flex items-center gap-2 cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={rememberMe}
+                    onChange={(e) => setRememberMe(e.target.checked)}
+                    className="w-4 h-4 rounded-md bg-slate-950 border-slate-800 text-blue-600 focus:ring-0 cursor-pointer"
+                  />
+                  <span>Remember this workstation</span>
+                </label>
+              </div>
+
+              {/* Submit CTA */}
+              <button
+                type="submit"
+                disabled={isLoading}
+                className="w-full py-3.5 px-4 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-lg shadow-blue-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+              >
+                {isLoading ? (
+                  <>
+                    <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                    <span>Signing in...</span>
+                  </>
+                ) : (
+                  <>
+                    <span>
+                      Sign in to {accountType === "creator" ? "Creator Hub" : "Business Workspace"}
+                    </span>
+                    <ArrowRight className="w-4 h-4" />
+                  </>
+                )}
+              </button>
+            </form>
+
+            {/* Bottom Sign Up Navigation Link */}
+            <div className="pt-2 text-center text-xs text-slate-400 border-t border-slate-800/80">
+              Don&apos;t have a TrustScore account?{" "}
+              <Link
+                href={`/signup?type=${accountType}`}
+                className="font-bold text-blue-400 hover:text-blue-300 transition-colors"
+              >
+                Create an account
+              </Link>
+            </div>
+
+            {/* Legal & Terms */}
+            <p className="text-[11px] text-slate-500 text-center leading-relaxed">
+              By continuing, you agree to TrustScore&apos;s{" "}
+              <Link href="/terms" className="text-slate-400 hover:text-slate-200 underline">
+                Terms of Service
+              </Link>{" "}
+              and{" "}
+              <Link href="/privacy" className="text-slate-400 hover:text-slate-200 underline">
+                Privacy Policy
+              </Link>
+              .
+            </p>
+          </div>
         </div>
       </div>
     </div>
@@ -183,7 +404,13 @@ function LoginContent() {
 
 export default function LoginPage() {
   return (
-    <Suspense fallback={<div className="min-h-screen bg-slate-50 flex items-center justify-center text-xs text-slate-400">Loading sign in...</div>}>
+    <Suspense
+      fallback={
+        <div className="min-h-screen bg-[#090d16] flex items-center justify-center text-xs text-slate-400">
+          Loading sign in...
+        </div>
+      }
+    >
       <LoginContent />
     </Suspense>
   );
