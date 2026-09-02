@@ -78,6 +78,7 @@ function SignupContent() {
 
   // Verification Pending Screen State
   const [isPendingVerification, setIsPendingVerification] = useState(false);
+  const [isEmailSent, setIsEmailSent] = useState(false);
   const [pendingEmail, setPendingEmail] = useState("");
   const [resendStatus, setResendStatus] = useState<string | null>(null);
   const [resendError, setResendError] = useState<string | null>(null);
@@ -150,8 +151,9 @@ function SignupContent() {
 
     if (res.success && res.requiresVerification) {
       setPendingEmail(res.email || cleanEmail);
+      setIsEmailSent(res.emailSent === true);
       setIsPendingVerification(true);
-      setResendCooldown(60);
+      setResendCooldown(res.emailSent ? 60 : 0);
     } else if (res.success && res.session) {
       // Fallback for non-verification flows if applicable
       router.push(res.session.role === "CREATOR" ? "/dashboard/creator" : "/dashboard");
@@ -170,6 +172,7 @@ function SignupContent() {
     setIsResending(false);
 
     if (res.success) {
+      setIsEmailSent(true);
       setResendStatus(res.message || "A new verification link has been sent to your email.");
       setResendCooldown(60);
     } else {
@@ -242,29 +245,61 @@ function SignupContent() {
             /* CHECK YOUR EMAIL / PENDING VERIFICATION SCREEN               */
             /* ============================================================ */
             <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 text-center animate-in fade-in zoom-in-95">
-              <div className="w-16 h-16 rounded-3xl bg-blue-600/15 border border-blue-500/30 text-blue-400 flex items-center justify-center mx-auto shadow-inner">
-                <Mail className="w-8 h-8 text-blue-400 animate-bounce" />
-              </div>
+              {isEmailSent ? (
+                /* DELIVERED STATE: Check your email */
+                <>
+                  <div className="w-16 h-16 rounded-3xl bg-blue-600/15 border border-blue-500/30 text-blue-400 flex items-center justify-center mx-auto shadow-inner">
+                    <Mail className="w-8 h-8 text-blue-400 animate-bounce" />
+                  </div>
 
-              <div className="space-y-2">
-                <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[10px] font-bold uppercase tracking-wider">
-                  <Send className="w-3 h-3" />
-                  <span>Activation Email Sent</span>
-                </span>
-                <h2 className="text-2xl sm:text-3xl font-black text-slate-100 tracking-tight">
-                  Check your email
-                </h2>
-                <p className="text-xs sm:text-sm text-slate-400 max-w-sm mx-auto">
-                  We&apos;ve sent a secure verification link to:
-                </p>
-                <div className="py-2 px-4 rounded-2xl bg-slate-950 border border-slate-800 text-slate-100 font-bold text-sm tracking-wide inline-block max-w-full truncate">
-                  {pendingEmail}
-                </div>
-              </div>
+                  <div className="space-y-2">
+                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[10px] font-bold uppercase tracking-wider">
+                      <Send className="w-3 h-3" />
+                      <span>Activation Email Sent</span>
+                    </span>
+                    <h2 className="text-2xl sm:text-3xl font-black text-slate-100 tracking-tight">
+                      Check your email
+                    </h2>
+                    <p className="text-xs sm:text-sm text-slate-400 max-w-sm mx-auto">
+                      We&apos;ve sent a secure verification link to:
+                    </p>
+                    <div className="py-2 px-4 rounded-2xl bg-slate-950 border border-slate-800 text-slate-100 font-bold text-sm tracking-wide inline-block max-w-full truncate">
+                      {pendingEmail}
+                    </div>
+                  </div>
 
-              <p className="text-xs text-slate-400 leading-relaxed max-w-sm mx-auto">
-                Click the link in your email to activate your TrustScore account. The verification link expires in <strong>30 minutes</strong>.
-              </p>
+                  <p className="text-xs text-slate-400 leading-relaxed max-w-sm mx-auto">
+                    Click the link in your email to activate your TrustScore account. The verification link expires in <strong>30 minutes</strong>.
+                  </p>
+                </>
+              ) : (
+                /* DELIVERY FAILED / PENDING STATE: Account created, delivery issue */
+                <>
+                  <div className="w-16 h-16 rounded-3xl bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center mx-auto shadow-inner">
+                    <AlertCircle className="w-8 h-8 text-amber-400" />
+                  </div>
+
+                  <div className="space-y-2">
+                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[10px] font-bold uppercase tracking-wider">
+                      <Clock className="w-3 h-3" />
+                      <span>Account Created • Email Pending</span>
+                    </span>
+                    <h2 className="text-2xl sm:text-3xl font-black text-slate-100 tracking-tight">
+                      Account created
+                    </h2>
+                    <p className="text-xs sm:text-sm text-slate-400 max-w-sm mx-auto">
+                      We couldn&apos;t send the verification email to:
+                    </p>
+                    <div className="py-2 px-4 rounded-2xl bg-slate-950 border border-slate-800 text-slate-100 font-bold text-sm tracking-wide inline-block max-w-full truncate">
+                      {pendingEmail}
+                    </div>
+                  </div>
+
+                  <p className="text-xs text-slate-400 leading-relaxed max-w-sm mx-auto">
+                    Your account is safe, but email delivery could not be completed. Please click below to send the verification email.
+                  </p>
+                </>
+              )}
 
               {/* Resend Feedback Alerts */}
               {resendStatus && (

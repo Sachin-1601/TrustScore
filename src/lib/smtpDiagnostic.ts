@@ -93,9 +93,10 @@ export class SmtpDiagnosticService {
     if (host.includes("gmail.com")) {
       provider = "Google Gmail SMTP";
       notes.push("Gmail SMTP detected (smtp.gmail.com).");
-      notes.push("Gmail requires 2-Step Verification and a 16-character Gmail App Password (not standard account password).");
-      if (from && !from.includes(user) && !from.includes("@gmail.com")) {
-        notes.push(`Notice: EMAIL_FROM is "${from}" but SMTP user is a Gmail account. Gmail may rewrite or reject non-matching sender headers.`);
+      notes.push("Gmail requires 2-Step Verification and a 16-character Google App Password (NOT a normal Google account password).");
+      notes.push(`Port mode: ${port === 465 ? "Port 465 (Direct SSL/TLS)" : "Port 587 (STARTTLS)"}.`);
+      if (from && user && !from.includes(user)) {
+        notes.push(`Notice: EMAIL_FROM should match your authenticated Gmail address for deliverability.`);
       }
     } else if (host.includes("sendgrid")) {
       provider = "Twilio SendGrid SMTP";
@@ -154,11 +155,11 @@ export class SmtpDiagnosticService {
       let errorReason = err.message || "Unknown SMTP error";
 
       if (errorCode === "EAUTH" || err.responseCode === 535) {
-        errorReason = "Authentication failed: Invalid SMTP username or password. If using Gmail, ensure you are using a 16-character App Password.";
+        errorReason = "Authentication failed (Code 535): Invalid SMTP username or password. For Gmail, you must use a 16-character App Password generated with 2-Step Verification enabled.";
       } else if (errorCode === "ETIMEDOUT" || errorCode === "ECONNREFUSED") {
-        errorReason = `Connection failed: Could not reach SMTP server at ${host}:${port}. Check firewall or port configuration.`;
+        errorReason = `Connection failed: Could not reach SMTP server at ${host}:${port}. Verify port or network/firewall settings.`;
       } else if (errorCode === "ESOCKET") {
-        errorReason = `TLS/SSL handshake failed on ${host}:${port}. Try port 587 (secure: false) or 465 (secure: true).`;
+        errorReason = `TLS/SSL handshake failed on ${host}:${port}. Use port 465 (secure: true) or port 587 (secure: false / STARTTLS).`;
       }
 
       return {
@@ -190,6 +191,7 @@ export class SmtpDiagnosticService {
       return {
         success: false,
         error: "Cannot send test email: SMTP credentials are not configured in .env.",
+        errorCode: "SMTP_NOT_CONFIGURED",
       };
     }
 
@@ -208,18 +210,18 @@ export class SmtpDiagnosticService {
         from,
         to: toEmail,
         subject: "TrustScore Email Delivery Test",
-        text: `This is a TrustScore email delivery test sent to ${toEmail}.
+        text: `This is a TrustScore email delivery test.
 
 If this message arrives in your inbox, SMTP delivery is operational.
 
 Timestamp: ${new Date().toISOString()}
 Provider: ${host}`,
-        html: `<div style="font-family: sans-serif; padding: 20px; background: #090d16; color: #f8fafc; border-radius: 12px;">
-          <h2 style="color: #3b82f6;">TrustScore Email Delivery Test</h2>
-          <p>This is a TrustScore email delivery test sent to <strong>${toEmail}</strong>.</p>
-          <p>If this message arrives in your inbox, SMTP delivery is operational.</p>
+        html: `<div style="font-family: -apple-system, BlinkMacSystemFont, sans-serif; padding: 24px; background: #090d16; color: #f8fafc; border-radius: 16px; border: 1px solid #1e293b; max-width: 500px;">
+          <h2 style="color: #3b82f6; margin-top: 0;">TrustScore Email Delivery Test</h2>
+          <p style="color: #cbd5e1; font-size: 14px;">This is a TrustScore email delivery test sent to <strong>${toEmail}</strong>.</p>
+          <p style="color: #10b981; font-size: 14px; font-weight: bold;">If this message arrives, SMTP delivery is working.</p>
           <hr style="border: 1px solid #1e293b; margin: 20px 0;" />
-          <small style="color: #94a3b8;">Timestamp: ${new Date().toISOString()}<br>Host: ${host}</small>
+          <small style="color: #64748b;">Timestamp: ${new Date().toISOString()}<br>Host: ${host}</small>
         </div>`,
       });
 

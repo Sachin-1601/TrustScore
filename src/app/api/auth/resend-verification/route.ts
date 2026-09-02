@@ -16,13 +16,20 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: result.error, rateLimited: true }, { status: 429 });
     }
 
-    if (!result.success) {
-      return NextResponse.json({ error: result.error || "Failed to resend verification email" }, { status: 400 });
+    if (result.isServiceError || !result.success) {
+      return NextResponse.json(
+        {
+          error: result.error || "We couldn't send the verification email. Please check your SMTP configuration or try again shortly.",
+          isServiceError: true,
+        },
+        { status: 503 }
+      );
     }
 
     return NextResponse.json(
       {
         success: true,
+        emailSent: true,
         message: result.message || "If an unverified account exists for this email, a new verification link has been sent.",
       },
       { status: 200 }

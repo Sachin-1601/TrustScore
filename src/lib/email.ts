@@ -11,14 +11,13 @@ export interface EmailDeliveryResult {
   messageId?: string;
   error?: string;
   errorCode?: string | number;
-  simulated?: boolean;
   missingConfig?: string[];
 }
 
 /**
  * Production Email Service for TrustScore.
  * Handles transactional delivery using SMTP / configured transport.
- * Never logs credentials or secrets.
+ * Never logs credentials, passwords, or verification tokens.
  */
 export class EmailService {
   public static isConfigured(): boolean {
@@ -87,6 +86,26 @@ export class EmailService {
     name,
     verificationUrl,
   }: SendVerificationEmailParams): Promise<EmailDeliveryResult> {
+    const cleanEmail = to.trim().toLowerCase();
+    const toDomain = cleanEmail.split("@")[1] || "unknown";
+
+    // 1. Check if SMTP transport is configured
+    const transporter = this.getTransporter();
+
+    if (!transporter) {
+      const missing = this.getMissingConfig();
+      console.warn(
+        `[EmailService] SMTP delivery unavailable — Missing credentials: ${missing.join(", ")}`
+      );
+
+      return {
+        success: false,
+        error: "Email delivery service is not configured.",
+        errorCode: "SMTP_NOT_CONFIGURED",
+        missingConfig: missing,
+      };
+    }
+
     const from = this.getFromAddress();
     const cleanName = name.trim() || "there";
     const subject = "Verify your TrustScore account";
@@ -177,48 +196,30 @@ https://trustscore.io`;
 </body>
 </html>`;
 
-    const transporter = this.getTransporter();
+    try {
+      console.log(`[EmailService] Attempting SMTP delivery to recipient domain: ${toDomain}`);
 
-    if (transporter) {
-      try {
-        const toDomain = to.split("@")[1] || "unknown";
-        console.log(`[EmailService] Attempting SMTP delivery to recipient domain: ${toDomain}`);
+      const info = await transporter.sendMail({
+        from,
+        to: cleanEmail,
+        subject,
+        text: textBody,
+        html: htmlBody,
+      });
 
-        const info = await transporter.sendMail({
-          from,
-          to,
-          subject,
-          text: textBody,
-          html: htmlBody,
-        });
-
-        console.log(`[EmailService] SMTP delivery ACCEPTED: messageId=${info.messageId}`);
-        return {
-          success: true,
-          messageId: info.messageId,
-        };
-      } catch (err: any) {
-        const errorCode = err.code || err.responseCode || "UNKNOWN";
-        console.error(`[EmailService] SMTP delivery FAILED (Code: ${errorCode}):`, err.message);
-        return {
-          success: false,
-          error: err.message || "SMTP transmission error",
-          errorCode,
-        };
-      }
+      console.log(`[EmailService] SMTP delivery ACCEPTED: messageId=${info.messageId}`);
+      return {
+        success: true,
+        messageId: info.messageId,
+      };
+    } catch (err: any) {
+      const errorCode = err.code || err.responseCode || "UNKNOWN";
+      console.error(`[EmailService] SMTP delivery FAILED (Code: ${errorCode}):`, err.message);
+      return {
+        success: false,
+        error: err.message || "SMTP transmission error",
+        errorCode,
+      };
     }
-
-    // SMTP credentials not yet configured
-    const missing = this.getMissingConfig();
-    console.warn(
-      `[EmailService] SMTP delivery skipped — Missing credentials in .env: ${missing.join(", ")}`
-    );
-
-    return {
-      success: true,
-      simulated: true,
-      messageId: `simulated_${Date.now()}`,
-      missingConfig: missing,
-    };
   }
 }

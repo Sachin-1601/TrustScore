@@ -25,7 +25,10 @@ export interface SignupResponse {
   success: boolean;
   error?: string;
   requiresVerification?: boolean;
+  accountCreated?: boolean;
+  emailSent?: boolean;
   email?: string;
+  message?: string;
   session?: UserSession;
 }
 
@@ -33,6 +36,7 @@ export interface ResendResponse {
   success: boolean;
   message?: string;
   error?: string;
+  emailSent?: boolean;
   rateLimited?: boolean;
 }
 
@@ -126,8 +130,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       }
       return {
         success: true,
+        accountCreated: resData.accountCreated ?? true,
         requiresVerification: resData.requiresVerification ?? true,
+        emailSent: resData.emailSent ?? false,
         email: resData.email,
+        message: resData.message,
       };
     } catch (err: any) {
       return { success: false, error: err.message || "Network error" };
@@ -146,10 +153,15 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         return {
           success: false,
           error: data.error || "Failed to resend verification email",
+          emailSent: false,
           rateLimited: data.rateLimited,
         };
       }
-      return { success: true, message: data.message };
+      return {
+        success: true,
+        emailSent: data.emailSent ?? true,
+        message: data.message,
+      };
     } catch (err: any) {
       return { success: false, error: err.message || "Network error" };
     }

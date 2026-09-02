@@ -3,9 +3,10 @@ import { POST as signupApiHandler } from "../app/api/auth/signup/route";
 import { POST as loginApiHandler } from "../app/api/auth/login/route";
 import { POST as resendApiHandler } from "../app/api/auth/resend-verification/route";
 import { GET as verifyEmailApiHandler } from "../app/api/auth/verify-email/route";
-import { GET as googleCallbackApiHandler } from "../app/api/auth/google/callback/route";
 import { prisma } from "../lib/prisma";
 import { hashVerificationToken, generateVerificationToken } from "../lib/tokenSecurity";
+import { EmailService } from "../lib/email";
+import nodemailer from "nodemailer";
 
 async function runEmailVerificationTestSuite() {
   console.log("==================================================");
@@ -29,9 +30,24 @@ async function runEmailVerificationTestSuite() {
   const createdUserIds: string[] = [];
 
   // =========================================================================
-  // 1. Creator Signup Creates Unverified User & Token
+  // 1. EmailService Truthful Reporting (Missing / Failing SMTP)
   // =========================================================================
-  console.log("\n[1] Testing Creator Signup & Unverified Initial State");
+  console.log("\n[1] Testing EmailService Truthful Reporting");
+  
+  // When SMTP is not configured (current test environment):
+  const deliveryResultWithoutSmtp = await EmailService.sendVerificationEmail({
+    to: "test@example.com",
+    name: "Test User",
+    verificationUrl: "http://localhost:3000/api/auth/verify-email?token=123",
+  });
+  assert(deliveryResultWithoutSmtp.success === false, "EmailService returns success=false when SMTP is unconfigured");
+  assert(deliveryResultWithoutSmtp.errorCode === "SMTP_NOT_CONFIGURED", "EmailService returns errorCode='SMTP_NOT_CONFIGURED'");
+  assert(Array.isArray(deliveryResultWithoutSmtp.missingConfig), "EmailService lists missingConfig array");
+
+  // =========================================================================
+  // 2. Creator Signup Creates Unverified User & Returns emailSent=false when SMTP missing
+  // =========================================================================
+  console.log("\n[2] Testing Creator Signup (Unverified Initial State & emailSent Truthfulness)");
   const creatorEmail = `creator.verify.${timestamp}@gmail.com`;
   const creatorSignupReq = new Request("http://localhost:3000/api/auth/signup", {
     method: "POST",
@@ -50,7 +66,9 @@ async function runEmailVerificationTestSuite() {
 
   const creatorSignupBody = await creatorSignupRes.json();
   assert(creatorSignupBody.success === true, "Signup response has success=true");
+  assert(creatorSignupBody.accountCreated === true, "Signup response has accountCreated=true");
   assert(creatorSignupBody.requiresVerification === true, "Signup response indicates requiresVerification=true");
+  assert(creatorSignupBody.emailSent === false, "Signup response truthfully reports emailSent=false when SMTP is unconfigured");
   assert(creatorSignupBody.session === undefined, "Signup response does NOT contain an authenticated session");
 
   const creatorDbUser = await prisma.user.findUnique({
@@ -66,9 +84,9 @@ async function runEmailVerificationTestSuite() {
   if (creatorDbUser) createdUserIds.push(creatorDbUser.id);
 
   // =========================================================================
-  // 2. Business Signup Creates Unverified User & Token
+  // 3. Business Signup Creates Unverified User & Token
   // =========================================================================
-  console.log("\n[2] Testing Business Signup & Unverified Initial State");
+  console.log("\n[3] Testing Business Signup (Unverified Initial State & Multi-Domain)");
   const businessEmail = `business.verify.${timestamp}@enterprise-corp.com`;
   const businessSignupReq = new Request("http://localhost:3000/api/auth/signup", {
     method: "POST",
@@ -88,6 +106,7 @@ async function runEmailVerificationTestSuite() {
   const businessSignupBody = await businessSignupRes.json();
   assert(businessSignupBody.success === true, "Business signup response has success=true");
   assert(businessSignupBody.requiresVerification === true, "Business signup response has requiresVerification=true");
+  assert(businessSignupBody.emailSent === false, "Business signup truthfully reports emailSent=false");
   assert(businessSignupBody.session === undefined, "Business signup does NOT return session");
 
   const businessDbUser = await prisma.user.findUnique({
@@ -103,9 +122,9 @@ async function runEmailVerificationTestSuite() {
   if (businessDbUser) createdUserIds.push(businessDbUser.id);
 
   // =========================================================================
-  // 3. Login Gating: Unverified Account Blocked from Login
+  // 4. Login Gating: Unverified Account Blocked from Login
   // =========================================================================
-  console.log("\n[3] Testing Login Gating for Unverified Accounts");
+  console.log("\n[4] Testing Login Gating for Unverified Accounts");
   const unverifiedLoginReq = new Request("http://localhost:3000/api/auth/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -128,9 +147,9 @@ async function runEmailVerificationTestSuite() {
   );
 
   // =========================================================================
-  // 4. Token Security: Secure Hashing & Single-Use
+  // 5. Token Security: Secure Hashing & Single-Use
   // =========================================================================
-  console.log("\n[4] Testing Token Security & Single-Use Enforcement");
+  console.log("\n[5] Testing Token Security & Single-Use Enforcement");
   const tokenRecord = creatorDbUser?.emailVerificationTokens[0];
   assert(Boolean(tokenRecord?.tokenHash), "Token hash stored in DB is non-empty");
   assert(tokenRecord?.usedAt === null, "Token usedAt is initially NULL");
@@ -169,9 +188,9 @@ async function runEmailVerificationTestSuite() {
   );
 
   // =========================================================================
-  // 5. Verified User Login Success
+  // 6. Verified User Login Success
   // =========================================================================
-  console.log("\n[5] Testing Verified User Login");
+  console.log("\n[6] Testing Verified User Login");
   const verifiedLoginReq = new Request("http://localhost:3000/api/auth/login", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -190,9 +209,9 @@ async function runEmailVerificationTestSuite() {
   assert(verifiedLoginBody.session?.email === creatorEmail, "Verified login returns valid authenticated session");
 
   // =========================================================================
-  // 6. Token Expiry Enforcement
+  // 7. Token Expiry Enforcement
   // =========================================================================
-  console.log("\n[6] Testing Token Expiration Enforcement");
+  console.log("\n[7] Testing Token Expiration Enforcement");
   // Create an expired token (expiresAt 10 minutes ago)
   const expiredRawToken = "expired_raw_token_" + timestamp;
   const expiredHash = hashVerificationToken(expiredRawToken);
@@ -212,11 +231,11 @@ async function runEmailVerificationTestSuite() {
   );
 
   // =========================================================================
-  // 7. Resend Verification & Rate Limiting
+  // 8. Resend Verification: Rate Limiting & Truthful Delivery Reporting
   // =========================================================================
-  console.log("\n[7] Testing Resend Verification & Rate Limiting");
-  // Business account is still unverified.
-  // Test rate limiting when requesting immediately after token creation
+  console.log("\n[8] Testing Resend Verification & Rate Limiting");
+  // Business account is unverified.
+  // Rapid-fire resend should be rate-limited
   const rateLimitReq1 = new Request("http://localhost:3000/api/auth/resend-verification", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
@@ -238,24 +257,20 @@ async function runEmailVerificationTestSuite() {
     data: { createdAt: new Date(Date.now() - 70 * 1000) },
   });
 
-  // Now resend should succeed
-  const allowedResendReq = new Request("http://localhost:3000/api/auth/resend-verification", {
+  // When SMTP is unconfigured, resend returns HTTP 503 (service failure) without claiming delivery
+  const unconfiguredResendReq = new Request("http://localhost:3000/api/auth/resend-verification", {
     method: "POST",
     headers: { "Content-Type": "application/json" },
     body: JSON.stringify({ email: businessEmail }),
   });
 
-  const allowedResendRes = await resendApiHandler(allowedResendReq);
-  assert(allowedResendRes.status === 200, "Resend after cooldown returns HTTP 200 OK");
-
-  const allowedResendBody = await allowedResendRes.json();
-  assert(allowedResendBody.success === true, "Resend returns success=true");
-
-  // Verify that a new active token was generated in DB
-  const businessTokens = await prisma.emailVerificationToken.findMany({
-    where: { userId: businessDbUser!.id, usedAt: null },
-  });
-  assert(businessTokens.length === 1, "Old unused tokens were invalidated, exactly 1 active token exists");
+  const unconfiguredResendRes = await resendApiHandler(unconfiguredResendReq);
+  assert(
+    unconfiguredResendRes.status === 503,
+    "Resend when SMTP is unconfigured returns HTTP 503 Service Unavailable"
+  );
+  const unconfiguredResendBody = await unconfiguredResendRes.json();
+  assert(unconfiguredResendBody.isServiceError === true, "Resend body indicates isServiceError=true");
 
   // Verify email enumeration protection: non-existent email returns generic message
   const nonExistentResendReq = new Request("http://localhost:3000/api/auth/resend-verification", {
@@ -267,9 +282,79 @@ async function runEmailVerificationTestSuite() {
   assert(nonExistentResendRes.status === 200, "Non-existent email resend returns HTTP 200 for privacy");
 
   // =========================================================================
-  // 8. GET /api/auth/verify-email Route Handler & Redirect
+  // 9. Mocked SMTP Success Boundary Test
   // =========================================================================
-  console.log("\n[8] Testing GET /api/auth/verify-email Endpoint Flow");
+  console.log("\n[9] Testing Email Delivery with Configured SMTP Transport");
+  const origCreateTransport = nodemailer.createTransport;
+  try {
+    // Temporarily configure dummy SMTP in env
+    process.env.SMTP_HOST = "smtp.test-provider.com";
+    process.env.SMTP_PORT = "587";
+    process.env.SMTP_USER = "test-user";
+    process.env.SMTP_PASS = "test-pass";
+
+    // Mock nodemailer transport sendMail to succeed
+    (nodemailer as any).createTransport = () => ({
+      sendMail: async () => ({
+        messageId: "mock_msg_12345",
+      }),
+    });
+
+    const mockSendResult = await EmailService.sendVerificationEmail({
+      to: "creator.mock@gmail.com",
+      name: "Mock Creator",
+      verificationUrl: "http://localhost:3000/api/auth/verify-email?token=mock_token",
+    });
+    assert(mockSendResult.success === true, "EmailService returns success=true when SMTP sendMail succeeds");
+    assert(mockSendResult.messageId === "mock_msg_12345", "EmailService returns messageId on success");
+
+    // Reset token timestamp for resend test
+    await prisma.emailVerificationToken.updateMany({
+      where: { userId: businessDbUser!.id },
+      data: { createdAt: new Date(Date.now() - 70 * 1000) },
+    });
+
+    const mockResendReq = new Request("http://localhost:3000/api/auth/resend-verification", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ email: businessEmail }),
+    });
+    const mockResendRes = await resendApiHandler(mockResendReq);
+    assert(mockResendRes.status === 200, "Resend returns HTTP 200 when SMTP delivery succeeds");
+    const mockResendBody = await mockResendRes.json();
+    assert(mockResendBody.success === true, "Resend body has success=true");
+    assert(mockResendBody.emailSent === true, "Resend body has emailSent=true");
+
+    // Mock sendMail failure
+    (nodemailer as any).createTransport = () => ({
+      sendMail: async () => {
+        const err: any = new Error("Authentication failed");
+        err.code = "EAUTH";
+        err.responseCode = 535;
+        throw err;
+      },
+    });
+
+    const failSendResult = await EmailService.sendVerificationEmail({
+      to: "creator.mock@gmail.com",
+      name: "Mock Creator",
+      verificationUrl: "http://localhost:3000/api/auth/verify-email?token=mock_token",
+    });
+    assert(failSendResult.success === false, "EmailService returns success=false when SMTP throws EAUTH");
+    assert(failSendResult.errorCode === "EAUTH", "EmailService captures exact SMTP error code");
+  } finally {
+    // Restore environment and nodemailer transport
+    delete process.env.SMTP_HOST;
+    delete process.env.SMTP_PORT;
+    delete process.env.SMTP_USER;
+    delete process.env.SMTP_PASS;
+    nodemailer.createTransport = origCreateTransport;
+  }
+
+  // =========================================================================
+  // 10. GET /api/auth/verify-email Route Handler & Redirect
+  // =========================================================================
+  console.log("\n[10] Testing GET /api/auth/verify-email Endpoint Flow");
   const businessTokenPair = generateVerificationToken(30 * 60 * 1000);
   await prisma.emailVerificationToken.create({
     data: {
@@ -300,9 +385,9 @@ async function runEmailVerificationTestSuite() {
   assert(businessUserVerified?.emailVerifiedAt !== null, "Business user emailVerifiedAt is now set");
 
   // =========================================================================
-  // 9. Cleanup Test Fixtures
+  // 11. Cleanup Test Fixtures
   // =========================================================================
-  console.log("\n[9] Cleaning up test users created during test execution");
+  console.log("\n[11] Cleaning up test users created during test execution");
   if (createdUserIds.length > 0) {
     await prisma.user.deleteMany({
       where: { id: { in: createdUserIds } },

@@ -57,13 +57,19 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: result.error }, { status: 400 });
     }
 
-    // DO NOT set session cookie. Account is created in UNVERIFIED state.
+    const emailSent = result.emailSent === true;
+
+    // Return 201 with truthful emailSent status
     return NextResponse.json(
       {
         success: true,
+        accountCreated: true,
         requiresVerification: true,
+        emailSent,
         email: result.email,
-        message: "Account created. Please check your email to verify your account.",
+        message: emailSent
+          ? "Account created. Please check your email to verify your account."
+          : "Your account was created, but we couldn't send the verification email. Please try Resend.",
       },
       { status: 201 }
     );

@@ -20,7 +20,7 @@ async function main() {
   console.log(`  Provider:            ${diagnostic.provider}`);
   console.log(`  Host:                ${diagnostic.host}`);
   console.log(`  Port:                ${diagnostic.port}`);
-  console.log(`  Secure (SSL/TLS):    ${diagnostic.secure}`);
+  console.log(`  Secure (SSL/TLS):    ${diagnostic.secure ? "true (SSL/TLS)" : "false (STARTTLS)"}`);
   console.log(`  TCP Connection:      ${diagnostic.connectionSuccess ? "SUCCESS ✅" : "FAILED ❌"}`);
   console.log(`  Authentication:      ${diagnostic.authSuccess ? "SUCCESS ✅" : "FAILED ❌"}`);
 
@@ -35,20 +35,31 @@ async function main() {
     diagnostic.notes.forEach((note) => console.log(`  • ${note}`));
   }
 
-  // If credentials are configured, attempt delivery of a real test email to sachinboddhulx@gmail.com
+  // Recipient resolution: from CLI arg or TEST_EMAIL_RECIPIENT environment variable
+  const recipient = process.argv[2] || process.env.TEST_EMAIL_RECIPIENT;
+
   if (diagnostic.authSuccess) {
-    console.log("\n[4] Attempting Real Test Email Delivery to sachinboddhulx@gmail.com...");
-    const sendResult = await SmtpDiagnosticService.sendTestEmail("sachinboddhulx@gmail.com");
-    if (sendResult.success) {
-      console.log("  ✅ Test email accepted by SMTP server!");
-      console.log(`  Message ID: ${sendResult.messageId}`);
+    if (recipient && recipient.includes("@")) {
+      const sanitizedRecipient = recipient.trim();
+      const domain = sanitizedRecipient.split("@")[1];
+      console.log(`\n[4] Attempting Real Test Email Delivery to @${domain}...`);
+      const sendResult = await SmtpDiagnosticService.sendTestEmail(sanitizedRecipient);
+      if (sendResult.success) {
+        console.log("  ✅ Test email ACCEPTED by SMTP server!");
+        console.log(`  Message ID: ${sendResult.messageId}`);
+      } else {
+        console.log("  ❌ Test email failed delivery!");
+        console.log(`  Error: ${sendResult.error}`);
+        console.log(`  Code: ${sendResult.errorCode || "N/A"}`);
+      }
     } else {
-      console.log("  ❌ Test email failed delivery!");
-      console.log(`  Error: ${sendResult.error}`);
-      console.log(`  Code: ${sendResult.errorCode || "N/A"}`);
+      console.log("\n[4] Test Email Delivery: Skipped");
+      console.log("  To send a live test email, run:");
+      console.log("  npx tsx src/tests/runSmtpDiagnostics.ts your-email@example.com");
+      console.log("  OR: TEST_EMAIL_RECIPIENT=your-email@example.com npx tsx src/tests/runSmtpDiagnostics.ts");
     }
   } else {
-    console.log("\n[4] Test Email Delivery: Skipped (SMTP credentials not configured or handshake failed)");
+    console.log("\n[4] Test Email Delivery: Skipped (SMTP credentials not configured or authentication failed)");
   }
 
   console.log("\n==================================================");

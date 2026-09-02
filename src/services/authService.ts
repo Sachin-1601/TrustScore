@@ -8,6 +8,9 @@ import { EmailService } from "@/lib/email";
 export interface SignupResult {
   requiresVerification?: boolean;
   email?: string;
+  emailSent?: boolean;
+  emailDeliveryError?: boolean;
+  emailErrorMessage?: string;
   error?: string;
 }
 
@@ -26,7 +29,9 @@ export interface VerifyEmailResult {
 
 export interface ResendVerificationResult {
   success: boolean;
+  emailSent?: boolean;
   rateLimited?: boolean;
+  isServiceError?: boolean;
   error?: string;
   message?: string;
 }
@@ -236,10 +241,10 @@ export class AuthService {
       });
     });
 
-    // 5. Send Verification Email
+    // 5. Send Verification Email & capture actual result
     const appUrl = EmailService.getAppUrl();
     const verificationUrl = `${appUrl}/api/auth/verify-email?token=${rawToken}`;
-    await EmailService.sendVerificationEmail({
+    const emailResult = await EmailService.sendVerificationEmail({
       to: cleanEmail,
       name: data.name.trim(),
       verificationUrl,
@@ -248,6 +253,9 @@ export class AuthService {
     return {
       requiresVerification: true,
       email: cleanEmail,
+      emailSent: emailResult.success,
+      emailDeliveryError: !emailResult.success,
+      emailErrorMessage: emailResult.error,
     };
   }
 
@@ -341,6 +349,7 @@ export class AuthService {
     if (!user || user.emailVerifiedAt) {
       return {
         success: true,
+        emailSent: true,
         message: "If an unverified account exists for this email, a new verification link has been sent.",
       };
     }
@@ -381,14 +390,24 @@ export class AuthService {
 
     const appUrl = EmailService.getAppUrl();
     const verificationUrl = `${appUrl}/api/auth/verify-email?token=${rawToken}`;
-    await EmailService.sendVerificationEmail({
+    const emailResult = await EmailService.sendVerificationEmail({
       to: cleanEmail,
       name: user.name,
       verificationUrl,
     });
 
+    if (!emailResult.success) {
+      return {
+        success: false,
+        emailSent: false,
+        isServiceError: true,
+        error: emailResult.error || "We couldn't send the verification email. Please check your SMTP configuration or try again shortly.",
+      };
+    }
+
     return {
       success: true,
+      emailSent: true,
       message: "A new verification link has been sent to your email address.",
     };
   }
