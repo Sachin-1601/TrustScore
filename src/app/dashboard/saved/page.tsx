@@ -26,7 +26,7 @@ export default function SavedCreatorsPage() {
       const res = await fetch("/api/creators/saved");
       if (res.ok) {
         const data = await res.json();
-        setSavedCreators(data.saved || []);
+        setSavedCreators(data.creators || []);
       }
     } catch {
       // safe ignore

@@ -376,8 +376,8 @@ async function runEmailVerificationTestSuite() {
   );
   const redirectLocation = verifyEndpointRes.headers.get("location");
   assert(
-    redirectLocation?.includes("/dashboard") === true,
-    `Business user redirected to /dashboard (got: ${redirectLocation})`
+    redirectLocation?.includes("/dashboard/businesses") === true,
+    `Business user redirected to /dashboard/businesses (got: ${redirectLocation})`
   );
 
   // Verify Business DB state

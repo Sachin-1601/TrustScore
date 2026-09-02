@@ -6,6 +6,59 @@ import { SubscriptionStatus, ScoreBand, RiskLevel, DataCoverage } from "@prisma/
 
 const toEnum = (v: string) => v.trim().toUpperCase().replace(/\s+/g, "_");
 
+export async function GET(req: Request) {
+  try {
+    const session = await getServerSession();
+    if (!session) {
+      return NextResponse.json({ error: "Unauthorized" }, { status: 401 });
+    }
+
+    const { searchParams } = new URL(req.url);
+    const limit = Math.min(20, Math.max(1, parseInt(searchParams.get("limit") || "6", 10)));
+
+    const records = await prisma.trustScoreRecord.findMany({
+      take: limit,
+      orderBy: { calculatedAt: "desc" },
+      include: {
+        creator: {
+          select: {
+            id: true,
+            username: true,
+            name: true,
+            avatar: true,
+            category: true,
+            platform: true,
+            followers: true,
+            verifiedBadge: true,
+          },
+        },
+      },
+    });
+
+    const analyses = records.map((r) => ({
+      id: r.id,
+      creatorId: r.creatorId,
+      creatorUsername: r.creator.username,
+      creatorName: r.creator.name,
+      creatorAvatar: r.creator.avatar,
+      category: r.creator.category,
+      platform: r.creator.platform,
+      followers: r.creator.followers,
+      verifiedBadge: r.creator.verifiedBadge,
+      trustScore: r.score,
+      scoreBand: r.scoreBand,
+      riskLevel: r.riskLevel,
+      calculatedAt: r.calculatedAt.toISOString(),
+      modelVersion: r.modelVersion,
+    }));
+
+    return NextResponse.json({ analyses, total: analyses.length });
+  } catch (err: any) {
+    console.error("Recent analyses GET error:", err);
+    return NextResponse.json({ error: "Failed to fetch recent analyses" }, { status: 500 });
+  }
+}
+
 export async function POST(req: Request) {
   const session = await getServerSession();
   if (!session) {

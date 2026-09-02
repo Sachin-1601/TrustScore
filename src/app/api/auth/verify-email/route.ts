@@ -39,7 +39,7 @@ export async function GET(req: Request) {
         ? "/dashboard/creator"
         : result.user.role === "ADMIN"
         ? "/admin"
-        : "/dashboard";
+        : "/dashboard/businesses";
 
     return NextResponse.redirect(new URL(targetDashboard, req.url), 302);
   } catch (err: any) {

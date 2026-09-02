@@ -22,13 +22,17 @@ export default function DashboardLayout({
       return;
     }
 
-    // Role-based route guard
-    if (role === "CREATOR" && pathname === "/dashboard") {
-      router.replace("/dashboard/creator");
-    } else if ((role === "BUSINESS" || role === "AGENCY") && pathname.startsWith("/dashboard/creator")) {
-      router.replace("/dashboard");
+    // Role-based route guards
+    if (role === "CREATOR") {
+      if (pathname === "/dashboard" || pathname.startsWith("/dashboard/businesses")) {
+        router.replace("/dashboard/creator");
+      }
+    } else if (role === "BUSINESS" || role === "AGENCY") {
+      if (pathname === "/dashboard" || pathname.startsWith("/dashboard/creator")) {
+        router.replace("/dashboard/businesses");
+      }
     } else if (role !== "ADMIN" && (pathname === "/admin" || pathname === "/dashboard/model-insights")) {
-      router.replace(role === "CREATOR" ? "/dashboard/creator" : "/dashboard");
+      router.replace(role === "CREATOR" ? "/dashboard/creator" : "/dashboard/businesses");
     }
   }, [user, role, isLoading, pathname, router]);
 

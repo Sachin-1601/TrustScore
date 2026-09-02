@@ -217,7 +217,7 @@ export async function GET(req: Request) {
           ? "/dashboard/creator"
           : user.role === "ADMIN"
           ? "/admin"
-          : "/dashboard";
+          : "/dashboard/businesses";
 
       console.log(`[Google OAuth Callback] Authentication successful. Redirecting to ${targetDashboard}`);
       return NextResponse.redirect(new URL(targetDashboard, req.url), 302);

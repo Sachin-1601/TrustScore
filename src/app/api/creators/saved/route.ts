@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { prisma } from "@/lib/prisma";
 import { getServerSession } from "@/lib/session";
+import { CreatorService } from "@/services/creatorService";
 
 /**
  * SavedCreator ownership is always scoped to the authenticated business profile.
@@ -19,17 +20,29 @@ export async function GET() {
     const businessProfileId = await requireBusinessProfileId(session.userId);
     if (!businessProfileId) {
       // Non-business accounts have no saved list.
-      return NextResponse.json({ saved: [], success: true });
+      return NextResponse.json({ saved: [], creators: [], success: true });
     }
 
     const records = await prisma.savedCreator.findMany({
       where: { businessId: businessProfileId },
-      include: { creator: true },
+      include: {
+        creator: {
+          include: {
+            user: true,
+            trustScores: { orderBy: { calculatedAt: "desc" }, take: 1, include: { factors: true } },
+            socialAccounts: true,
+            verifications: true,
+            engagementSnapshots: { orderBy: { recordedAt: "desc" }, take: 15 },
+          },
+        },
+      },
       orderBy: { savedAt: "desc" },
     });
 
     const saved = records.map((r) => r.creator.username.replace("@", ""));
-    return NextResponse.json({ saved, success: true });
+    const creators = records.map((r) => CreatorService.mapPrismaToCreator(r.creator));
+
+    return NextResponse.json({ saved, creators, success: true });
   } catch (err) {
     console.error("Saved creators GET error:", err);
     return NextResponse.json({ error: "Failed to fetch saved creators" }, { status: 500 });

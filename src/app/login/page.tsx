@@ -128,7 +128,7 @@ function LoginContent() {
       } else if (res.session.role === "ADMIN") {
         router.push("/admin");
       } else {
-        router.push("/dashboard");
+        router.push("/dashboard/businesses");
       }
     } else {
       setErrorMessage(res.error || "Invalid login credentials. Please try again.");

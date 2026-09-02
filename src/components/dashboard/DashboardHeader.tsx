@@ -203,7 +203,7 @@ export function DashboardHeader({
                   <div className="p-2.5 bg-slate-950 rounded-xl border border-slate-800">
                     <p className="font-semibold text-slate-200">System Ready</p>
                     <p className="text-slate-400 text-[11px]">
-                      Your creator profile telemetry and notifications are active.
+                      Your TrustScore account telemetry and notifications are active.
                     </p>
                   </div>
                 </div>
