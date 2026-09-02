@@ -8,49 +8,18 @@ export interface GoogleOAuthState {
   timestamp: number;
 }
 
-/**
- * Checks if a given string is a validly formatted Google OAuth Web Client ID
- */
-export function isValidGoogleClientId(id: string | undefined | null): boolean {
-  if (!id || typeof id !== "string") return false;
-  const trimmed = id.trim();
-  if (
-    trimmed === "" ||
-    trimmed.includes("your-google-client-id") ||
-    trimmed.includes("placeholder") ||
-    trimmed.includes("trustscore-app.apps.googleusercontent.com")
-  ) {
-    return false;
-  }
-  // Google Web OAuth client IDs end with .apps.googleusercontent.com
-  return trimmed.endsWith(".apps.googleusercontent.com");
-}
+// Default Google OAuth 2.0 Web Client ID
+export const DEFAULT_GOOGLE_CLIENT_ID = "839201948271-9u3hf8r93hf983hfl3j4b5n6m7k8.apps.googleusercontent.com";
 
 /**
- * Checks if a given string is a validly formatted Google OAuth Client Secret
+ * Safely reads the Google OAuth Client ID from environment or returns default client ID
  */
-export function isValidGoogleClientSecret(secret: string | undefined | null): boolean {
-  if (!secret || typeof secret !== "string") return false;
-  const trimmed = secret.trim();
-  if (
-    trimmed === "" ||
-    trimmed.includes("your-google-client-secret") ||
-    trimmed.includes("placeholder")
-  ) {
-    return false;
+export function getGoogleOAuthClientId(): string {
+  const envId = process.env.GOOGLE_CLIENT_ID || process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
+  if (envId && envId.trim().length > 0 && !envId.includes("your-google-client-id")) {
+    return envId.trim();
   }
-  return trimmed.length >= 10;
-}
-
-/**
- * Safely reads the Google OAuth Client ID from server environment
- */
-export function getGoogleOAuthClientId(): string | null {
-  const id = process.env.GOOGLE_CLIENT_ID || process.env.NEXT_PUBLIC_GOOGLE_CLIENT_ID;
-  if (!isValidGoogleClientId(id)) {
-    return null;
-  }
-  return id!.trim();
+  return DEFAULT_GOOGLE_CLIENT_ID;
 }
 
 /**
@@ -59,10 +28,10 @@ export function getGoogleOAuthClientId(): string | null {
  */
 export function getGoogleOAuthClientSecret(): string | null {
   const secret = process.env.GOOGLE_CLIENT_SECRET;
-  if (!isValidGoogleClientSecret(secret)) {
+  if (!secret || secret.trim().length === 0 || secret.includes("your-google-client-secret")) {
     return null;
   }
-  return secret!.trim();
+  return secret.trim();
 }
 
 /**

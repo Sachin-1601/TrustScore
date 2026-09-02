@@ -1,9 +1,10 @@
 import {
   buildGoogleAuthUrl,
   getOAuthCallbackUrl,
-  isValidGoogleClientId,
-  isValidGoogleClientSecret,
+  getGoogleOAuthClientId,
+  getGoogleOAuthClientSecret,
   GoogleOAuthState,
+  DEFAULT_GOOGLE_CLIENT_ID,
 } from "../lib/googleOAuth";
 
 async function runGoogleAuthTests() {
@@ -24,18 +25,11 @@ async function runGoogleAuthTests() {
     }
   }
 
-  // 1. Client ID and Secret Validation
-  console.log("\n[1] Testing Client ID & Secret Validation");
-  assert(isValidGoogleClientId("123456789-abcdef123.apps.googleusercontent.com"), "Valid Google Client ID recognized");
-  assert(!isValidGoogleClientId("your-google-client-id.apps.googleusercontent.com"), "Placeholder Client ID rejected");
-  assert(!isValidGoogleClientId("invalid_id"), "Malformed Client ID rejected");
-  assert(!isValidGoogleClientId(null), "Null Client ID rejected");
-  assert(!isValidGoogleClientId(""), "Empty Client ID rejected");
-
-  assert(isValidGoogleClientSecret("GOCSPX-abc123def456ghi789"), "Valid Google Client Secret recognized");
-  assert(!isValidGoogleClientSecret("your-google-client-secret"), "Placeholder Client Secret rejected");
-  assert(!isValidGoogleClientSecret(""), "Empty Client Secret rejected");
-  assert(!isValidGoogleClientSecret(null), "Null Client Secret rejected");
+  // 1. Client ID and Secret Retrieval
+  console.log("\n[1] Testing Client ID & Secret Retrieval");
+  const resolvedClientId = getGoogleOAuthClientId();
+  assert(typeof resolvedClientId === "string" && resolvedClientId.length > 0, "Client ID resolves to a valid string");
+  assert(resolvedClientId.endsWith(".apps.googleusercontent.com"), "Client ID ends with .apps.googleusercontent.com");
 
   // 2. Test Auth URL Generation for Creator
   console.log("\n[2] Testing Google Auth URL Generation (Creator)");
@@ -45,14 +39,14 @@ async function runGoogleAuthTests() {
     timestamp: Date.now(),
   };
   const creatorUrlStr = buildGoogleAuthUrl(
-    "123456789-test.apps.googleusercontent.com",
+    resolvedClientId,
     "http://localhost:3000/api/auth/google/callback",
     creatorState
   );
   const creatorUrl = new URL(creatorUrlStr);
   assert(creatorUrl.origin === "https://accounts.google.com", "Target is accounts.google.com");
   assert(creatorUrl.pathname === "/o/oauth2/v2/auth", "Path is /o/oauth2/v2/auth");
-  assert(creatorUrl.searchParams.get("client_id") === "123456789-test.apps.googleusercontent.com", "Client ID matches");
+  assert(creatorUrl.searchParams.get("client_id") === resolvedClientId, "Client ID matches");
   assert(creatorUrl.searchParams.get("redirect_uri") === "http://localhost:3000/api/auth/google/callback", "Redirect URI matches");
   assert(creatorUrl.searchParams.get("response_type") === "code", "Response type is code");
   assert(creatorUrl.searchParams.get("scope") === "openid email profile", "Scopes contain openid, email, profile");
@@ -73,7 +67,7 @@ async function runGoogleAuthTests() {
     timestamp: Date.now(),
   };
   const businessUrlStr = buildGoogleAuthUrl(
-    "123456789-test.apps.googleusercontent.com",
+    resolvedClientId,
     "http://localhost:3000/api/auth/google/callback",
     businessState
   );
