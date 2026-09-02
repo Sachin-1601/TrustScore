@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, Suspense } from "react";
+import React, { useState, useEffect, Suspense } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Logo } from "@/components/common/Logo";
@@ -17,7 +17,8 @@ import {
   ShieldCheck,
   Sparkles,
   CheckCircle2,
-  Info,
+  RefreshCw,
+  Clock,
 } from "lucide-react";
 
 type AccountType = "creator" | "business";
@@ -48,7 +49,7 @@ function GoogleIcon({ className = "w-4 h-4" }: { className?: string }) {
 function LoginContent() {
   const router = useRouter();
   const searchParams = useSearchParams();
-  const { login } = useAuth();
+  const { login, resendVerification } = useAuth();
 
   const typeParam = searchParams.get("type");
   const isCreatorInitial = typeParam === "creator";
@@ -67,16 +68,32 @@ function LoginContent() {
   );
   const [forgotNotice, setForgotNotice] = useState<string | null>(null);
 
+  // Unverified state handling
+  const [isUnverified, setIsUnverified] = useState(false);
+  const [unverifiedEmail, setUnverifiedEmail] = useState("");
+  const [resendStatus, setResendStatus] = useState<string | null>(null);
+  const [isResending, setIsResending] = useState(false);
+  const [resendCooldown, setResendCooldown] = useState(0);
+
+  useEffect(() => {
+    let timer: NodeJS.Timeout;
+    if (resendCooldown > 0) {
+      timer = setTimeout(() => setResendCooldown(resendCooldown - 1), 1000);
+    }
+    return () => clearTimeout(timer);
+  }, [resendCooldown]);
+
   const handleSelectAccountType = (type: AccountType) => {
     setAccountType(type);
     setErrorMessage(null);
     setForgotNotice(null);
+    setIsUnverified(false);
   };
 
   const handleGoogleClick = () => {
     setIsGoogleLoading(true);
     setErrorMessage(null);
-    // Direct browser redirect to Google OAuth authorization endpoint
+    setIsUnverified(false);
     window.location.href = `/api/auth/google?type=${accountType}&action=login`;
   };
 
@@ -84,7 +101,7 @@ function LoginContent() {
     e.preventDefault();
     setForgotNotice(
       "Password reset instructions will be sent to " +
-        (email.trim() ? email.trim() : "your registered work email") +
+        (email.trim() ? email.trim() : "your registered email") +
         " if an active account exists."
     );
     setErrorMessage(null);
@@ -95,11 +112,17 @@ function LoginContent() {
     setIsLoading(true);
     setErrorMessage(null);
     setForgotNotice(null);
+    setIsUnverified(false);
+    setResendStatus(null);
 
     const res = await login(email, password, accountType);
     setIsLoading(false);
 
-    if (res.success && res.session) {
+    if (res.emailUnverified) {
+      setIsUnverified(true);
+      setUnverifiedEmail(res.email || email.trim());
+      setErrorMessage(res.error || "Please verify your email address before signing in.");
+    } else if (res.success && res.session) {
       if (res.session.role === "CREATOR") {
         router.push("/dashboard/creator");
       } else if (res.session.role === "ADMIN") {
@@ -112,12 +135,28 @@ function LoginContent() {
     }
   };
 
+  const handleResend = async () => {
+    const targetEmail = unverifiedEmail || email.trim();
+    if (resendCooldown > 0 || isResending || !targetEmail) return;
+
+    setIsResending(true);
+    setResendStatus(null);
+
+    const res = await resendVerification(targetEmail);
+    setIsResending(false);
+
+    if (res.success) {
+      setResendStatus(res.message || "A new verification email has been sent.");
+      setResendCooldown(60);
+    } else {
+      setErrorMessage(res.error || "Failed to resend verification email.");
+    }
+  };
+
   return (
     <div className="min-h-screen bg-[#090d16] text-slate-100 flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-950/25 via-[#090d16] to-[#090d16]">
       <div className="max-w-5xl w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-        {/* ============================================================ */}
-        {/* LEFT COLUMN: TrustScore Brand Value Proposition (Desktop)    */}
-        {/* ============================================================ */}
+        {/* LEFT COLUMN: TrustScore Brand Value Proposition (Desktop) */}
         <div className="hidden lg:flex lg:col-span-5 flex-col justify-between space-y-8 pr-4">
           <div className="space-y-6">
             <Logo size="lg" href="/" showTagline={false} variant="light" showBadge={false} />
@@ -172,9 +211,7 @@ function LoginContent() {
           </div>
         </div>
 
-        {/* ============================================================ */}
-        {/* RIGHT COLUMN: Redesigned SaaS Authentication Card            */}
-        {/* ============================================================ */}
+        {/* RIGHT COLUMN: SaaS Authentication Card */}
         <div className="lg:col-span-7 w-full max-w-lg mx-auto">
           <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
             {/* Mobile Header Logo */}
@@ -257,6 +294,14 @@ function LoginContent() {
                 </div>
               )}
 
+              {/* Resend Success Notice */}
+              {resendStatus && (
+                <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs flex items-start gap-2.5 animate-in fade-in">
+                  <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-emerald-400" />
+                  <span className="leading-relaxed">{resendStatus}</span>
+                </div>
+              )}
+
               {/* Divider */}
               <div className="relative flex items-center justify-center">
                 <div className="w-full border-t border-slate-800" />
@@ -266,12 +311,53 @@ function LoginContent() {
               </div>
             </div>
 
-            {/* Error Message Display */}
-            {errorMessage && (
-              <div className="p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-2.5 animate-in fade-in">
-                <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-400" />
-                <span className="leading-relaxed">{errorMessage}</span>
+            {/* Unverified Email Warning Box */}
+            {isUnverified ? (
+              <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs space-y-2.5 animate-in fade-in">
+                <div className="flex items-start gap-2.5">
+                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-400" />
+                  <div>
+                    <h4 className="font-bold text-amber-300">Email not verified</h4>
+                    <p className="text-amber-200/90 text-[11px] mt-0.5 leading-relaxed">
+                      Please verify your email address before signing in. Check your inbox for the activation link.
+                    </p>
+                  </div>
+                </div>
+
+                <div className="pt-1 flex items-center gap-2">
+                  <button
+                    type="button"
+                    onClick={handleResend}
+                    disabled={resendCooldown > 0 || isResending}
+                    className="px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 font-bold text-[11px] rounded-xl transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                  >
+                    {isResending ? (
+                      <>
+                        <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                        <span>Sending...</span>
+                      </>
+                    ) : resendCooldown > 0 ? (
+                      <>
+                        <Clock className="w-3.5 h-3.5" />
+                        <span>Resend in {resendCooldown}s</span>
+                      </>
+                    ) : (
+                      <>
+                        <RefreshCw className="w-3.5 h-3.5" />
+                        <span>Resend Verification Email</span>
+                      </>
+                    )}
+                  </button>
+                </div>
               </div>
+            ) : (
+              /* Standard Error Message Display */
+              errorMessage && (
+                <div className="p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-2.5 animate-in fade-in">
+                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-400" />
+                  <span className="leading-relaxed">{errorMessage}</span>
+                </div>
+              )
             )}
 
             {/* Login Form */}
@@ -288,7 +374,7 @@ function LoginContent() {
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder={
                       accountType === "creator"
-                        ? "creator@example.com"
+                        ? "alex@gmail.com"
                         : "name@company.com"
                     }
                     className="w-full py-3 px-4 pl-10 bg-slate-950 border border-slate-800 rounded-2xl text-slate-100 placeholder-slate-500 text-xs sm:text-sm font-semibold focus:outline-hidden focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
@@ -329,9 +415,9 @@ function LoginContent() {
                     aria-label={showPassword ? "Hide password" : "Show password"}
                   >
                     {showPassword ? (
-                      <EyeOff className="w-4 h-4" />
+                      <EyeOff className="w-3.5 h-3.5" />
                     ) : (
-                      <Eye className="w-4 h-4" />
+                      <Eye className="w-3.5 h-3.5" />
                     )}
                   </button>
                 </div>

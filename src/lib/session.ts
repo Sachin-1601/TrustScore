@@ -72,14 +72,18 @@ export async function getServerSession(): Promise<SessionPayload | null> {
 
 export async function setSessionCookie(payload: SessionPayload): Promise<string> {
   const token = await createSessionToken(payload);
-  const cookieStore = await cookies();
-  cookieStore.set(SESSION_COOKIE_NAME, token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === "production",
-    sameSite: "lax",
-    path: "/",
-    maxAge: SESSION_MAX_AGE_SECONDS,
-  });
+  try {
+    const cookieStore = await cookies();
+    cookieStore.set(SESSION_COOKIE_NAME, token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === "production",
+      sameSite: "lax",
+      path: "/",
+      maxAge: SESSION_MAX_AGE_SECONDS,
+    });
+  } catch {
+    // Gracefully handle execution outside Next.js request context (e.g. CLI test runners)
+  }
   return token;
 }
 

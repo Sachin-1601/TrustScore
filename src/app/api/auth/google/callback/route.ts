@@ -128,7 +128,7 @@ export async function GET(req: Request) {
 
     if (!user) {
       console.log(`[Google OAuth Callback] Registering new user (${cleanEmail}) with requested role: ${requestedRole}`);
-      // Create new user with selected account type
+      // Create new user with selected account type and emailVerifiedAt from Google identity
       user = await prisma.user.create({
         data: {
           email: cleanEmail,
@@ -136,6 +136,7 @@ export async function GET(req: Request) {
           name: googleUser.name || "Google User",
           role: requestedRole,
           avatar: googleUser.picture || undefined,
+          emailVerifiedAt: new Date(),
         },
         include: { creatorProfile: true, businessProfile: true },
       });
@@ -151,15 +152,16 @@ export async function GET(req: Request) {
             avatar:
               googleUser.picture ||
               "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80",
-            bio: "Verified creator on TrustScore.",
+            bio: "",
             category: "Lifestyle",
             location: "Global",
             country: "Australia",
             platform: "INSTAGRAM",
             followers: 0,
             startingRate: 250,
-            verifiedBadge: true,
-            verifiedAt: new Date(),
+            verifiedBadge: false, // Google auth verifies email identity ONLY, not TrustScore social verification
+            verifiedAt: null,
+            dataCoverage: "INSUFFICIENT",
           },
         });
       } else {
@@ -168,15 +170,15 @@ export async function GET(req: Request) {
           data: {
             userId: user.id,
             slug: `${companySlug}-${Date.now().toString().slice(-4)}`,
-            name: googleUser.name ? `${googleUser.name}'s Brand` : "Verified Brand",
+            name: googleUser.name ? `${googleUser.name}'s Brand` : "Brand Workspace",
             logo:
               googleUser.picture ||
               "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&auto=format&fit=crop&q=80",
             category: "Brand",
             location: "Global",
-            tagline: "Connecting with authentic creators",
-            description: "Verified brand on TrustScore.",
-            website: "https://example.com",
+            tagline: "",
+            description: "",
+            website: "",
           },
         });
       }
@@ -188,6 +190,13 @@ export async function GET(req: Request) {
       });
     } else {
       console.log(`[Google OAuth Callback] Existing user found (${cleanEmail}). Preserving assigned role: ${user.role}`);
+      if (!user.emailVerifiedAt) {
+        // Google auth confirms ownership of this email address
+        await prisma.user.update({
+          where: { id: user.id },
+          data: { emailVerifiedAt: new Date() },
+        });
+      }
     }
 
     // Set secure session cookie

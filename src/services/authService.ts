@@ -2,11 +2,38 @@ import bcrypt from "bcryptjs";
 import { prisma } from "@/lib/prisma";
 import { UserRole } from "@prisma/client";
 import { UserSession } from "@/types/schema";
+import { generateVerificationToken, hashVerificationToken, EMAIL_VERIFICATION_EXPIRY_MS } from "@/lib/tokenSecurity";
+import { EmailService } from "@/lib/email";
+
+export interface SignupResult {
+  requiresVerification?: boolean;
+  email?: string;
+  error?: string;
+}
+
+export interface LoginResult {
+  session: UserSession | null;
+  emailUnverified?: boolean;
+  email?: string;
+  error?: string;
+}
+
+export interface VerifyEmailResult {
+  success: boolean;
+  user?: UserSession;
+  error?: string;
+}
+
+export interface ResendVerificationResult {
+  success: boolean;
+  rateLimited?: boolean;
+  error?: string;
+  message?: string;
+}
 
 /**
  * AuthService — PostgreSQL/Prisma is the single source of truth.
- * There is NO in-memory fallback: database failures surface as thrown errors
- * so the API layer can return a proper 5xx instead of silently serving fake data.
+ * All password-based signups require email verification before sessions can be established.
  */
 export class AuthService {
   /** Roles a member of the public is permitted to self-register as. */
@@ -28,7 +55,7 @@ export class AuthService {
     email: string,
     passwordPlain: string,
     expectedRole?: "creator" | "business" | "admin"
-  ): Promise<{ session: UserSession | null; error?: string }> {
+  ): Promise<LoginResult> {
     const cleanEmail = email.trim().toLowerCase();
 
     const user = await prisma.user.findUnique({
@@ -45,6 +72,7 @@ export class AuthService {
       return { session: null, error: "Invalid email or password" };
     }
 
+    // Role expectations check
     if (expectedRole === "creator" && user.role !== "CREATOR") {
       return { session: null, error: "These credentials belong to a Business account. Please use Business login." };
     }
@@ -53,6 +81,16 @@ export class AuthService {
     }
     if (expectedRole === "admin" && user.role !== "ADMIN") {
       return { session: null, error: "This account does not have administrator access." };
+    }
+
+    // Email Ownership Verification Gate
+    if (!user.emailVerifiedAt) {
+      return {
+        session: null,
+        emailUnverified: true,
+        email: user.email,
+        error: "Please verify your email address before signing in.",
+      };
     }
 
     return {
@@ -76,21 +114,26 @@ export class AuthService {
     handleOrCompany?: string;
     category?: string;
     platform?: "instagram" | "tiktok" | "youtube";
-  }): Promise<{ session: UserSession | null; error?: string }> {
+  }): Promise<SignupResult> {
     const cleanEmail = data.email.trim().toLowerCase();
 
-    // Hard server-side guard against privilege escalation.
+    // Guard against privilege escalation
     if (!this.PUBLIC_SIGNUP_ROLES.includes(data.role)) {
-      return { session: null, error: "Invalid account type. You may register as a Creator or a Business." };
+      return { error: "Invalid account type. You may register as a Creator or a Business." };
+    }
+
+    // Creator accounts require a Gmail address ending in @gmail.com
+    if (data.role === "CREATOR" && !cleanEmail.endsWith("@gmail.com")) {
+      return { error: "Creator accounts require a Gmail address ending in @gmail.com." };
     }
 
     if (data.passwordPlain.length < 8) {
-      return { session: null, error: "Password must be at least 8 characters." };
+      return { error: "Password must be at least 8 characters." };
     }
 
     const existing = await prisma.user.findUnique({ where: { email: cleanEmail } });
     if (existing) {
-      return { session: null, error: "An account with this email already exists" };
+      return { error: "An account with this email already exists" };
     }
 
     const passwordHash = await this.hashPassword(data.passwordPlain);
@@ -99,7 +142,10 @@ export class AuthService {
         ? "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80"
         : "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=120&auto=format&fit=crop&q=80";
 
-    const result = await prisma.$transaction(async (tx) => {
+    const { rawToken, tokenHash, expiresAt } = generateVerificationToken(EMAIL_VERIFICATION_EXPIRY_MS);
+
+    await prisma.$transaction(async (tx) => {
+      // 1. Create User with emailVerifiedAt = null
       const createdUser = await tx.user.create({
         data: {
           email: cleanEmail,
@@ -107,22 +153,20 @@ export class AuthService {
           name: data.name.trim(),
           role: data.role,
           avatar: defaultAvatar,
+          emailVerifiedAt: null, // Unverified upon password signup
         },
       });
 
-      let creatorProfileId: string | undefined;
-      let businessProfileId: string | undefined;
-
+      // 2. Create Profile Data
       if (data.role === "CREATOR") {
         const rawHandle = (data.handleOrCompany || data.name).toLowerCase().replace(/[^a-z0-9_]/g, "");
         const baseUsername = rawHandle || `creator${Date.now().toString().slice(-6)}`;
-        // Ensure username uniqueness
         let username = `@${baseUsername}`;
         if (await tx.creatorProfile.findUnique({ where: { username } })) {
           username = `@${baseUsername}${Date.now().toString().slice(-4)}`;
         }
 
-        const creator = await tx.creatorProfile.create({
+        await tx.creatorProfile.create({
           data: {
             userId: createdUser.id,
             username,
@@ -133,7 +177,6 @@ export class AuthService {
             location: "",
             country: "Australia",
             platform: data.platform === "tiktok" ? "TIKTOK" : data.platform === "youtube" ? "YOUTUBE" : "INSTAGRAM",
-            // No fabricated telemetry — a brand new creator starts empty.
             followers: 0,
             following: 0,
             totalPosts: 0,
@@ -149,13 +192,12 @@ export class AuthService {
             dataCoverage: "INSUFFICIENT",
           },
         });
-        creatorProfileId = creator.id;
       } else if (data.role === "BUSINESS") {
         const companyName = data.handleOrCompany?.trim() || `${data.name.trim()}`;
         const baseSlug = companyName.toLowerCase().replace(/[^a-z0-9]/g, "-").replace(/-+/g, "-").replace(/^-|-$/g, "");
         const slug = `${baseSlug || "brand"}-${Date.now().toString().slice(-5)}`;
 
-        const business = await tx.businessProfile.create({
+        await tx.businessProfile.create({
           data: {
             userId: createdUser.id,
             slug,
@@ -165,15 +207,13 @@ export class AuthService {
             location: "",
             tagline: "",
             description: "",
-            // No placeholder website — the business enters this during onboarding.
             website: "",
             isSponsored: false,
           },
         });
-        businessProfileId = business.id;
       }
 
-      // Baseline free/starter subscription record (no paid entitlement granted here).
+      // 3. Baseline subscription record
       await tx.subscription.create({
         data: {
           userId: createdUser.id,
@@ -186,20 +226,171 @@ export class AuthService {
         },
       });
 
-      return {
-        session: {
-          id: createdUser.id,
-          email: createdUser.email,
-          name: createdUser.name,
-          role: createdUser.role as any,
-          avatar: createdUser.avatar || undefined,
-          creatorProfileId,
-          businessProfileId,
-        } as UserSession,
-      };
+      // 4. Create Email Verification Token
+      await tx.emailVerificationToken.create({
+        data: {
+          userId: createdUser.id,
+          tokenHash,
+          expiresAt,
+        },
+      });
     });
 
-    return result;
+    // 5. Send Verification Email
+    const appUrl = EmailService.getAppUrl();
+    const verificationUrl = `${appUrl}/api/auth/verify-email?token=${rawToken}`;
+    await EmailService.sendVerificationEmail({
+      to: cleanEmail,
+      name: data.name.trim(),
+      verificationUrl,
+    });
+
+    return {
+      requiresVerification: true,
+      email: cleanEmail,
+    };
+  }
+
+  public static async verifyEmailToken(rawToken: string): Promise<VerifyEmailResult> {
+    if (!rawToken || typeof rawToken !== "string") {
+      return { success: false, error: "Missing or invalid verification token." };
+    }
+
+    const tokenHash = hashVerificationToken(rawToken.trim());
+
+    const tokenRecord = await prisma.emailVerificationToken.findUnique({
+      where: { tokenHash },
+      include: {
+        user: {
+          include: { creatorProfile: true, businessProfile: true },
+        },
+      },
+    });
+
+    if (!tokenRecord) {
+      return { success: false, error: "Invalid or expired verification token." };
+    }
+
+    if (tokenRecord.usedAt) {
+      return {
+        success: false,
+        error: "This verification link has already been used. Please sign in to your account.",
+      };
+    }
+
+    if (tokenRecord.expiresAt < new Date()) {
+      return {
+        success: false,
+        error: "This verification link has expired. Please request a new verification email.",
+      };
+    }
+
+    const user = tokenRecord.user;
+    const now = new Date();
+
+    await prisma.$transaction(async (tx) => {
+      // Mark token as used
+      await tx.emailVerificationToken.update({
+        where: { id: tokenRecord.id },
+        data: { usedAt: now },
+      });
+
+      // Set user emailVerifiedAt
+      await tx.user.update({
+        where: { id: user.id },
+        data: { emailVerifiedAt: now },
+      });
+
+      // Invalidate any other outstanding tokens for this user
+      await tx.emailVerificationToken.updateMany({
+        where: {
+          userId: user.id,
+          usedAt: null,
+          id: { not: tokenRecord.id },
+        },
+        data: { usedAt: now },
+      });
+    });
+
+    return {
+      success: true,
+      user: {
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role as any,
+        avatar: user.avatar || undefined,
+        creatorProfileId: user.creatorProfile?.id,
+        businessProfileId: user.businessProfile?.id,
+      },
+    };
+  }
+
+  public static async resendVerification(email: string): Promise<ResendVerificationResult> {
+    const cleanEmail = email.trim().toLowerCase();
+    if (!cleanEmail) {
+      return { success: false, error: "Please provide an email address." };
+    }
+
+    const user = await prisma.user.findUnique({
+      where: { email: cleanEmail },
+      include: { emailVerificationTokens: { orderBy: { createdAt: "desc" }, take: 1 } },
+    });
+
+    // Generic response if account doesn't exist or is already verified (prevents user enumeration)
+    if (!user || user.emailVerifiedAt) {
+      return {
+        success: true,
+        message: "If an unverified account exists for this email, a new verification link has been sent.",
+      };
+    }
+
+    // Rate-limiting: prevent resending within 60 seconds
+    const latestToken = user.emailVerificationTokens[0];
+    if (latestToken && Date.now() - latestToken.createdAt.getTime() < 60 * 1000) {
+      const waitSec = Math.ceil((60 * 1000 - (Date.now() - latestToken.createdAt.getTime())) / 1000);
+      return {
+        success: false,
+        rateLimited: true,
+        error: `Please wait ${waitSec} seconds before requesting another verification email.`,
+      };
+    }
+
+    const { rawToken, tokenHash, expiresAt } = generateVerificationToken(EMAIL_VERIFICATION_EXPIRY_MS);
+    const now = new Date();
+
+    await prisma.$transaction(async (tx) => {
+      // Invalidate existing unused tokens
+      await tx.emailVerificationToken.updateMany({
+        where: {
+          userId: user.id,
+          usedAt: null,
+        },
+        data: { usedAt: now },
+      });
+
+      // Create new token record
+      await tx.emailVerificationToken.create({
+        data: {
+          userId: user.id,
+          tokenHash,
+          expiresAt,
+        },
+      });
+    });
+
+    const appUrl = EmailService.getAppUrl();
+    const verificationUrl = `${appUrl}/api/auth/verify-email?token=${rawToken}`;
+    await EmailService.sendVerificationEmail({
+      to: cleanEmail,
+      name: user.name,
+      verificationUrl,
+    });
+
+    return {
+      success: true,
+      message: "A new verification link has been sent to your email address.",
+    };
   }
 
   public static async getUserById(userId: string): Promise<UserSession | null> {

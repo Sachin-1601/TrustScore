@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 import { DashboardHeader } from "@/components/dashboard/DashboardHeader";
 import { useAuth } from "@/contexts/AuthContext";
@@ -18,9 +18,15 @@ import {
   Globe,
   MapPin,
   DollarSign,
-  Layers,
   ShieldCheck,
   Eye,
+  Camera,
+  Layers,
+  Award,
+  Circle,
+  ArrowUpRight,
+  AlertCircle,
+  Loader2,
 } from "lucide-react";
 
 const PRESET_TAGS = [
@@ -31,23 +37,31 @@ const PRESET_TAGS = [
   "Available for Campaigns",
   "Open to UGC",
   "Open to Affiliate Partnerships",
+  "Product Reviews",
+  "Event Appearances",
+  "Long-term Ambassador",
 ];
 
 export default function CreatorProfilePage() {
   const { user } = useAuth();
   const { success, error: toastError } = useToast();
+  const fileInputRef = useRef<HTMLInputElement>(null);
 
   const [creator, setCreator] = useState<Creator | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [isSaving, setIsSaving] = useState(false);
+  const [hasUnsavedChanges, setHasUnsavedChanges] = useState(false);
 
   // Form states
+  const [avatar, setAvatar] = useState("");
   const [name, setName] = useState("");
   const [username, setUsername] = useState("");
   const [bio, setBio] = useState("");
   const [category, setCategory] = useState("Fitness");
   const [location, setLocation] = useState("");
+  const [country, setCountry] = useState("Australia");
   const [website, setWebsite] = useState("");
+  const [platform, setPlatform] = useState<"instagram" | "tiktok" | "youtube">("instagram");
   const [startingRate, setStartingRate] = useState<number>(350);
   const [availabilityStatus, setAvailabilityStatus] = useState<
     "OPEN_TO_WORK" | "AVAILABLE_FOR_COLLABORATION" | "NOT_AVAILABLE"
@@ -63,20 +77,25 @@ export default function CreatorProfilePage() {
     async function loadProfile() {
       try {
         const res = await fetch("/api/creators/me");
-        const data = await res.json();
-        if (data.creator) {
-          const c: Creator = data.creator;
-          setCreator(c);
-          setName(c.name || user?.name || "");
-          setUsername(c.username || "");
-          setBio(c.bio || "");
-          setCategory(c.category || "Fitness");
-          setLocation(c.location || "Australia");
-          setWebsite(c.website || "");
-          setStartingRate(c.startingRate || 350);
-          setAvailabilityStatus(c.availabilityStatus || "OPEN_TO_WORK");
-          if (c.profileTags && c.profileTags.length > 0) {
-            setSelectedTags(c.profileTags);
+        if (res.ok) {
+          const data = await res.json();
+          if (data.creator) {
+            const c: Creator = data.creator;
+            setCreator(c);
+            setAvatar(c.avatar || user?.avatar || "");
+            setName(c.name || user?.name || "");
+            setUsername(c.username || "");
+            setBio(c.bio || "");
+            setCategory(c.category || "Fitness");
+            setLocation(c.location || "Australia");
+            setCountry(c.country || "Australia");
+            setWebsite(c.website || "");
+            setPlatform((c.platform as any) || "instagram");
+            setStartingRate(c.startingRate || 350);
+            setAvailabilityStatus(c.availabilityStatus || "OPEN_TO_WORK");
+            if (c.profileTags && c.profileTags.length > 0) {
+              setSelectedTags(c.profileTags);
+            }
           }
         }
       } catch (err) {
@@ -88,7 +107,29 @@ export default function CreatorProfilePage() {
     loadProfile();
   }, [user]);
 
+  // Handle Photo Upload
+  const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (file) {
+      if (file.size > 5 * 1024 * 1024) {
+        toastError("File Too Large", "Please select an image smaller than 5MB.");
+        return;
+      }
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const dataUrl = event.target?.result as string;
+        if (dataUrl) {
+          setAvatar(dataUrl);
+          setHasUnsavedChanges(true);
+          success("Photo Selected", "New profile photo ready. Click Save Changes to apply.");
+        }
+      };
+      reader.readAsDataURL(file);
+    }
+  };
+
   const handleToggleTag = (tag: string) => {
+    setHasUnsavedChanges(true);
     if (selectedTags.includes(tag)) {
       setSelectedTags(selectedTags.filter((t) => t !== tag));
     } else {
@@ -102,11 +143,13 @@ export default function CreatorProfilePage() {
     if (!clean) return;
     if (!selectedTags.includes(clean)) {
       setSelectedTags([...selectedTags, clean]);
+      setHasUnsavedChanges(true);
     }
     setCustomTagInput("");
   };
 
   const handleRemoveTag = (tagToRemove: string) => {
+    setHasUnsavedChanges(true);
     setSelectedTags(selectedTags.filter((t) => t !== tagToRemove));
   };
 
@@ -119,11 +162,14 @@ export default function CreatorProfilePage() {
         method: "PATCH",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
-          name,
-          bio,
+          avatar,
+          name: name.trim(),
+          bio: bio.trim(),
           category,
-          location,
-          website,
+          location: location.trim(),
+          country,
+          website: website.trim(),
+          platform,
           startingRate: Number(startingRate),
           availabilityStatus,
           profileTags: selectedTags,
@@ -133,67 +179,331 @@ export default function CreatorProfilePage() {
 
       const data = await res.json();
       if (!res.ok || data.error) {
-        toastError("Update Failed", data.error || "Could not save changes");
+        toastError("Update Failed", data.error || "Could not save profile changes");
       } else {
         setCreator(data.creator);
+        setHasUnsavedChanges(false);
         success("Profile Updated!", "Your creator profile, tags, and availability are live in the marketplace.");
       }
     } catch (err: any) {
-      toastError("Error", err.message || "Network error while saving profile");
+      toastError("Network Error", err.message || "Could not connect to the server");
     } finally {
       setIsSaving(false);
     }
   };
 
+  // Derived Completion Metrics
+  const completionItems = [
+    { label: "Display Name & Avatar", isComplete: Boolean(name && avatar) },
+    { label: "Bio & Pitch (15+ chars)", isComplete: Boolean(bio && bio.length >= 15) },
+    { label: "Category & Location", isComplete: Boolean(category && location) },
+    { label: "Starting Collaboration Rate", isComplete: Number(startingRate) > 0 },
+    { label: "Marketplace Search Tags", isComplete: selectedTags.length > 0 },
+    { label: "Social Telemetry Verification", isComplete: Boolean(creator?.verifiedBadge) },
+  ];
+  const completedCount = completionItems.filter((i) => i.isComplete).length;
+  const completionPercentage = Math.round((completedCount / completionItems.length) * 100);
+
+  const cleanHandle = (username || creator?.username || "").replace("@", "");
+  const publicProfileUrl = `/creators/${cleanHandle || "me"}`;
+
+  if (isLoading) {
+    return (
+      <div className="min-h-full flex flex-col bg-slate-950 text-slate-100">
+        <DashboardHeader title="Profile & Tags" />
+        <div className="py-24 flex flex-col items-center justify-center gap-3 text-slate-400">
+          <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+          <span className="text-xs font-semibold">Loading creator profile editor...</span>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="min-h-full flex flex-col bg-slate-950 text-slate-100">
       <DashboardHeader
-        title="Creator Profile &amp; Marketplace Tag Manager"
-        subtitle="Control your public creator identity, collaboration availability, and custom marketplace tags"
+        title="Profile & Tags"
+        subtitle="Manage how brands discover and understand your creator profile."
       />
 
       <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-8">
-        {/* Top Action Bar */}
-        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900/90 border border-slate-800 rounded-3xl p-5">
-          <div className="flex items-center gap-3">
-            <div className="w-10 h-10 rounded-2xl bg-blue-600/20 border border-blue-500/30 flex items-center justify-center text-blue-400">
+        {/* Top Control Bar */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 bg-slate-900/90 border border-slate-800 rounded-3xl p-5 shadow-sm">
+          <div className="flex items-center gap-3.5">
+            <div className="w-10 h-10 rounded-2xl bg-blue-600/15 border border-blue-500/25 flex items-center justify-center text-blue-400 shrink-0">
               <UserCheck className="w-5 h-5" />
             </div>
             <div>
-              <h3 className="font-bold text-slate-100 text-sm">Public Marketplace Listing</h3>
+              <div className="flex items-center gap-2">
+                <h3 className="font-bold text-slate-100 text-sm">Marketplace Discoverability</h3>
+                <span className="px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                  {completionPercentage >= 80 ? "Public & Listed" : "Incomplete Profile"}
+                </span>
+              </div>
               <p className="text-xs text-slate-400">
-                Changes saved here reflect on your public profile and in brand discovery searches.
+                Profile changes persist directly to the PostgreSQL database and update your public card instantly.
               </p>
             </div>
           </div>
 
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2.5 shrink-0">
             <Link
-              href={`/creators/${creator?.id || "alexfitness"}`}
+              href={publicProfileUrl}
               target="_blank"
-              className="px-4 py-2 bg-slate-950 border border-slate-800 hover:bg-slate-800 text-slate-200 font-bold text-xs rounded-xl transition-colors flex items-center gap-1.5 cursor-pointer"
+              className="px-4 py-2.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-200 font-bold text-xs rounded-2xl transition-colors flex items-center gap-1.5 cursor-pointer shadow-xs"
             >
-              <Eye className="w-3.5 h-3.5" />
-              <span>Preview Public Profile</span>
+              <Eye className="w-3.5 h-3.5 text-slate-400" />
+              <span>Public Profile</span>
+              <ExternalLink className="w-3 h-3 text-slate-400" />
             </Link>
           </div>
         </div>
 
+        {/* Main Form Layout */}
         <form onSubmit={handleSaveChanges} className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
-          {/* Left Column: Form Fields */}
+          {/* Left Column (8 cols): Editor Sections */}
           <div className="lg:col-span-8 space-y-6">
-            {/* 1. Availability Status Card */}
-            <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-sm">
-              <div className="flex items-center gap-2 pb-2 border-b border-slate-800">
+            {/* SECTION 1: Identity & Avatar */}
+            <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-7 space-y-5 shadow-lg">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-800">
                 <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                  1. Collaboration Availability Status
+                  1. Profile Identity &amp; Avatar
+                </span>
+                <span className="text-[11px] text-slate-500">Required</span>
+              </div>
+
+              <div className="flex flex-col sm:flex-row sm:items-center gap-5">
+                <div className="relative shrink-0">
+                  {avatar ? (
+                    <img
+                      src={avatar}
+                      alt={name || "Avatar"}
+                      className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl object-cover border-2 border-slate-700 bg-slate-950 shadow-md"
+                    />
+                  ) : (
+                    <div className="w-20 h-20 sm:w-24 sm:h-24 rounded-3xl border-2 border-slate-700 bg-slate-950 flex items-center justify-center text-2xl font-black text-slate-400">
+                      {name?.charAt(0) || "C"}
+                    </div>
+                  )}
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handlePhotoUpload}
+                    className="hidden"
+                  />
+                  <button
+                    type="button"
+                    onClick={() => fileInputRef.current?.click()}
+                    className="absolute -bottom-1 -right-1 p-2 bg-blue-600 hover:bg-blue-500 text-white rounded-xl shadow-md transition-colors cursor-pointer"
+                    title="Change Photo"
+                  >
+                    <Camera className="w-3.5 h-3.5" />
+                  </button>
+                </div>
+
+                <div className="flex-1 space-y-3">
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
+                    <div>
+                      <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1">
+                        Creator Display Name
+                      </label>
+                      <input
+                        type="text"
+                        value={name}
+                        onChange={(e) => {
+                          setName(e.target.value);
+                          setHasUnsavedChanges(true);
+                        }}
+                        placeholder="e.g. Alex Rivera"
+                        className="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-slate-100 font-semibold focus:outline-hidden focus:border-blue-500 transition-all"
+                        required
+                      />
+                    </div>
+
+                    <div>
+                      <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1">
+                        Creator Handle (Locked)
+                      </label>
+                      <input
+                        type="text"
+                        value={username}
+                        disabled
+                        className="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950/60 border border-slate-800/80 text-xs text-slate-500 font-semibold cursor-not-allowed"
+                      />
+                    </div>
+                  </div>
+
+                  <div>
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1">
+                      Avatar Image URL (Alternative to upload)
+                    </label>
+                    <input
+                      type="url"
+                      value={avatar}
+                      onChange={(e) => {
+                        setAvatar(e.target.value);
+                        setHasUnsavedChanges(true);
+                      }}
+                      placeholder="https://images.unsplash.com/..."
+                      className="w-full px-3.5 py-2 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-slate-100 focus:outline-hidden focus:border-blue-500 transition-all"
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            {/* SECTION 2: Bio & Description */}
+            <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-7 space-y-4 shadow-lg">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                  2. Creator Bio &amp; Pitch
+                </span>
+                <span className={`text-[11px] font-semibold ${bio.length < 15 ? "text-amber-400" : "text-slate-400"}`}>
+                  {bio.length} / 500 characters
+                </span>
+              </div>
+
+              <div>
+                <textarea
+                  rows={4}
+                  maxLength={500}
+                  value={bio}
+                  onChange={(e) => {
+                    setBio(e.target.value);
+                    setHasUnsavedChanges(true);
+                  }}
+                  placeholder="Describe your content niche, audience demographics, typical collaboration deliverables (e.g. 1 Reel + 3 Story frames), and brand partnership values..."
+                  className="w-full p-4 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-slate-100 placeholder-slate-500 focus:outline-hidden focus:border-blue-500 transition-all leading-relaxed"
+                />
+                <p className="text-[11px] text-slate-500 mt-1.5">
+                  Pro-tip: Clear deliverable packages and niche focus increase response rates on inbound brand proposals.
+                </p>
+              </div>
+            </div>
+
+            {/* SECTION 3: Category, Location & Rate */}
+            <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-7 space-y-4 shadow-lg">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                  3. Niche Category, Geography &amp; Base Rate
+                </span>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1">
+                    Industry Category
+                  </label>
+                  <select
+                    value={category}
+                    onChange={(e) => {
+                      setCategory(e.target.value);
+                      setHasUnsavedChanges(true);
+                    }}
+                    className="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-slate-100 font-semibold focus:outline-hidden focus:border-blue-500 transition-all cursor-pointer"
+                  >
+                    <option value="Fitness">Fitness &amp; Health</option>
+                    <option value="Beauty">Beauty &amp; Skincare</option>
+                    <option value="Fashion">Fashion &amp; Style</option>
+                    <option value="Technology">Technology &amp; Gadgets</option>
+                    <option value="Food">Food &amp; Cooking</option>
+                    <option value="Travel">Travel &amp; Hospitality</option>
+                    <option value="Gaming">Gaming &amp; Esports</option>
+                    <option value="Lifestyle">Lifestyle</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1">
+                    Location / City
+                  </label>
+                  <input
+                    type="text"
+                    value={location}
+                    onChange={(e) => {
+                      setLocation(e.target.value);
+                      setHasUnsavedChanges(true);
+                    }}
+                    placeholder="e.g. Melbourne, Australia"
+                    className="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-slate-100 font-semibold focus:outline-hidden focus:border-blue-500 transition-all"
+                  />
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1">
+                    Starting Collab Rate (USD)
+                  </label>
+                  <div className="relative">
+                    <input
+                      type="number"
+                      min="0"
+                      step="25"
+                      value={startingRate}
+                      onChange={(e) => {
+                        setStartingRate(Number(e.target.value));
+                        setHasUnsavedChanges(true);
+                      }}
+                      className="w-full px-3.5 py-2.5 pl-8 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-slate-100 font-semibold focus:outline-hidden focus:border-blue-500 transition-all"
+                    />
+                    <DollarSign className="w-3.5 h-3.5 text-slate-500 absolute left-3 top-3 pointer-events-none" />
+                  </div>
+                </div>
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 pt-1">
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1">
+                    Primary Social Platform
+                  </label>
+                  <select
+                    value={platform}
+                    onChange={(e) => {
+                      setPlatform(e.target.value as any);
+                      setHasUnsavedChanges(true);
+                    }}
+                    className="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-slate-100 font-semibold focus:outline-hidden focus:border-blue-500 transition-all cursor-pointer capitalize"
+                  >
+                    <option value="instagram">Instagram</option>
+                    <option value="tiktok">TikTok</option>
+                    <option value="youtube">YouTube</option>
+                  </select>
+                </div>
+
+                <div>
+                  <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1">
+                    Media Kit / Website URL
+                  </label>
+                  <input
+                    type="url"
+                    value={website}
+                    onChange={(e) => {
+                      setWebsite(e.target.value);
+                      setHasUnsavedChanges(true);
+                    }}
+                    placeholder="https://yourlinktree.com/creator"
+                    className="w-full px-3.5 py-2.5 rounded-2xl bg-slate-950 border border-slate-800 text-xs text-slate-100 font-semibold focus:outline-hidden focus:border-blue-500 transition-all"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* SECTION 4: Collaboration Availability */}
+            <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-7 space-y-4 shadow-lg">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-800">
+                <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
+                  4. Collaboration Availability Status
                 </span>
               </div>
 
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
-                <label
-                  onClick={() => setAvailabilityStatus("OPEN_TO_WORK")}
-                  className={`p-4 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between ${
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAvailabilityStatus("OPEN_TO_WORK");
+                    setHasUnsavedChanges(true);
+                  }}
+                  className={`p-4 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
                     availabilityStatus === "OPEN_TO_WORK"
                       ? "bg-emerald-500/10 border-emerald-500 ring-1 ring-emerald-500 text-slate-100"
                       : "bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700"
@@ -203,14 +513,18 @@ export default function CreatorProfilePage() {
                     <span className="w-2.5 h-2.5 rounded-full bg-emerald-400 shrink-0" />
                     <span className="font-bold text-xs text-slate-100">Open to Work</span>
                   </div>
-                  <span className="text-[11px] text-slate-400 mt-2">
-                    Actively accepting new brand deals and retainer proposals.
+                  <span className="text-[11px] text-slate-400 mt-2 leading-relaxed">
+                    Actively reviewing inbound brand deals and retainer proposals.
                   </span>
-                </label>
+                </button>
 
-                <label
-                  onClick={() => setAvailabilityStatus("AVAILABLE_FOR_COLLABORATION")}
-                  className={`p-4 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between ${
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAvailabilityStatus("AVAILABLE_FOR_COLLABORATION");
+                    setHasUnsavedChanges(true);
+                  }}
+                  className={`p-4 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
                     availabilityStatus === "AVAILABLE_FOR_COLLABORATION"
                       ? "bg-blue-500/10 border-blue-500 ring-1 ring-blue-500 text-slate-100"
                       : "bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700"
@@ -220,14 +534,18 @@ export default function CreatorProfilePage() {
                     <span className="w-2.5 h-2.5 rounded-full bg-blue-400 shrink-0" />
                     <span className="font-bold text-xs text-slate-100">Available for Collabs</span>
                   </div>
-                  <span className="text-[11px] text-slate-400 mt-2">
-                    Selective partnerships for aligned campaign briefs.
+                  <span className="text-[11px] text-slate-400 mt-2 leading-relaxed">
+                    Selective partnerships for campaigns matching specific briefs.
                   </span>
-                </label>
+                </button>
 
-                <label
-                  onClick={() => setAvailabilityStatus("NOT_AVAILABLE")}
-                  className={`p-4 rounded-2xl border cursor-pointer transition-all flex flex-col justify-between ${
+                <button
+                  type="button"
+                  onClick={() => {
+                    setAvailabilityStatus("NOT_AVAILABLE");
+                    setHasUnsavedChanges(true);
+                  }}
+                  className={`p-4 rounded-2xl border text-left transition-all cursor-pointer flex flex-col justify-between ${
                     availabilityStatus === "NOT_AVAILABLE"
                       ? "bg-rose-500/10 border-rose-500 ring-1 ring-rose-500 text-slate-100"
                       : "bg-slate-950 border-slate-800 text-slate-400 hover:border-slate-700"
@@ -237,35 +555,35 @@ export default function CreatorProfilePage() {
                     <span className="w-2.5 h-2.5 rounded-full bg-rose-400 shrink-0" />
                     <span className="font-bold text-xs text-slate-100">Not Available</span>
                   </div>
-                  <span className="text-[11px] text-slate-400 mt-2">
-                    Temporarily fully booked or on hiatus.
+                  <span className="text-[11px] text-slate-400 mt-2 leading-relaxed">
+                    Temporarily fully booked or not accepting new brand briefs.
                   </span>
-                </label>
+                </button>
               </div>
             </div>
 
-            {/* 2. Reusable Profile Tags System */}
-            <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-sm">
-              <div className="flex items-center justify-between pb-2 border-b border-slate-800">
+            {/* SECTION 5: Marketplace Profile Tags */}
+            <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-7 space-y-4 shadow-lg">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-800">
                 <div className="flex items-center gap-2">
                   <Tag className="w-4 h-4 text-blue-400" />
                   <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                    2. Marketplace Profile Tags
+                    5. Reusable Marketplace Profile Tags
                   </span>
                 </div>
-                <span className="text-[10px] text-slate-500">
-                  {selectedTags.length} tags selected
+                <span className="text-[11px] text-slate-400">
+                  {selectedTags.length} active tag{selectedTags.length === 1 ? "" : "s"}
                 </span>
               </div>
 
-              {/* Active selected tags */}
+              {/* Active display tags */}
               <div className="space-y-2">
                 <span className="text-[11px] font-bold text-slate-400 block">
                   Active Display Tags (Click X to remove):
                 </span>
-                <div className="flex flex-wrap gap-2 p-3 bg-slate-950 rounded-2xl border border-slate-800 min-h-[48px] items-center">
+                <div className="flex flex-wrap gap-2 p-3.5 bg-slate-950 rounded-2xl border border-slate-800 min-h-[52px] items-center">
                   {selectedTags.length === 0 ? (
-                    <span className="text-xs text-slate-500 italic">No profile tags added yet.</span>
+                    <span className="text-xs text-slate-500 italic">No profile tags added yet. Choose from presets below or add custom tags.</span>
                   ) : (
                     selectedTags.map((tag) => (
                       <span
@@ -276,7 +594,7 @@ export default function CreatorProfilePage() {
                         <button
                           type="button"
                           onClick={() => handleRemoveTag(tag)}
-                          className="hover:text-white cursor-pointer"
+                          className="hover:text-white cursor-pointer p-0.5"
                           title="Remove tag"
                         >
                           <X className="w-3.5 h-3.5" />
@@ -315,7 +633,7 @@ export default function CreatorProfilePage() {
               </div>
 
               {/* Custom tag add form */}
-              <div className="pt-3 border-t border-slate-800/80 flex gap-2">
+              <div className="pt-3 border-t border-slate-800 flex gap-2">
                 <input
                   type="text"
                   placeholder="Create custom tag (e.g. 'Podcast Host', 'Speaking Engagements')..."
@@ -332,136 +650,29 @@ export default function CreatorProfilePage() {
                 </button>
               </div>
 
-              <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl text-[11px] text-slate-400 flex items-center gap-2">
+              <div className="p-3 bg-slate-950 border border-slate-800 rounded-2xl text-[11px] text-slate-400 flex items-center gap-2">
                 <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
                 <span>
-                  Profile tags are marketplace discovery attributes only and do not alter your TrustScore.
+                  Profile tags are marketplace discovery attributes and do not modify your statistical TrustScore.
                 </span>
               </div>
             </div>
 
-            {/* 3. Core Profile Information */}
-            <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-sm">
-              <div className="flex items-center gap-2 pb-2 border-b border-slate-800">
-                <span className="text-xs font-bold uppercase tracking-wider text-slate-400">
-                  3. Creator Bio &amp; Marketplace Details
-                </span>
-              </div>
+            {/* Save Actions Bar */}
+            <div className="flex items-center justify-between p-4 bg-slate-900/90 border border-slate-800 rounded-2xl">
+              <span className={`text-xs font-semibold ${hasUnsavedChanges ? "text-amber-400" : "text-slate-400"}`}>
+                {hasUnsavedChanges ? "● You have unsaved changes" : "All changes saved to database"}
+              </span>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1">
-                    Display Name
-                  </label>
-                  <input
-                    type="text"
-                    value={name}
-                    onChange={(e) => setName(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-100 focus:outline-hidden focus:border-blue-500"
-                    required
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1">
-                    Social Username / Handle
-                  </label>
-                  <input
-                    type="text"
-                    value={username}
-                    disabled
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950/60 border border-slate-800 text-xs text-slate-500 cursor-not-allowed"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1">
-                  Creator Bio &amp; Pitch
-                </label>
-                <textarea
-                  rows={3}
-                  value={bio}
-                  onChange={(e) => setBio(e.target.value)}
-                  placeholder="Tell brands about your audience demographics, content pillars, and typical collaboration deliverable packages..."
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-100 focus:outline-hidden focus:border-blue-500"
-                />
-              </div>
-
-              <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1">
-                    Category / Niche
-                  </label>
-                  <select
-                    value={category}
-                    onChange={(e) => setCategory(e.target.value)}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-100 focus:outline-hidden focus:border-blue-500"
-                  >
-                    <option value="Fitness">Fitness &amp; Health</option>
-                    <option value="Beauty">Beauty &amp; Skincare</option>
-                    <option value="Fashion">Fashion &amp; Style</option>
-                    <option value="Technology">Technology &amp; Gadgets</option>
-                    <option value="Food">Food &amp; Cooking</option>
-                    <option value="Travel">Travel &amp; Hospitality</option>
-                    <option value="Gaming">Gaming &amp; Esports</option>
-                    <option value="Lifestyle">Lifestyle</option>
-                  </select>
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1">
-                    Location
-                  </label>
-                  <input
-                    type="text"
-                    value={location}
-                    onChange={(e) => setLocation(e.target.value)}
-                    placeholder="e.g. Melbourne, Australia"
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-100 focus:outline-hidden focus:border-blue-500"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1">
-                    Starting Rate (USD)
-                  </label>
-                  <input
-                    type="number"
-                    min="0"
-                    step="25"
-                    value={startingRate}
-                    onChange={(e) => setStartingRate(Number(e.target.value))}
-                    className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-100 focus:outline-hidden focus:border-blue-500"
-                  />
-                </div>
-              </div>
-
-              <div>
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1">
-                  Website / Media Kit URL
-                </label>
-                <input
-                  type="url"
-                  value={website}
-                  onChange={(e) => setWebsite(e.target.value)}
-                  placeholder="https://yourwebsite.com/mediakit"
-                  className="w-full px-3.5 py-2.5 rounded-xl bg-slate-950 border border-slate-800 text-xs text-slate-100 focus:outline-hidden focus:border-blue-500"
-                />
-              </div>
-            </div>
-
-            {/* Submit Bar */}
-            <div className="flex items-center justify-end gap-3 pt-2">
               <button
                 type="submit"
                 disabled={isSaving}
-                className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow-md shadow-blue-600/30 flex items-center gap-2 cursor-pointer disabled:opacity-50 transition-all"
+                className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-2xl shadow-md shadow-blue-600/30 flex items-center gap-2 cursor-pointer disabled:opacity-50 transition-all"
               >
                 {isSaving ? (
                   <>
                     <span className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                    <span>Saving Profile...</span>
+                    <span>Saving Changes...</span>
                   </>
                 ) : (
                   <>
@@ -473,42 +684,82 @@ export default function CreatorProfilePage() {
             </div>
           </div>
 
-          {/* Right Column: Live Marketplace Card Preview */}
-          <div className="lg:col-span-4 space-y-4 sticky top-6">
-            <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
-              Live Marketplace Preview:
-            </span>
+          {/* Right Column (4 cols): Sticky Profile Completion & Preview */}
+          <div className="lg:col-span-4 space-y-6 sticky top-6">
+            {/* Completion Progress Card */}
+            <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-lg">
+              <div className="flex items-center justify-between">
+                <div className="flex items-center gap-2">
+                  <Award className="w-4 h-4 text-emerald-400" />
+                  <h4 className="text-sm font-bold text-slate-100">
+                    Profile Completeness
+                  </h4>
+                </div>
+                <span className="text-sm font-black text-emerald-400">
+                  {completionPercentage}%
+                </span>
+              </div>
 
-            <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-xl">
-              <div className="flex items-center gap-3">
-                <img
-                  src={creator?.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80"}
-                  alt={name}
-                  className="w-14 h-14 rounded-2xl object-cover border border-slate-700 shadow-xs"
+              <div className="w-full h-2 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
+                <div
+                  className="h-full bg-gradient-to-r from-blue-600 to-emerald-400 rounded-full transition-all duration-500"
+                  style={{ width: `${completionPercentage}%` }}
                 />
-                <div>
-                  <h4 className="font-bold text-slate-100 text-sm">{name || "Your Name"}</h4>
-                  <span className="text-xs text-slate-400 block">{username || "@yourhandle"}</span>
+              </div>
+
+              <div className="space-y-2 pt-1 text-xs">
+                {completionItems.map((item, idx) => (
+                  <div key={idx} className="flex items-center justify-between text-slate-300">
+                    <div className="flex items-center gap-2">
+                      {item.isComplete ? (
+                        <CheckCircle2 className="w-3.5 h-3.5 text-emerald-400 shrink-0" />
+                      ) : (
+                        <Circle className="w-3.5 h-3.5 text-slate-500 shrink-0" />
+                      )}
+                      <span className={item.isComplete ? "text-slate-200" : "text-slate-400"}>{item.label}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Live Marketplace Card Preview */}
+            <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-xl">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block pb-1 border-b border-slate-800">
+                Live Marketplace Card Preview:
+              </span>
+
+              <div className="flex items-center gap-3.5">
+                <img
+                  src={avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=120&auto=format&fit=crop&q=80"}
+                  alt={name || "Creator"}
+                  className="w-14 h-14 rounded-2xl object-cover border border-slate-700 shadow-xs bg-slate-950"
+                />
+                <div className="min-w-0 flex-1">
+                  <h4 className="font-bold text-slate-100 text-sm truncate">{name || "Your Name"}</h4>
+                  <span className="text-xs text-slate-400 block truncate">{username || "@yourhandle"}</span>
                   <div className="flex items-center gap-1 text-[11px] text-slate-500 mt-0.5">
-                    <MapPin className="w-3 h-3" />
-                    <span>{location || "Australia"}</span>
+                    <MapPin className="w-3 h-3 text-slate-500" />
+                    <span className="truncate">{location || "Australia"}</span>
                   </div>
                 </div>
               </div>
 
-              {/* Status indicator */}
-              <div className="pt-2">
+              {/* Status Badge */}
+              <div className="pt-1">
                 <span
-                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[11px] font-bold border ${
+                  className={`inline-flex items-center gap-1.5 px-2.5 py-1 rounded-lg text-[10px] font-bold uppercase tracking-wider border ${
                     availabilityStatus === "NOT_AVAILABLE"
                       ? "bg-rose-500/10 text-rose-400 border-rose-500/20"
+                      : availabilityStatus === "AVAILABLE_FOR_COLLABORATION"
+                      ? "bg-blue-500/10 text-blue-400 border-blue-500/20"
                       : "bg-emerald-500/10 text-emerald-400 border-emerald-500/20"
                   }`}
                 >
                   <span className="w-1.5 h-1.5 rounded-full bg-current" />
                   <span>
                     {availabilityStatus === "NOT_AVAILABLE"
-                      ? "Not Currently Available"
+                      ? "Not Available"
                       : availabilityStatus === "AVAILABLE_FOR_COLLABORATION"
                       ? "Available for Collabs"
                       : "Open to Work"}
@@ -516,14 +767,14 @@ export default function CreatorProfilePage() {
                 </span>
               </div>
 
-              {/* Bio */}
-              <p className="text-xs text-slate-300 leading-relaxed min-h-[40px]">
-                {bio || "Your bio will appear here to prospective brands and agencies looking for talent."}
+              {/* Bio snippet */}
+              <p className="text-xs text-slate-300 leading-relaxed min-h-[36px] line-clamp-2">
+                {bio || "Your bio will appear here to prospective brands seeking creator talent."}
               </p>
 
-              {/* Tags */}
+              {/* Active Tags */}
               <div className="flex flex-wrap gap-1.5 pt-1">
-                {selectedTags.map((tag) => (
+                {selectedTags.slice(0, 4).map((tag) => (
                   <span
                     key={tag}
                     className="px-2 py-0.5 rounded-md bg-slate-950 border border-slate-800 text-[10px] font-semibold text-blue-300"
@@ -531,8 +782,14 @@ export default function CreatorProfilePage() {
                     {tag}
                   </span>
                 ))}
+                {selectedTags.length > 4 && (
+                  <span className="px-1.5 py-0.5 rounded-md bg-slate-950 border border-slate-800 text-[10px] text-slate-500">
+                    +{selectedTags.length - 4} more
+                  </span>
+                )}
               </div>
 
+              {/* Starting Rate Box */}
               <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 flex justify-between items-center text-xs">
                 <span className="text-slate-400 font-semibold">Starting Rate:</span>
                 <span className="font-black text-emerald-400">${startingRate} USD</span>

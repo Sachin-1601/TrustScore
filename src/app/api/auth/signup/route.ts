@@ -1,6 +1,5 @@
 import { NextResponse } from "next/server";
 import { AuthService } from "@/services/authService";
-import { setSessionCookie } from "@/lib/session";
 import { UserRole } from "@prisma/client";
 
 /**
@@ -23,8 +22,9 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Missing required signup fields" }, { status: 400 });
     }
 
+    const cleanEmail = String(email || "").trim().toLowerCase();
     const emailPattern = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    if (!emailPattern.test(String(email).trim())) {
+    if (!emailPattern.test(cleanEmail)) {
       return NextResponse.json({ error: "Please provide a valid email address" }, { status: 400 });
     }
 
@@ -36,8 +36,15 @@ export async function POST(req: Request) {
       );
     }
 
-    const { session, error } = await AuthService.signup({
-      email,
+    if (safeRole === "CREATOR" && !cleanEmail.endsWith("@gmail.com")) {
+      return NextResponse.json(
+        { error: "Creator accounts require a Gmail address ending in @gmail.com." },
+        { status: 400 }
+      );
+    }
+
+    const result = await AuthService.signup({
+      email: cleanEmail,
       passwordPlain: password,
       name,
       role: safeRole,
@@ -46,21 +53,20 @@ export async function POST(req: Request) {
       platform,
     });
 
-    if (error || !session) {
-      return NextResponse.json({ error: error || "Registration failed" }, { status: 400 });
+    if (result.error) {
+      return NextResponse.json({ error: result.error }, { status: 400 });
     }
 
-    await setSessionCookie({
-      userId: session.id,
-      email: session.email,
-      name: session.name,
-      role: session.role as any,
-      avatar: session.avatar,
-      creatorProfileId: session.creatorProfileId,
-      businessProfileId: session.businessProfileId,
-    });
-
-    return NextResponse.json({ session, success: true }, { status: 201 });
+    // DO NOT set session cookie. Account is created in UNVERIFIED state.
+    return NextResponse.json(
+      {
+        success: true,
+        requiresVerification: true,
+        email: result.email,
+        message: "Account created. Please check your email to verify your account.",
+      },
+      { status: 201 }
+    );
   } catch (err: any) {
     console.error("Signup error:", err);
     return NextResponse.json({ error: "Internal server error" }, { status: 500 });

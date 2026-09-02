@@ -13,13 +13,37 @@ interface SignupParams {
   platform?: "instagram" | "tiktok" | "youtube";
 }
 
+export interface LoginResponse {
+  success: boolean;
+  error?: string;
+  session?: UserSession;
+  emailUnverified?: boolean;
+  email?: string;
+}
+
+export interface SignupResponse {
+  success: boolean;
+  error?: string;
+  requiresVerification?: boolean;
+  email?: string;
+  session?: UserSession;
+}
+
+export interface ResendResponse {
+  success: boolean;
+  message?: string;
+  error?: string;
+  rateLimited?: boolean;
+}
+
 interface AuthContextType {
   user: UserSession | null;
   role: UserRole;
   isAuthenticated: boolean;
   isLoading: boolean;
-  login: (email: string, passwordPlain: string, accountType?: "creator" | "business") => Promise<{ success: boolean; error?: string; session?: UserSession }>;
-  signup: (data: SignupParams) => Promise<{ success: boolean; error?: string; session?: UserSession }>;
+  login: (email: string, passwordPlain: string, accountType?: "creator" | "business") => Promise<LoginResponse>;
+  signup: (data: SignupParams) => Promise<SignupResponse>;
+  resendVerification: (email: string) => Promise<ResendResponse>;
   logout: () => Promise<void>;
   refreshSession: () => Promise<void>;
 }
@@ -54,7 +78,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   const role: UserRole = user?.role || "BUSINESS";
 
-  const login = async (email: string, passwordPlain: string, accountType?: "creator" | "business") => {
+  const login = async (
+    email: string,
+    passwordPlain: string,
+    accountType?: "creator" | "business"
+  ): Promise<LoginResponse> => {
     try {
       const res = await fetch("/api/auth/login", {
         method: "POST",
@@ -63,7 +91,12 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       });
       const data = await res.json();
       if (!res.ok || data.error) {
-        return { success: false, error: data.error || "Login failed" };
+        return {
+          success: false,
+          error: data.error || "Login failed",
+          emailUnverified: data.emailUnverified,
+          email: data.email,
+        };
       }
       setUser(data.session);
       return { success: true, session: data.session };
@@ -72,7 +105,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
-  const signup = async (data: SignupParams) => {
+  const signup = async (data: SignupParams): Promise<SignupResponse> => {
     try {
       const res = await fetch("/api/auth/signup", {
         method: "POST",
@@ -91,8 +124,32 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       if (!res.ok || resData.error) {
         return { success: false, error: resData.error || "Signup failed" };
       }
-      setUser(resData.session);
-      return { success: true, session: resData.session };
+      return {
+        success: true,
+        requiresVerification: resData.requiresVerification ?? true,
+        email: resData.email,
+      };
+    } catch (err: any) {
+      return { success: false, error: err.message || "Network error" };
+    }
+  };
+
+  const resendVerification = async (email: string): Promise<ResendResponse> => {
+    try {
+      const res = await fetch("/api/auth/resend-verification", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ email }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        return {
+          success: false,
+          error: data.error || "Failed to resend verification email",
+          rateLimited: data.rateLimited,
+        };
+      }
+      return { success: true, message: data.message };
     } catch (err: any) {
       return { success: false, error: err.message || "Network error" };
     }
@@ -116,6 +173,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         isLoading,
         login,
         signup,
+        resendVerification,
         logout,
         refreshSession,
       }}

@@ -11,22 +11,34 @@ export async function POST(req: Request) {
       return NextResponse.json({ error: "Email and password are required" }, { status: 400 });
     }
 
-    const { session, error } = await AuthService.login(email, password, accountType);
-    if (error || !session) {
-      return NextResponse.json({ error: error || "Authentication failed" }, { status: 401 });
+    const result = await AuthService.login(email, password, accountType);
+
+    if (result.emailUnverified) {
+      return NextResponse.json(
+        {
+          error: result.error || "Please verify your email address before signing in.",
+          emailUnverified: true,
+          email: result.email,
+        },
+        { status: 403 }
+      );
+    }
+
+    if (result.error || !result.session) {
+      return NextResponse.json({ error: result.error || "Authentication failed" }, { status: 401 });
     }
 
     await setSessionCookie({
-      userId: session.id,
-      email: session.email,
-      name: session.name,
-      role: session.role as any,
-      avatar: session.avatar,
-      creatorProfileId: session.creatorProfileId,
-      businessProfileId: session.businessProfileId,
+      userId: result.session.id,
+      email: result.session.email,
+      name: result.session.name,
+      role: result.session.role as any,
+      avatar: result.session.avatar,
+      creatorProfileId: result.session.creatorProfileId,
+      businessProfileId: result.session.businessProfileId,
     });
 
-    return NextResponse.json({ session, success: true }, { status: 200 });
+    return NextResponse.json({ session: result.session, success: true }, { status: 200 });
   } catch (err: any) {
     return NextResponse.json({ error: err.message || "Internal server error" }, { status: 500 });
   }
