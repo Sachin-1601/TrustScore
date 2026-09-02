@@ -155,8 +155,14 @@ function SignupContent() {
       setIsPendingVerification(true);
       setResendCooldown(res.emailSent ? 60 : 0);
     } else if (res.success && res.session) {
-      // Fallback for non-verification flows if applicable
-      router.push(res.session.role === "CREATOR" ? "/dashboard/creator" : "/dashboard");
+      // Explicit role-based destination for non-verification flows
+      if (res.session.role === "CREATOR") {
+        router.push("/dashboard/creator");
+      } else if (res.session.role === "ADMIN") {
+        router.push("/admin");
+      } else {
+        router.push("/dashboard/businesses");
+      }
     } else {
       setErrorMessage(res.error || "Signup failed. Please check your information and try again.");
     }

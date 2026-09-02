@@ -42,7 +42,7 @@ export interface ResendResponse {
 
 interface AuthContextType {
   user: UserSession | null;
-  role: UserRole;
+  role: UserRole | null;
   isAuthenticated: boolean;
   isLoading: boolean;
   login: (email: string, passwordPlain: string, accountType?: "creator" | "business") => Promise<LoginResponse>;
@@ -80,7 +80,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     refreshSession();
   }, [refreshSession]);
 
-  const role: UserRole = user?.role || "BUSINESS";
+  const role: UserRole | null = user?.role ?? null;
 
   const login = async (
     email: string,

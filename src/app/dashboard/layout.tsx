@@ -4,6 +4,7 @@ import React, { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { DashboardSidebar } from "@/components/dashboard/DashboardSidebar";
 import { useAuth } from "@/contexts/AuthContext";
+import { Loader2 } from "lucide-react";
 
 export default function DashboardLayout({
   children,
@@ -35,6 +36,46 @@ export default function DashboardLayout({
       router.replace(role === "CREATOR" ? "/dashboard/creator" : "/dashboard/businesses");
     }
   }, [user, role, isLoading, pathname, router]);
+
+  // Prevent flash of unauthorized content while loading or redirecting
+  if (isLoading || !user || !role) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-slate-400 gap-3">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+        <p className="text-xs font-semibold">Loading TrustScore Workspace...</p>
+      </div>
+    );
+  }
+
+  // Guard: Block rendering children if Creator is on Business route
+  if (role === "CREATOR" && (pathname === "/dashboard" || pathname.startsWith("/dashboard/businesses"))) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-slate-400 gap-3">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+        <p className="text-xs font-semibold">Redirecting to Creator Workspace...</p>
+      </div>
+    );
+  }
+
+  // Guard: Block rendering children if Business is on Creator route
+  if ((role === "BUSINESS" || role === "AGENCY") && (pathname === "/dashboard" || pathname.startsWith("/dashboard/creator"))) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-slate-400 gap-3">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+        <p className="text-xs font-semibold">Redirecting to Business Workspace...</p>
+      </div>
+    );
+  }
+
+  // Guard: Block rendering children if Non-Admin is on Admin route
+  if (role !== "ADMIN" && (pathname === "/admin" || pathname === "/dashboard/model-insights")) {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-slate-400 gap-3">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+        <p className="text-xs font-semibold">Redirecting to Authorized Workspace...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen flex bg-slate-950 text-slate-100">

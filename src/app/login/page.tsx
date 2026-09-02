@@ -125,6 +125,8 @@ function LoginContent() {
     } else if (res.success && res.session) {
       if (res.session.role === "CREATOR") {
         router.push("/dashboard/creator");
+      } else if (res.session.role === "BUSINESS" || res.session.role === "AGENCY") {
+        router.push("/dashboard/businesses");
       } else if (res.session.role === "ADMIN") {
         router.push("/admin");
       } else {

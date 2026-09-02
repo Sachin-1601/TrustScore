@@ -221,7 +221,7 @@ export function DashboardSidebar() {
                 {user?.name || "Business Workspace"}
               </p>
               <p className="text-[11px] text-slate-400 truncate capitalize">
-                {role === "BUSINESS" ? "Business Account" : `${role.toLowerCase()} Account`}
+                {role === "CREATOR" ? "Creator Account" : role === "ADMIN" ? "Admin Account" : "Business Account"}
               </p>
             </div>
           )}
