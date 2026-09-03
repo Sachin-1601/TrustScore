@@ -188,121 +188,121 @@ function SignupContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#090d16] text-slate-100 flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-950/25 via-[#090d16] to-[#090d16]">
+    <div className="min-h-screen bg-[#f8f9fb] text-slate-900 flex items-center justify-center p-4 sm:p-6 lg:p-8">
       <div className="max-w-5xl w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
-        {/* LEFT COLUMN: TrustScore Credibility & Features (Desktop) */}
+        {/* LEFT COLUMN: TrustScore Brand Value Proposition (Desktop) */}
         <div className="hidden lg:flex lg:col-span-5 flex-col justify-between space-y-8 pr-4">
           <div className="space-y-6">
             <Logo size="lg" href="/" showTagline={false} variant="light" showBadge={false} />
 
             <div className="space-y-3">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[11px] font-bold uppercase tracking-wider">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-[11px] font-bold uppercase tracking-wider">
                 <Sparkles className="w-3.5 h-3.5" />
-                <span>Join the Trusted Marketplace</span>
+                <span>Verified Creator Ecosystem</span>
               </div>
-              <h1 className="text-3xl font-black text-slate-100 tracking-tight leading-tight">
-                Build partnerships on verified data.
+              <h1 className="text-3xl font-black text-slate-900 tracking-tight leading-tight">
+                Join the platform built on verified authenticity.
               </h1>
-              <p className="text-sm text-slate-400 leading-relaxed">
-                Whether you&apos;re an authentic creator demonstrating engagement quality or a brand scaling high-ROI campaigns, TrustScore provides the verified infrastructure.
+              <p className="text-sm text-slate-600 leading-relaxed">
+                Connect your social channels, compute your TrustScore, and collaborate with brands looking for genuine creators.
               </p>
             </div>
 
-            {/* Credibility Checklist */}
+            {/* Feature Telemetry Highlights */}
             <div className="space-y-3.5 pt-2">
-              <div className="flex items-start gap-3 p-3 rounded-2xl bg-slate-900/60 border border-slate-800/80">
-                <div className="w-8 h-8 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center shrink-0 mt-0.5">
+              <div className="flex items-start gap-3 p-3.5 rounded-xl bg-white border border-slate-200 shadow-xs">
+                <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-200 text-blue-600 flex items-center justify-center shrink-0 mt-0.5">
                   <ShieldCheck className="w-4 h-4" />
                 </div>
                 <div>
-                  <h4 className="text-xs font-bold text-slate-200">Verified Authenticity Badge</h4>
-                  <p className="text-[11px] text-slate-400 leading-relaxed">
-                    Stand out with cryptographic proof of authentic audience engagement.
+                  <h4 className="text-xs font-bold text-slate-900">Official Graph API Verification</h4>
+                  <p className="text-[11px] text-slate-500 leading-relaxed">
+                    Direct Meta, TikTok, and YouTube read-only OAuth integrations without sharing passwords.
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3 p-3 rounded-2xl bg-slate-900/60 border border-slate-800/80">
-                <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+              <div className="flex items-start gap-3 p-3.5 rounded-xl bg-white border border-slate-200 shadow-xs">
+                <div className="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5">
                   <CheckCircle2 className="w-4 h-4" />
                 </div>
                 <div>
-                  <h4 className="text-xs font-bold text-slate-200">Escrow Protected Sponsorships</h4>
-                  <p className="text-[11px] text-slate-400 leading-relaxed">
-                    Milestone-based campaign delivery guaranteeing fair and timely compensation.
+                  <h4 className="text-xs font-bold text-slate-900">Free for Genuine Creators</h4>
+                  <p className="text-[11px] text-slate-500 leading-relaxed">
+                    Zero subscription fees for creators. Keep 100% of your commercial campaign revenue.
                   </p>
                 </div>
               </div>
             </div>
           </div>
 
-          <div className="pt-6 border-t border-slate-800/70 flex items-center justify-between text-xs text-slate-500">
+          <div className="pt-6 border-t border-slate-200 flex items-center justify-between text-xs text-slate-400">
             <span>© 2026 TrustScore SaaS</span>
-            <span className="flex items-center gap-1.5 text-emerald-400 font-medium">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
-              Secure 256-bit TLS Encryption
+            <span className="flex items-center gap-1.5 text-emerald-700 font-medium">
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
+              API Services Operational
             </span>
           </div>
         </div>
 
-        {/* RIGHT COLUMN: Sign Up Form OR Check Your Email Card */}
+        {/* RIGHT COLUMN: SaaS Registration / Verification Card */}
         <div className="lg:col-span-7 w-full max-w-lg mx-auto">
           {isPendingVerification ? (
             /* ============================================================ */
             /* CHECK YOUR EMAIL / PENDING VERIFICATION SCREEN               */
             /* ============================================================ */
-            <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6 text-center animate-in fade-in zoom-in-95">
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-xs space-y-6 text-center animate-in fade-in zoom-in-95">
               {isEmailSent ? (
                 /* DELIVERED STATE: Check your email */
                 <>
-                  <div className="w-16 h-16 rounded-3xl bg-blue-600/15 border border-blue-500/30 text-blue-400 flex items-center justify-center mx-auto shadow-inner">
-                    <Mail className="w-8 h-8 text-blue-400 animate-bounce" />
+                  <div className="w-16 h-16 rounded-2xl bg-blue-50 border border-blue-200 text-blue-600 flex items-center justify-center mx-auto shadow-xs">
+                    <Mail className="w-8 h-8 text-blue-600 animate-bounce" />
                   </div>
 
                   <div className="space-y-2">
-                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[10px] font-bold uppercase tracking-wider">
+                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-[10px] font-bold uppercase tracking-wider">
                       <Send className="w-3 h-3" />
                       <span>Activation Email Sent</span>
                     </span>
-                    <h2 className="text-2xl sm:text-3xl font-black text-slate-100 tracking-tight">
+                    <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
                       Check your email
                     </h2>
-                    <p className="text-xs sm:text-sm text-slate-400 max-w-sm mx-auto">
+                    <p className="text-xs sm:text-sm text-slate-500 max-w-sm mx-auto">
                       We&apos;ve sent a secure verification link to:
                     </p>
-                    <div className="py-2 px-4 rounded-2xl bg-slate-950 border border-slate-800 text-slate-100 font-bold text-sm tracking-wide inline-block max-w-full truncate">
+                    <div className="py-2 px-4 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 font-bold text-sm tracking-wide inline-block max-w-full truncate">
                       {pendingEmail}
                     </div>
                   </div>
 
-                  <p className="text-xs text-slate-400 leading-relaxed max-w-sm mx-auto">
+                  <p className="text-xs text-slate-500 leading-relaxed max-w-sm mx-auto">
                     Click the link in your email to activate your TrustScore account. The verification link expires in <strong>30 minutes</strong>.
                   </p>
                 </>
               ) : (
                 /* DELIVERY FAILED / PENDING STATE: Account created, delivery issue */
                 <>
-                  <div className="w-16 h-16 rounded-3xl bg-amber-500/15 border border-amber-500/30 text-amber-400 flex items-center justify-center mx-auto shadow-inner">
-                    <AlertCircle className="w-8 h-8 text-amber-400" />
+                  <div className="w-16 h-16 rounded-2xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center mx-auto shadow-xs">
+                    <AlertCircle className="w-8 h-8 text-amber-600" />
                   </div>
 
                   <div className="space-y-2">
-                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-500/10 text-amber-400 border border-amber-500/20 text-[10px] font-bold uppercase tracking-wider">
+                    <span className="inline-flex items-center gap-1 px-3 py-1 rounded-full bg-amber-50 text-amber-700 border border-amber-200 text-[10px] font-bold uppercase tracking-wider">
                       <Clock className="w-3 h-3" />
                       <span>Account Created • Email Pending</span>
                     </span>
-                    <h2 className="text-2xl sm:text-3xl font-black text-slate-100 tracking-tight">
+                    <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
                       Account created
                     </h2>
-                    <p className="text-xs sm:text-sm text-slate-400 max-w-sm mx-auto">
+                    <p className="text-xs sm:text-sm text-slate-500 max-w-sm mx-auto">
                       We couldn&apos;t send the verification email to:
                     </p>
-                    <div className="py-2 px-4 rounded-2xl bg-slate-950 border border-slate-800 text-slate-100 font-bold text-sm tracking-wide inline-block max-w-full truncate">
+                    <div className="py-2 px-4 rounded-xl bg-slate-50 border border-slate-200 text-slate-900 font-bold text-sm tracking-wide inline-block max-w-full truncate">
                       {pendingEmail}
                     </div>
                   </div>
 
-                  <p className="text-xs text-slate-400 leading-relaxed max-w-sm mx-auto">
+                  <p className="text-xs text-slate-500 leading-relaxed max-w-sm mx-auto">
                     Your account is safe, but email delivery could not be completed. Please click below to send the verification email.
                   </p>
                 </>
@@ -310,15 +310,15 @@ function SignupContent() {
 
               {/* Resend Feedback Alerts */}
               {resendStatus && (
-                <div className="p-3.5 rounded-2xl bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-xs flex items-start gap-2.5 text-left">
-                  <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-emerald-400" />
+                <div className="p-3.5 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs flex items-start gap-2.5 text-left">
+                  <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-emerald-600" />
                   <span className="leading-relaxed">{resendStatus}</span>
                 </div>
               )}
 
               {resendError && (
-                <div className="p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-2.5 text-left">
-                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-400" />
+                <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-start gap-2.5 text-left">
+                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-600" />
                   <span className="leading-relaxed">{resendError}</span>
                 </div>
               )}
@@ -329,11 +329,11 @@ function SignupContent() {
                   type="button"
                   onClick={handleResend}
                   disabled={resendCooldown > 0 || isResending}
-                  className="w-full py-3.5 px-4 bg-slate-800 hover:bg-slate-750 text-slate-100 font-bold text-xs sm:text-sm rounded-2xl border border-slate-700 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-xs"
+                  className="w-full py-3.5 px-4 bg-slate-50 hover:bg-slate-100 text-slate-800 font-bold text-xs sm:text-sm rounded-xl border border-slate-200 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed shadow-xs"
                 >
                   {isResending ? (
                     <>
-                      <RefreshCw className="w-4 h-4 animate-spin text-blue-400" />
+                      <RefreshCw className="w-4 h-4 animate-spin text-blue-600" />
                       <span>Sending verification link...</span>
                     </>
                   ) : resendCooldown > 0 ? (
@@ -343,7 +343,7 @@ function SignupContent() {
                     </>
                   ) : (
                     <>
-                      <RefreshCw className="w-4 h-4 text-blue-400" />
+                      <RefreshCw className="w-4 h-4 text-blue-600" />
                       <span>Resend Verification Email</span>
                     </>
                   )}
@@ -351,13 +351,13 @@ function SignupContent() {
 
                 <Link
                   href={`/login?type=${accountType}`}
-                  className="block w-full py-3 px-4 bg-transparent hover:bg-slate-850 text-slate-400 hover:text-slate-200 font-semibold text-xs rounded-2xl transition-colors"
+                  className="block w-full py-3 px-4 bg-transparent hover:bg-slate-50 text-slate-500 hover:text-slate-900 font-semibold text-xs rounded-xl transition-colors"
                 >
                   Back to Sign In
                 </Link>
               </div>
 
-              <div className="pt-4 border-t border-slate-800 text-[11px] text-slate-500">
+              <div className="pt-4 border-t border-slate-100 text-[11px] text-slate-400">
                 Didn&apos;t receive it? Check your spam folder or ensure your email address was entered correctly.
               </div>
             </div>
@@ -365,7 +365,7 @@ function SignupContent() {
             /* ============================================================ */
             /* STANDARD REGISTRATION FORM                                   */
             /* ============================================================ */
-            <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
+            <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-xs space-y-6">
               {/* Mobile Header Logo */}
               <div className="lg:hidden text-center space-y-2 pb-2">
                 <Logo size="md" href="/" showTagline={false} variant="light" showBadge={false} className="justify-center" />
@@ -373,27 +373,27 @@ function SignupContent() {
 
               {/* Header Title */}
               <div className="space-y-1">
-                <h2 className="text-2xl sm:text-3xl font-black text-slate-100 tracking-tight">
+                <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
                   Create your account
                 </h2>
-                <p className="text-xs sm:text-sm text-slate-400">
+                <p className="text-xs sm:text-sm text-slate-500">
                   Join the trusted creator and business intelligence marketplace.
                 </p>
               </div>
 
               {/* Account Type Segmented Control */}
               <div className="space-y-2">
-                <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">
+                <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500">
                   Account Type
                 </label>
-                <div className="grid grid-cols-2 gap-2 p-1 bg-slate-950 rounded-2xl border border-slate-800">
+                <div className="grid grid-cols-2 gap-2 p-1 bg-slate-50 rounded-xl border border-slate-200">
                   <button
                     type="button"
                     onClick={() => handleSelectAccountType("creator")}
-                    className={`py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer flex items-center justify-center gap-2 ${
+                    className={`py-2.5 px-3 rounded-lg font-bold text-xs sm:text-sm transition-all cursor-pointer flex items-center justify-center gap-2 ${
                       accountType === "creator"
-                        ? "bg-blue-600 text-white shadow-md shadow-blue-600/30"
-                        : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/60"
+                        ? "bg-blue-600 text-white shadow-xs"
+                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                     }`}
                   >
                     <User className="w-4 h-4 shrink-0" />
@@ -403,10 +403,10 @@ function SignupContent() {
                   <button
                     type="button"
                     onClick={() => handleSelectAccountType("business")}
-                    className={`py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer flex items-center justify-center gap-2 ${
+                    className={`py-2.5 px-3 rounded-lg font-bold text-xs sm:text-sm transition-all cursor-pointer flex items-center justify-center gap-2 ${
                       accountType === "business"
-                        ? "bg-blue-600 text-white shadow-md shadow-blue-600/30"
-                        : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/60"
+                        ? "bg-blue-600 text-white shadow-xs"
+                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                     }`}
                   >
                     <Building2 className="w-4 h-4 shrink-0" />
@@ -414,7 +414,7 @@ function SignupContent() {
                   </button>
                 </div>
 
-                <p className="text-[11px] text-slate-400 px-1">
+                <p className="text-[11px] text-slate-500 px-1">
                   {accountType === "creator"
                     ? "For creators, influencers, and talent looking to verify metrics and receive brand sponsorships."
                     : "For brands, direct-to-consumer businesses, and marketing agencies seeking authentic partnerships."}
@@ -427,10 +427,10 @@ function SignupContent() {
                   type="button"
                   onClick={handleGoogleClick}
                   disabled={isGoogleLoading}
-                  className="w-full py-3 px-4 rounded-2xl bg-slate-950 hover:bg-slate-800/80 border border-slate-800 hover:border-slate-700 text-slate-200 font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-3 cursor-pointer shadow-xs disabled:opacity-50"
+                  className="w-full py-3 px-4 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-3 cursor-pointer shadow-xs disabled:opacity-50"
                 >
                   {isGoogleLoading ? (
-                    <span className="w-4 h-4 border-2 border-slate-400 border-t-blue-500 rounded-full animate-spin" />
+                    <span className="w-4 h-4 border-2 border-slate-400 border-t-blue-600 rounded-full animate-spin" />
                   ) : (
                     <GoogleIcon className="w-4 h-4 shrink-0" />
                   )}
@@ -439,8 +439,8 @@ function SignupContent() {
 
                 {/* Divider */}
                 <div className="relative flex items-center justify-center">
-                  <div className="w-full border-t border-slate-800" />
-                  <span className="absolute px-3 bg-slate-900 text-[10px] uppercase font-bold text-slate-500 tracking-wider">
+                  <div className="w-full border-t border-slate-100" />
+                  <span className="absolute px-3 bg-white text-[10px] uppercase font-bold text-slate-400 tracking-wider">
                     or register with email
                   </span>
                 </div>
@@ -448,8 +448,8 @@ function SignupContent() {
 
               {/* Error Alert Box */}
               {errorMessage && (
-                <div className="p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-2.5 animate-in fade-in">
-                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-400" />
+                <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-start gap-2.5 animate-in fade-in">
+                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-600" />
                   <span className="leading-relaxed">{errorMessage}</span>
                 </div>
               )}
@@ -459,7 +459,7 @@ function SignupContent() {
                 {/* Row 1: Name & Handle/Company */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   <div className="space-y-1.5">
-                    <label className="block font-bold text-slate-300 uppercase tracking-wider text-[10px]">
+                    <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px]">
                       {accountType === "creator" ? "Your Full Name" : "Contact Full Name"}
                     </label>
                     <div className="relative">
@@ -468,7 +468,7 @@ function SignupContent() {
                         value={name}
                         onChange={(e) => setName(e.target.value)}
                         placeholder={accountType === "creator" ? "e.g. Alex Rivera" : "e.g. Sarah Jenkins"}
-                        className="w-full py-2.5 px-3.5 pl-9 bg-slate-950 border border-slate-800 rounded-2xl text-slate-100 placeholder-slate-500 text-xs sm:text-sm font-semibold focus:outline-hidden focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+                        className="w-full py-2.5 px-3.5 pl-9 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 text-xs sm:text-sm font-semibold focus:outline-hidden focus:border-blue-600 focus:bg-white transition-all shadow-xs"
                         required
                       />
                       <User className="w-4 h-4 text-slate-400 absolute left-3 top-3 pointer-events-none" />
@@ -476,7 +476,7 @@ function SignupContent() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="block font-bold text-slate-300 uppercase tracking-wider text-[10px]">
+                    <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px]">
                       {accountType === "creator" ? "Social Handle" : "Company / Brand Name"}
                     </label>
                     <div className="relative">
@@ -485,7 +485,7 @@ function SignupContent() {
                         value={handleOrCompany}
                         onChange={(e) => setHandleOrCompany(e.target.value)}
                         placeholder={accountType === "creator" ? "@username" : "Acme Nutrition Co"}
-                        className="w-full py-2.5 px-3.5 pl-9 bg-slate-950 border border-slate-800 rounded-2xl text-slate-100 placeholder-slate-500 text-xs sm:text-sm font-semibold focus:outline-hidden focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+                        className="w-full py-2.5 px-3.5 pl-9 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 text-xs sm:text-sm font-semibold focus:outline-hidden focus:border-blue-600 focus:bg-white transition-all shadow-xs"
                         required
                       />
                       {accountType === "creator" ? (
@@ -500,14 +500,14 @@ function SignupContent() {
                 {/* Row 2: Category & Platform/Email */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   <div className="space-y-1.5">
-                    <label className="block font-bold text-slate-300 uppercase tracking-wider text-[10px]">
+                    <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px]">
                       {accountType === "creator" ? "Primary Niche" : "Industry Category"}
                     </label>
                     <div className="relative">
                       <select
                         value={category}
                         onChange={(e) => setCategory(e.target.value)}
-                        className="w-full py-2.5 px-3.5 bg-slate-950 border border-slate-800 rounded-2xl text-slate-200 text-xs sm:text-sm font-semibold focus:outline-hidden focus:border-blue-500 transition-all cursor-pointer"
+                        className="w-full py-2.5 px-3.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-xs sm:text-sm font-semibold focus:outline-hidden focus:border-blue-600 focus:bg-white transition-all cursor-pointer shadow-xs"
                       >
                         <option value="Fitness">Fitness &amp; Health</option>
                         <option value="Beauty">Beauty &amp; Skincare</option>
@@ -524,13 +524,13 @@ function SignupContent() {
 
                   {accountType === "creator" ? (
                     <div className="space-y-1.5">
-                      <label className="block font-bold text-slate-300 uppercase tracking-wider text-[10px]">
+                      <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px]">
                         Primary Platform
                       </label>
                       <select
                         value={platform}
                         onChange={(e) => setPlatform(e.target.value as any)}
-                        className="w-full py-2.5 px-3.5 bg-slate-950 border border-slate-800 rounded-2xl text-slate-200 text-xs sm:text-sm font-semibold focus:outline-hidden focus:border-blue-500 transition-all cursor-pointer"
+                        className="w-full py-2.5 px-3.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-xs sm:text-sm font-semibold focus:outline-hidden focus:border-blue-600 focus:bg-white transition-all cursor-pointer shadow-xs"
                       >
                         <option value="instagram">Instagram</option>
                         <option value="tiktok">TikTok</option>
@@ -539,7 +539,7 @@ function SignupContent() {
                     </div>
                   ) : (
                     <div className="space-y-1.5">
-                      <label className="block font-bold text-slate-300 uppercase tracking-wider text-[10px]">
+                      <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px]">
                         Work Email Address
                       </label>
                       <div className="relative">
@@ -548,7 +548,7 @@ function SignupContent() {
                           value={email}
                           onChange={(e) => setEmail(e.target.value)}
                           placeholder="name@company.com"
-                          className="w-full py-2.5 px-3.5 pl-9 bg-slate-950 border border-slate-800 rounded-2xl text-slate-100 placeholder-slate-500 text-xs sm:text-sm font-semibold focus:outline-hidden focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+                          className="w-full py-2.5 px-3.5 pl-9 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 text-xs sm:text-sm font-semibold focus:outline-hidden focus:border-blue-600 focus:bg-white transition-all shadow-xs"
                           required
                         />
                         <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3 pointer-events-none" />
@@ -561,10 +561,10 @@ function SignupContent() {
                 {accountType === "creator" && (
                   <div className="space-y-1.5">
                     <div className="flex items-center justify-between">
-                      <label className="block font-bold text-slate-300 uppercase tracking-wider text-[10px]">
+                      <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px]">
                         Creator Email Address
                       </label>
-                      <span className="text-[11px] text-blue-400 font-medium">
+                      <span className="text-[11px] text-blue-600 font-medium">
                         Creator accounts require a Gmail address.
                       </span>
                     </div>
@@ -574,7 +574,7 @@ function SignupContent() {
                         value={email}
                         onChange={(e) => setEmail(e.target.value)}
                         placeholder="alex@gmail.com"
-                        className="w-full py-2.5 px-3.5 pl-9 bg-slate-950 border border-slate-800 rounded-2xl text-slate-100 placeholder-slate-500 text-xs sm:text-sm font-semibold focus:outline-hidden focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+                        className="w-full py-2.5 px-3.5 pl-9 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 text-xs sm:text-sm font-semibold focus:outline-hidden focus:border-blue-600 focus:bg-white transition-all shadow-xs"
                         required
                       />
                       <Mail className="w-4 h-4 text-slate-400 absolute left-3 top-3 pointer-events-none" />
@@ -585,7 +585,7 @@ function SignupContent() {
                 {/* Row 3: Password & Confirm Password */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-3.5">
                   <div className="space-y-1.5">
-                    <label className="block font-bold text-slate-300 uppercase tracking-wider text-[10px]">
+                    <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px]">
                       Password (Min 8 chars)
                     </label>
                     <div className="relative">
@@ -594,7 +594,7 @@ function SignupContent() {
                         value={password}
                         onChange={(e) => setPassword(e.target.value)}
                         placeholder="••••••••••••"
-                        className="w-full py-2.5 px-3.5 pl-9 pr-9 bg-slate-950 border border-slate-800 rounded-2xl text-slate-100 placeholder-slate-500 text-xs sm:text-sm font-semibold focus:outline-hidden focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+                        className="w-full py-2.5 px-3.5 pl-9 pr-9 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 text-xs sm:text-sm font-semibold focus:outline-hidden focus:border-blue-600 focus:bg-white transition-all shadow-xs"
                         required
                         minLength={8}
                       />
@@ -602,7 +602,7 @@ function SignupContent() {
                       <button
                         type="button"
                         onClick={() => setShowPassword(!showPassword)}
-                        className="absolute right-3 top-3 text-slate-400 hover:text-slate-200 cursor-pointer p-0.5"
+                        className="absolute right-3 top-3 text-slate-400 hover:text-slate-600 cursor-pointer p-0.5"
                         aria-label={showPassword ? "Hide password" : "Show password"}
                       >
                         {showPassword ? (
@@ -615,7 +615,7 @@ function SignupContent() {
                   </div>
 
                   <div className="space-y-1.5">
-                    <label className="block font-bold text-slate-300 uppercase tracking-wider text-[10px]">
+                    <label className="block font-bold text-slate-700 uppercase tracking-wider text-[10px]">
                       Confirm Password
                     </label>
                     <div className="relative">
@@ -624,14 +624,14 @@ function SignupContent() {
                         value={confirmPassword}
                         onChange={(e) => setConfirmPassword(e.target.value)}
                         placeholder="••••••••••••"
-                        className="w-full py-2.5 px-3.5 pl-9 pr-9 bg-slate-950 border border-slate-800 rounded-2xl text-slate-100 placeholder-slate-500 text-xs sm:text-sm font-semibold focus:outline-hidden focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+                        className="w-full py-2.5 px-3.5 pl-9 pr-9 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 text-xs sm:text-sm font-semibold focus:outline-hidden focus:border-blue-600 focus:bg-white transition-all shadow-xs"
                         required
                       />
                       <Lock className="w-4 h-4 text-slate-400 absolute left-3 top-3 pointer-events-none" />
                       <button
                         type="button"
                         onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                        className="absolute right-3 top-3 text-slate-400 hover:text-slate-200 cursor-pointer p-0.5"
+                        className="absolute right-3 top-3 text-slate-400 hover:text-slate-600 cursor-pointer p-0.5"
                         aria-label={showConfirmPassword ? "Hide password" : "Show password"}
                       >
                         {showConfirmPassword ? (
@@ -648,12 +648,12 @@ function SignupContent() {
                 {password && confirmPassword && (
                   <div className="text-[11px] flex items-center gap-1.5">
                     {password === confirmPassword ? (
-                      <span className="text-emerald-400 flex items-center gap-1">
-                        <CheckCircle2 className="w-3 h-3" /> Passwords match
+                      <span className="text-emerald-700 flex items-center gap-1">
+                        <CheckCircle2 className="w-3 h-3 text-emerald-600" /> Passwords match
                       </span>
                     ) : (
-                      <span className="text-amber-400 flex items-center gap-1">
-                        <AlertCircle className="w-3 h-3" /> Passwords do not match yet
+                      <span className="text-amber-700 flex items-center gap-1">
+                        <AlertCircle className="w-3 h-3 text-amber-600" /> Passwords do not match yet
                       </span>
                     )}
                   </div>
@@ -663,7 +663,7 @@ function SignupContent() {
                 <button
                   type="submit"
                   disabled={isLoading}
-                  className="w-full py-3.5 px-4 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-lg shadow-blue-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed mt-2"
+                  className="w-full py-3.5 px-4 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs sm:text-sm rounded-xl shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed mt-2"
                 >
                   {isLoading ? (
                     <>
@@ -682,24 +682,24 @@ function SignupContent() {
               </form>
 
               {/* Bottom Sign In Navigation Link */}
-              <div className="pt-2 text-center text-xs text-slate-400 border-t border-slate-800/80">
+              <div className="pt-2 text-center text-xs text-slate-500 border-t border-slate-100">
                 Already have a TrustScore account?{" "}
                 <Link
                   href={`/login?type=${accountType}`}
-                  className="font-bold text-blue-400 hover:text-blue-300 transition-colors"
+                  className="font-bold text-blue-600 hover:underline transition-colors"
                 >
                   Sign in
                 </Link>
               </div>
 
               {/* Legal Terms & Conditions */}
-              <p className="text-[11px] text-slate-500 text-center leading-relaxed">
+              <p className="text-[11px] text-slate-400 text-center leading-relaxed">
                 By creating an account, you agree to TrustScore&apos;s{" "}
-                <Link href="/terms" className="text-slate-400 hover:text-slate-200 underline">
+                <Link href="/terms" className="text-slate-600 hover:underline">
                   Terms of Service
                 </Link>{" "}
                 and{" "}
-                <Link href="/privacy" className="text-slate-400 hover:text-slate-200 underline">
+                <Link href="/privacy" className="text-slate-600 hover:underline">
                   Privacy Policy
                 </Link>
                 .
@@ -716,7 +716,7 @@ export default function SignupPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-[#090d16] flex items-center justify-center text-xs text-slate-400">
+        <div className="min-h-screen bg-[#f8f9fb] flex items-center justify-center text-xs text-slate-400">
           Loading registration...
         </div>
       }

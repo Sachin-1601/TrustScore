@@ -33,8 +33,8 @@ export default function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className={`${inter.variable} font-sans antialiased text-slate-100 bg-[#090d16]`}>
-      <body className="min-h-screen flex flex-col bg-[#090d16] text-slate-100 selection:bg-blue-600 selection:text-white">
+    <html lang="en" className={`${inter.variable} font-sans antialiased text-slate-900 bg-[#f8f9fb]`}>
+      <body className="min-h-screen flex flex-col bg-[#f8f9fb] text-slate-900 selection:bg-blue-600 selection:text-white">
         <AuthProvider>
           <ToastProvider>{children}</ToastProvider>
         </AuthProvider>

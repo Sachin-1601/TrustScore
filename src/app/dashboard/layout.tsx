@@ -54,8 +54,8 @@ export default function DashboardLayout({
   // Prevent flash of unauthorized content while loading or redirecting
   if (isLoading || !user || !role) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-slate-400 gap-3">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8f9fb] text-slate-500 gap-3">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
         <p className="text-xs font-semibold">Loading TrustScore Workspace...</p>
       </div>
     );
@@ -64,8 +64,8 @@ export default function DashboardLayout({
   // Guard: Block rendering children if onboarding is incomplete
   if (!user.onboardingCompleted && role !== "ADMIN") {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-slate-400 gap-3">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8f9fb] text-slate-500 gap-3">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
         <p className="text-xs font-semibold">Redirecting to Account Onboarding...</p>
       </div>
     );
@@ -74,8 +74,8 @@ export default function DashboardLayout({
   // Guard: Block rendering children if Creator is on Business route
   if (role === "CREATOR" && (pathname === "/dashboard" || pathname.startsWith("/dashboard/businesses"))) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-slate-400 gap-3">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8f9fb] text-slate-500 gap-3">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
         <p className="text-xs font-semibold">Redirecting to Creator Workspace...</p>
       </div>
     );
@@ -84,8 +84,8 @@ export default function DashboardLayout({
   // Guard: Block rendering children if Business is on Creator route
   if ((role === "BUSINESS" || role === "AGENCY") && (pathname === "/dashboard" || pathname.startsWith("/dashboard/creator"))) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-slate-400 gap-3">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8f9fb] text-slate-500 gap-3">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
         <p className="text-xs font-semibold">Redirecting to Business Workspace...</p>
       </div>
     );
@@ -94,15 +94,15 @@ export default function DashboardLayout({
   // Guard: Block rendering children if Non-Admin is on Admin route
   if (role !== "ADMIN" && (pathname === "/admin" || pathname === "/dashboard/model-insights")) {
     return (
-      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-slate-400 gap-3">
-        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+      <div className="min-h-screen flex flex-col items-center justify-center bg-[#f8f9fb] text-slate-500 gap-3">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
         <p className="text-xs font-semibold">Redirecting to Authorized Workspace...</p>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen flex bg-slate-950 text-slate-100">
+    <div className="min-h-screen flex bg-[#f8f9fb] text-slate-900">
       {/* Sidebar Navigation */}
       <DashboardSidebar />
 

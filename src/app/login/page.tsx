@@ -165,7 +165,7 @@ function LoginContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#090d16] text-slate-100 flex items-center justify-center p-4 sm:p-6 lg:p-8 bg-[radial-gradient(ellipse_at_top,_var(--tw-gradient-stops))] from-blue-950/25 via-[#090d16] to-[#090d16]">
+    <div className="min-h-screen bg-[#f8f9fb] text-slate-900 flex items-center justify-center p-4 sm:p-6 lg:p-8">
       <div className="max-w-5xl w-full grid grid-cols-1 lg:grid-cols-12 gap-8 items-center">
         {/* LEFT COLUMN: TrustScore Brand Value Proposition (Desktop) */}
         <div className="hidden lg:flex lg:col-span-5 flex-col justify-between space-y-8 pr-4">
@@ -173,39 +173,39 @@ function LoginContent() {
             <Logo size="lg" href="/" showTagline={false} variant="light" showBadge={false} />
 
             <div className="space-y-3">
-              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 text-[11px] font-bold uppercase tracking-wider">
+              <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-[11px] font-bold uppercase tracking-wider">
                 <ShieldCheck className="w-3.5 h-3.5" />
                 <span>Enterprise Authenticity Intelligence</span>
               </div>
-              <h1 className="text-3xl font-black text-slate-100 tracking-tight leading-tight">
+              <h1 className="text-3xl font-black text-slate-900 tracking-tight leading-tight">
                 Authentic creator partnerships powered by data.
               </h1>
-              <p className="text-sm text-slate-400 leading-relaxed">
+              <p className="text-sm text-slate-600 leading-relaxed">
                 Access your TrustScore workspace to audit creator authenticity, track verified Graph API metrics, and manage secure collaborations.
               </p>
             </div>
 
             {/* Feature Telemetry Highlights */}
             <div className="space-y-3.5 pt-2">
-              <div className="flex items-start gap-3 p-3 rounded-2xl bg-slate-900/60 border border-slate-800/80">
-                <div className="w-8 h-8 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center shrink-0 mt-0.5">
+              <div className="flex items-start gap-3 p-3.5 rounded-xl bg-white border border-slate-200 shadow-xs">
+                <div className="w-8 h-8 rounded-lg bg-blue-50 border border-blue-200 text-blue-600 flex items-center justify-center shrink-0 mt-0.5">
                   <Sparkles className="w-4 h-4" />
                 </div>
                 <div>
-                  <h4 className="text-xs font-bold text-slate-200">Probabilistic TrustScore Engine</h4>
-                  <p className="text-[11px] text-slate-400 leading-relaxed">
+                  <h4 className="text-xs font-bold text-slate-900">Probabilistic TrustScore Engine</h4>
+                  <p className="text-[11px] text-slate-500 leading-relaxed">
                     Multivariate anomaly detection identifying engagement pods and bought followers.
                   </p>
                 </div>
               </div>
 
-              <div className="flex items-start gap-3 p-3 rounded-2xl bg-slate-900/60 border border-slate-800/80">
-                <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center shrink-0 mt-0.5">
+              <div className="flex items-start gap-3 p-3.5 rounded-xl bg-white border border-slate-200 shadow-xs">
+                <div className="w-8 h-8 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 flex items-center justify-center shrink-0 mt-0.5">
                   <CheckCircle2 className="w-4 h-4" />
                 </div>
                 <div>
-                  <h4 className="text-xs font-bold text-slate-200">Verified Platform Connections</h4>
-                  <p className="text-[11px] text-slate-400 leading-relaxed">
+                  <h4 className="text-xs font-bold text-slate-900">Verified Platform Connections</h4>
+                  <p className="text-[11px] text-slate-500 leading-relaxed">
                     Direct read-only API telemetry from Instagram, TikTok, and YouTube.
                   </p>
                 </div>
@@ -213,10 +213,10 @@ function LoginContent() {
             </div>
           </div>
 
-          <div className="pt-6 border-t border-slate-800/70 flex items-center justify-between text-xs text-slate-500">
+          <div className="pt-6 border-t border-slate-200 flex items-center justify-between text-xs text-slate-400">
             <span>© 2026 TrustScore SaaS</span>
-            <span className="flex items-center gap-1.5 text-emerald-400 font-medium">
-              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+            <span className="flex items-center gap-1.5 text-emerald-700 font-medium">
+              <span className="w-2 h-2 rounded-full bg-emerald-500" />
               API Services Operational
             </span>
           </div>
@@ -224,7 +224,7 @@ function LoginContent() {
 
         {/* RIGHT COLUMN: SaaS Authentication Card */}
         <div className="lg:col-span-7 w-full max-w-lg mx-auto">
-          <div className="bg-slate-900/90 backdrop-blur-xl border border-slate-800 rounded-3xl p-6 sm:p-8 shadow-2xl space-y-6">
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 shadow-xs space-y-6">
             {/* Mobile Header Logo */}
             <div className="lg:hidden text-center space-y-2 pb-2">
               <Logo size="md" href="/" showTagline={false} variant="light" showBadge={false} className="justify-center" />
@@ -232,27 +232,27 @@ function LoginContent() {
 
             {/* Header Title */}
             <div className="space-y-1">
-              <h2 className="text-2xl sm:text-3xl font-black text-slate-100 tracking-tight">
+              <h2 className="text-2xl sm:text-3xl font-black text-slate-900 tracking-tight">
                 Welcome back
               </h2>
-              <p className="text-xs sm:text-sm text-slate-400">
+              <p className="text-xs sm:text-sm text-slate-500">
                 Sign in to continue to your TrustScore workspace.
               </p>
             </div>
 
             {/* Account Type Segmented Control */}
             <div className="space-y-2">
-              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400">
+              <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500">
                 Continue As
               </label>
-              <div className="grid grid-cols-2 gap-2 p-1 bg-slate-950 rounded-2xl border border-slate-800">
+              <div className="grid grid-cols-2 gap-2 p-1 bg-slate-50 rounded-xl border border-slate-200">
                 <button
                   type="button"
                   onClick={() => handleSelectAccountType("creator")}
-                  className={`py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer flex items-center justify-center gap-2 ${
+                  className={`py-2.5 px-3 rounded-lg font-bold text-xs sm:text-sm transition-all cursor-pointer flex items-center justify-center gap-2 ${
                     accountType === "creator"
-                      ? "bg-blue-600 text-white shadow-md shadow-blue-600/30"
-                      : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/60"
+                      ? "bg-blue-600 text-white shadow-xs"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                   }`}
                 >
                   <User className="w-4 h-4 shrink-0" />
@@ -262,10 +262,10 @@ function LoginContent() {
                 <button
                   type="button"
                   onClick={() => handleSelectAccountType("business")}
-                  className={`py-2.5 px-3 rounded-xl font-bold text-xs sm:text-sm transition-all cursor-pointer flex items-center justify-center gap-2 ${
+                  className={`py-2.5 px-3 rounded-lg font-bold text-xs sm:text-sm transition-all cursor-pointer flex items-center justify-center gap-2 ${
                     accountType === "business"
-                      ? "bg-blue-600 text-white shadow-md shadow-blue-600/30"
-                      : "text-slate-400 hover:text-slate-200 hover:bg-slate-900/60"
+                      ? "bg-blue-600 text-white shadow-xs"
+                      : "text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                   }`}
                 >
                   <Building2 className="w-4 h-4 shrink-0" />
@@ -274,7 +274,7 @@ function LoginContent() {
               </div>
 
               {/* Contextual helper text */}
-              <p className="text-[11px] text-slate-400 px-1">
+              <p className="text-[11px] text-slate-500 px-1">
                 {accountType === "creator"
                   ? "Manage your profile, authenticity score, and brand partnerships."
                   : "Discover creators, evaluate authenticity, and manage campaigns."}
@@ -287,10 +287,10 @@ function LoginContent() {
                 type="button"
                 onClick={handleGoogleClick}
                 disabled={isGoogleLoading}
-                className="w-full py-3 px-4 rounded-2xl bg-slate-950 hover:bg-slate-800/80 border border-slate-800 hover:border-slate-700 text-slate-200 font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-3 cursor-pointer shadow-xs disabled:opacity-50"
+                className="w-full py-3 px-4 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-semibold text-xs sm:text-sm transition-all flex items-center justify-center gap-3 cursor-pointer shadow-xs disabled:opacity-50"
               >
                 {isGoogleLoading ? (
-                  <span className="w-4 h-4 border-2 border-slate-400 border-t-blue-500 rounded-full animate-spin" />
+                  <span className="w-4 h-4 border-2 border-slate-400 border-t-blue-600 rounded-full animate-spin" />
                 ) : (
                   <GoogleIcon className="w-4 h-4 shrink-0" />
                 )}
@@ -299,24 +299,24 @@ function LoginContent() {
 
               {/* Forgot Password Feedback Notice */}
               {forgotNotice && (
-                <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs flex items-start gap-2.5 animate-in fade-in">
-                  <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-emerald-400" />
+                <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs flex items-start gap-2.5 animate-in fade-in">
+                  <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-emerald-600" />
                   <span className="leading-relaxed">{forgotNotice}</span>
                 </div>
               )}
 
               {/* Resend Success Notice */}
               {resendStatus && (
-                <div className="p-3 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-300 text-xs flex items-start gap-2.5 animate-in fade-in">
-                  <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-emerald-400" />
+                <div className="p-3 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-700 text-xs flex items-start gap-2.5 animate-in fade-in">
+                  <CheckCircle2 className="w-4 h-4 shrink-0 mt-0.5 text-emerald-600" />
                   <span className="leading-relaxed">{resendStatus}</span>
                 </div>
               )}
 
               {/* Divider */}
               <div className="relative flex items-center justify-center">
-                <div className="w-full border-t border-slate-800" />
-                <span className="absolute px-3 bg-slate-900 text-[10px] uppercase font-bold text-slate-500 tracking-wider">
+                <div className="w-full border-t border-slate-100" />
+                <span className="absolute px-3 bg-white text-[10px] uppercase font-bold text-slate-400 tracking-wider">
                   or continue with email
                 </span>
               </div>
@@ -324,12 +324,12 @@ function LoginContent() {
 
             {/* Unverified Email Warning Box */}
             {isUnverified ? (
-              <div className="p-4 rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-200 text-xs space-y-2.5 animate-in fade-in">
+              <div className="p-4 rounded-xl bg-amber-50 border border-amber-200 text-amber-800 text-xs space-y-2.5 animate-in fade-in">
                 <div className="flex items-start gap-2.5">
-                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-400" />
+                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-amber-600" />
                   <div>
-                    <h4 className="font-bold text-amber-300">Email not verified</h4>
-                    <p className="text-amber-200/90 text-[11px] mt-0.5 leading-relaxed">
+                    <h4 className="font-bold text-amber-900">Email not verified</h4>
+                    <p className="text-amber-700 text-[11px] mt-0.5 leading-relaxed">
                       Please verify your email address before signing in. Check your inbox for the activation link.
                     </p>
                   </div>
@@ -340,7 +340,7 @@ function LoginContent() {
                     type="button"
                     onClick={handleResend}
                     disabled={resendCooldown > 0 || isResending}
-                    className="px-3 py-1.5 bg-amber-500/20 hover:bg-amber-500/30 border border-amber-500/40 text-amber-300 font-bold text-[11px] rounded-xl transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                    className="px-3 py-1.5 bg-amber-100 hover:bg-amber-200 border border-amber-300 text-amber-800 font-bold text-[11px] rounded-lg transition-all flex items-center gap-1.5 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
                   >
                     {isResending ? (
                       <>
@@ -364,8 +364,8 @@ function LoginContent() {
             ) : (
               /* Standard Error Message Display */
               errorMessage && (
-                <div className="p-3.5 rounded-2xl bg-rose-500/10 border border-rose-500/30 text-rose-300 text-xs flex items-start gap-2.5 animate-in fade-in">
-                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-400" />
+                <div className="p-3.5 rounded-xl bg-rose-50 border border-rose-200 text-rose-700 text-xs flex items-start gap-2.5 animate-in fade-in">
+                  <AlertCircle className="w-4 h-4 shrink-0 mt-0.5 text-rose-600" />
                   <span className="leading-relaxed">{errorMessage}</span>
                 </div>
               )
@@ -375,7 +375,7 @@ function LoginContent() {
             <form onSubmit={handleSubmit} className="space-y-4">
               {/* Email Address */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider text-[10px]">
+                <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider text-[10px]">
                   {accountType === "creator" ? "Creator Email Address" : "Work Email Address"}
                 </label>
                 <div className="relative">
@@ -388,7 +388,7 @@ function LoginContent() {
                         ? "alex@gmail.com"
                         : "name@company.com"
                     }
-                    className="w-full py-3 px-4 pl-10 bg-slate-950 border border-slate-800 rounded-2xl text-slate-100 placeholder-slate-500 text-xs sm:text-sm font-semibold focus:outline-hidden focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+                    className="w-full py-3 px-4 pl-10 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 text-xs sm:text-sm font-semibold focus:outline-hidden focus:border-blue-600 focus:bg-white transition-all shadow-xs"
                     required
                   />
                   <Mail className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5 pointer-events-none" />
@@ -398,13 +398,13 @@ function LoginContent() {
               {/* Password */}
               <div className="space-y-1.5">
                 <div className="flex items-center justify-between">
-                  <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider text-[10px]">
+                  <label className="block text-xs font-bold text-slate-700 uppercase tracking-wider text-[10px]">
                     Password
                   </label>
                   <button
                     type="button"
                     onClick={handleForgotPassword}
-                    className="text-xs text-blue-400 hover:text-blue-300 font-semibold cursor-pointer transition-colors"
+                    className="text-xs text-blue-600 hover:underline font-semibold cursor-pointer transition-colors"
                   >
                     Forgot password?
                   </button>
@@ -415,14 +415,14 @@ function LoginContent() {
                     value={password}
                     onChange={(e) => setPassword(e.target.value)}
                     placeholder="••••••••••••"
-                    className="w-full py-3 px-4 pl-10 pr-10 bg-slate-950 border border-slate-800 rounded-2xl text-slate-100 placeholder-slate-500 text-xs sm:text-sm font-semibold focus:outline-hidden focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+                    className="w-full py-3 px-4 pl-10 pr-10 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 text-xs sm:text-sm font-semibold focus:outline-hidden focus:border-blue-600 focus:bg-white transition-all shadow-xs"
                     required
                   />
                   <Lock className="w-4 h-4 text-slate-400 absolute left-3.5 top-3.5 pointer-events-none" />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3.5 top-3.5 text-slate-400 hover:text-slate-200 cursor-pointer p-0.5"
+                    className="absolute right-3.5 top-3.5 text-slate-400 hover:text-slate-600 cursor-pointer p-0.5"
                     aria-label={showPassword ? "Hide password" : "Show password"}
                   >
                     {showPassword ? (
@@ -435,13 +435,13 @@ function LoginContent() {
               </div>
 
               {/* Remember Me */}
-              <div className="flex items-center justify-between text-xs text-slate-400 pt-1">
+              <div className="flex items-center justify-between text-xs text-slate-500 pt-1">
                 <label className="flex items-center gap-2 cursor-pointer select-none">
                   <input
                     type="checkbox"
                     checked={rememberMe}
                     onChange={(e) => setRememberMe(e.target.checked)}
-                    className="w-4 h-4 rounded-md bg-slate-950 border-slate-800 text-blue-600 focus:ring-0 cursor-pointer"
+                    className="w-4 h-4 rounded-md border-slate-300 text-blue-600 focus:ring-0 cursor-pointer"
                   />
                   <span>Remember this workstation</span>
                 </label>
@@ -451,7 +451,7 @@ function LoginContent() {
               <button
                 type="submit"
                 disabled={isLoading}
-                className="w-full py-3.5 px-4 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-bold text-xs sm:text-sm rounded-2xl shadow-lg shadow-blue-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
+                className="w-full py-3.5 px-4 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-xs sm:text-sm rounded-xl shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50 disabled:cursor-not-allowed"
               >
                 {isLoading ? (
                   <>
@@ -470,24 +470,24 @@ function LoginContent() {
             </form>
 
             {/* Bottom Sign Up Navigation Link */}
-            <div className="pt-2 text-center text-xs text-slate-400 border-t border-slate-800/80">
+            <div className="pt-2 text-center text-xs text-slate-500 border-t border-slate-100">
               Don&apos;t have a TrustScore account?{" "}
               <Link
                 href={`/signup?type=${accountType}`}
-                className="font-bold text-blue-400 hover:text-blue-300 transition-colors"
+                className="font-bold text-blue-600 hover:underline transition-colors"
               >
                 Create an account
               </Link>
             </div>
 
             {/* Legal & Terms */}
-            <p className="text-[11px] text-slate-500 text-center leading-relaxed">
+            <p className="text-[11px] text-slate-400 text-center leading-relaxed">
               By continuing, you agree to TrustScore&apos;s{" "}
-              <Link href="/terms" className="text-slate-400 hover:text-slate-200 underline">
+              <Link href="/terms" className="text-slate-600 hover:underline">
                 Terms of Service
               </Link>{" "}
               and{" "}
-              <Link href="/privacy" className="text-slate-400 hover:text-slate-200 underline">
+              <Link href="/privacy" className="text-slate-600 hover:underline">
                 Privacy Policy
               </Link>
               .
@@ -503,7 +503,7 @@ export default function LoginPage() {
   return (
     <Suspense
       fallback={
-        <div className="min-h-screen bg-[#090d16] flex items-center justify-center text-xs text-slate-400">
+        <div className="min-h-screen bg-[#f8f9fb] flex items-center justify-center text-xs text-slate-400">
           Loading sign in...
         </div>
       }
@@ -512,3 +512,4 @@ export default function LoginPage() {
     </Suspense>
   );
 }
+

@@ -105,7 +105,7 @@ export default function CampaignsPage() {
   };
 
   return (
-    <div className="min-h-full flex flex-col bg-slate-950 text-slate-100">
+    <div className="min-h-full flex flex-col bg-[#f8f9fb] text-slate-900">
       <DashboardHeader
         title="Active Campaigns"
         subtitle="Manage multi-creator marketing rosters, deliverable schedules, and budget allocations"
@@ -114,8 +114,8 @@ export default function CampaignsPage() {
       <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <Briefcase className="w-5 h-5 text-blue-400" />
-            <h3 className="text-base font-bold text-slate-100">
+            <Briefcase className="w-5 h-5 text-blue-600" />
+            <h3 className="text-base font-bold text-slate-900">
               Your Brand Campaigns ({campaigns.length})
             </h3>
           </div>
@@ -123,7 +123,7 @@ export default function CampaignsPage() {
           <button
             type="button"
             onClick={() => setIsCreateModalOpen(true)}
-            className="py-2.5 px-4 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition-colors flex items-center gap-1.5 self-start sm:self-auto cursor-pointer shadow-md shadow-blue-600/25"
+            className="py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl transition-colors flex items-center gap-1.5 self-start sm:self-auto cursor-pointer shadow-xs"
           >
             <Plus className="w-4 h-4" />
             <span>Create New Campaign</span>
@@ -133,47 +133,47 @@ export default function CampaignsPage() {
         {/* Campaign Cards List */}
         {isLoading ? (
           <div className="py-20 flex flex-col items-center justify-center gap-3 text-slate-400">
-            <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
-            <span className="text-xs font-semibold">Loading brand campaigns...</span>
+            <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
+            <span className="text-xs font-semibold text-slate-500">Loading brand campaigns...</span>
           </div>
         ) : campaigns.length > 0 ? (
           <div className="grid grid-cols-1 gap-4">
             {campaigns.map((camp) => (
               <div
                 key={camp.id}
-                className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-7 space-y-4 shadow-md hover:border-slate-700 transition-all"
+                className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-7 space-y-4 shadow-xs hover:border-slate-300 transition-all"
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
                   <div>
                     <div className="flex items-center gap-2.5">
-                      <h4 className="font-bold text-slate-100 text-base">{camp.title}</h4>
+                      <h4 className="font-bold text-slate-900 text-base">{camp.title}</h4>
                       <span
                         className={`px-2.5 py-0.5 rounded-md text-[10px] font-bold uppercase ${
                           camp.status === "ACTIVE"
-                            ? "bg-blue-500/10 text-blue-400 border border-blue-500/20"
+                            ? "bg-blue-50 text-blue-700 border border-blue-200"
                             : camp.status === "COMPLETED"
-                            ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                            : "bg-amber-500/10 text-amber-400 border border-amber-500/20"
+                            ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                            : "bg-amber-50 text-amber-700 border border-amber-200"
                         }`}
                       >
                         {camp.status}
                       </span>
                     </div>
-                    <p className="text-xs text-slate-400 mt-1">
+                    <p className="text-xs text-slate-500 mt-1">
                       {camp.category} • Target Followers: {camp.targetFollowerRange || "10k-50k"} • Min TrustScore: {camp.targetMinTrustScore || 80}/100
                     </p>
                   </div>
 
                   <div className="flex items-center gap-6 text-xs self-start sm:self-auto">
                     <div className="text-right">
-                      <span className="text-[10px] uppercase font-bold text-slate-500 block">Total Budget</span>
-                      <span className="text-base font-black text-emerald-400">
+                      <span className="text-[10px] uppercase font-bold text-slate-400 block">Total Budget</span>
+                      <span className="text-base font-black text-emerald-600">
                         ${Math.round(camp.budget).toLocaleString()}
                       </span>
                     </div>
                     <div className="text-right">
-                      <span className="text-[10px] uppercase font-bold text-slate-500 block">Applications</span>
-                      <span className="text-sm font-bold text-slate-200">
+                      <span className="text-[10px] uppercase font-bold text-slate-400 block">Applications</span>
+                      <span className="text-sm font-bold text-slate-800">
                         {camp.applications?.length || 0} Creators
                       </span>
                     </div>
@@ -181,20 +181,20 @@ export default function CampaignsPage() {
                 </div>
 
                 {/* Deliverables requirement */}
-                <div className="p-3.5 bg-slate-950 rounded-2xl border border-slate-800/80 text-xs text-slate-300 flex items-start gap-2">
-                  <FileText className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" />
+                <div className="p-3.5 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-700 flex items-start gap-2">
+                  <FileText className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
                   <p className="leading-relaxed">{camp.deliverables}</p>
                 </div>
 
-                <div className="pt-2 flex items-center justify-between text-xs text-slate-400 border-t border-slate-800">
+                <div className="pt-2 flex items-center justify-between text-xs text-slate-500 border-t border-slate-100">
                   <Link
                     href="/creators"
-                    className="text-blue-400 hover:text-blue-300 font-semibold flex items-center gap-1"
+                    className="text-blue-600 hover:text-blue-700 font-semibold flex items-center gap-1"
                   >
                     <span>+ Invite Creators to Campaign</span>
                   </Link>
 
-                  <span className="text-[11px] text-slate-500">
+                  <span className="text-[11px] text-slate-400">
                     Created: {new Date(camp.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                   </span>
                 </div>
@@ -202,11 +202,11 @@ export default function CampaignsPage() {
             ))}
           </div>
         ) : (
-          <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-16 text-center space-y-4 shadow-md">
-            <Briefcase className="w-10 h-10 text-slate-500 mx-auto" />
+          <div className="bg-white border border-slate-200 rounded-2xl p-16 text-center space-y-4 shadow-xs">
+            <Briefcase className="w-10 h-10 text-slate-400 mx-auto" />
             <div className="space-y-1">
-              <h3 className="text-base font-bold text-slate-200">No campaigns yet</h3>
-              <p className="text-xs text-slate-400 max-w-sm mx-auto leading-relaxed">
+              <h3 className="text-base font-bold text-slate-800">No campaigns yet</h3>
+              <p className="text-xs text-slate-500 max-w-sm mx-auto leading-relaxed">
                 Create structured influencer marketing campaigns to recruit authentic creators, set deliverable milestones, and allocate budgets.
               </p>
             </div>
@@ -214,7 +214,7 @@ export default function CampaignsPage() {
               <button
                 type="button"
                 onClick={() => setIsCreateModalOpen(true)}
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-2xl shadow-md shadow-blue-600/25 cursor-pointer"
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-xs cursor-pointer"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Create Campaign</span>
@@ -226,17 +226,17 @@ export default function CampaignsPage() {
 
       {/* Create Campaign Modal */}
       {isCreateModalOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-xs">
-          <div className="bg-slate-900 border border-slate-800 rounded-3xl p-6 sm:p-8 max-w-lg w-full space-y-6 shadow-2xl relative">
-            <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/40 backdrop-blur-xs">
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 max-w-lg w-full space-y-6 shadow-xl relative">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
               <div className="flex items-center gap-2">
-                <Briefcase className="w-5 h-5 text-blue-400" />
-                <h3 className="text-base font-bold text-slate-100">Create New Campaign</h3>
+                <Briefcase className="w-5 h-5 text-blue-600" />
+                <h3 className="text-base font-bold text-slate-900">Create New Campaign</h3>
               </div>
               <button
                 type="button"
                 onClick={() => setIsCreateModalOpen(false)}
-                className="text-slate-400 hover:text-slate-200 p-1 cursor-pointer"
+                className="text-slate-400 hover:text-slate-600 p-1 cursor-pointer"
               >
                 <X className="w-5 h-5" />
               </button>
@@ -244,24 +244,24 @@ export default function CampaignsPage() {
 
             <form onSubmit={handleCreateCampaign} className="space-y-4 text-xs">
               <div className="space-y-1.5">
-                <label className="font-bold text-slate-300 block">Campaign Title</label>
+                <label className="font-bold text-slate-700 block">Campaign Title</label>
                 <input
                   type="text"
                   required
                   value={title}
                   onChange={(e) => setTitle(e.target.value)}
                   placeholder="e.g. Q4 Hydration Product Launch"
-                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 text-xs font-semibold focus:outline-hidden focus:border-blue-500"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-xs font-semibold focus:outline-hidden focus:border-blue-600 focus:bg-white transition-all"
                 />
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <label className="font-bold text-slate-300 block">Category</label>
+                  <label className="font-bold text-slate-700 block">Category</label>
                   <select
                     value={category}
                     onChange={(e) => setCategory(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 text-xs font-semibold focus:outline-hidden focus:border-blue-500"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-xs font-semibold focus:outline-hidden focus:border-blue-600 focus:bg-white transition-all"
                   >
                     <option value="Fitness">Fitness &amp; Health</option>
                     <option value="Beauty">Beauty &amp; Skincare</option>
@@ -273,7 +273,7 @@ export default function CampaignsPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="font-bold text-slate-300 block">Budget ($ USD)</label>
+                  <label className="font-bold text-slate-700 block">Budget ($ USD)</label>
                   <input
                     type="number"
                     required
@@ -281,18 +281,18 @@ export default function CampaignsPage() {
                     step="50"
                     value={budget}
                     onChange={(e) => setBudget(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 text-xs font-semibold focus:outline-hidden focus:border-blue-500"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-xs font-semibold focus:outline-hidden focus:border-blue-600 focus:bg-white transition-all"
                   />
                 </div>
               </div>
 
               <div className="grid grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <label className="font-bold text-slate-300 block">Min TrustScore</label>
+                  <label className="font-bold text-slate-700 block">Min TrustScore</label>
                   <select
                     value={targetMinTrustScore}
                     onChange={(e) => setTargetMinTrustScore(Number(e.target.value))}
-                    className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 text-xs font-semibold focus:outline-hidden focus:border-blue-500"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-xs font-semibold focus:outline-hidden focus:border-blue-600 focus:bg-white transition-all"
                   >
                     <option value={75}>75+ (Moderate Risk)</option>
                     <option value={80}>80+ (High Authenticity)</option>
@@ -301,11 +301,11 @@ export default function CampaignsPage() {
                 </div>
 
                 <div className="space-y-1.5">
-                  <label className="font-bold text-slate-300 block">Follower Target</label>
+                  <label className="font-bold text-slate-700 block">Follower Target</label>
                   <select
                     value={targetFollowerRange}
                     onChange={(e) => setTargetFollowerRange(e.target.value)}
-                    className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 text-xs font-semibold focus:outline-hidden focus:border-blue-500"
+                    className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-xs font-semibold focus:outline-hidden focus:border-blue-600 focus:bg-white transition-all"
                   >
                     <option value="5k-15k">Nano (5k-15k)</option>
                     <option value="10k-50k">Micro (10k-50k)</option>
@@ -316,29 +316,29 @@ export default function CampaignsPage() {
               </div>
 
               <div className="space-y-1.5">
-                <label className="font-bold text-slate-300 block">Deliverables Requirements</label>
+                <label className="font-bold text-slate-700 block">Deliverables Requirements</label>
                 <textarea
                   rows={3}
                   required
                   value={deliverables}
                   onChange={(e) => setDeliverables(e.target.value)}
                   placeholder="e.g. 1x Instagram Reel with product demonstration, 2x 24hr Stories with UTM link sticker"
-                  className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-100 text-xs font-semibold focus:outline-hidden focus:border-blue-500 resize-none"
+                  className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-xs font-semibold focus:outline-hidden focus:border-blue-600 focus:bg-white resize-none transition-all"
                 />
               </div>
 
-              <div className="pt-3 flex items-center justify-end gap-3 border-t border-slate-800">
+              <div className="pt-3 flex items-center justify-end gap-3 border-t border-slate-100">
                 <button
                   type="button"
                   onClick={() => setIsCreateModalOpen(false)}
-                  className="px-4 py-2 bg-slate-800 hover:bg-slate-750 text-slate-300 font-bold rounded-xl text-xs transition-colors cursor-pointer"
+                  className="px-4 py-2 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-xl text-xs transition-colors cursor-pointer"
                 >
                   Cancel
                 </button>
                 <button
                   type="submit"
                   disabled={isSubmitting}
-                  className="px-5 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer disabled:opacity-50 flex items-center gap-1.5 shadow-md shadow-blue-600/25"
+                  className="px-5 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl text-xs transition-colors cursor-pointer disabled:opacity-50 flex items-center gap-1.5 shadow-xs"
                 >
                   {isSubmitting ? (
                     <>

@@ -51,7 +51,7 @@ export default function SavedCreatorsPage() {
   };
 
   return (
-    <div className="min-h-full flex flex-col bg-slate-950 text-slate-100">
+    <div className="min-h-full flex flex-col bg-[#f8f9fb] text-slate-900">
       <DashboardHeader
         title="Saved Creators"
         subtitle="Bookmarked creator profiles and shortlisted candidates for upcoming campaigns"
@@ -60,15 +60,15 @@ export default function SavedCreatorsPage() {
       <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-6">
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
           <div className="flex items-center gap-2">
-            <Bookmark className="w-5 h-5 text-blue-400" />
-            <h3 className="text-base font-bold text-slate-100">
+            <Bookmark className="w-5 h-5 text-blue-600" />
+            <h3 className="text-base font-bold text-slate-900">
               Shortlisted Creators ({savedCreators.length})
             </h3>
           </div>
 
           <Link
             href="/creators"
-            className="py-2 px-3.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition-colors flex items-center gap-1.5 self-start sm:self-auto shadow-xs"
+            className="py-2 px-3.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl transition-colors flex items-center gap-1.5 self-start sm:self-auto shadow-xs"
           >
             <Plus className="w-4 h-4" />
             <span>Discover More Creators</span>
@@ -77,14 +77,14 @@ export default function SavedCreatorsPage() {
 
         {isLoading ? (
           <div className="py-20 flex flex-col items-center justify-center gap-3 text-slate-400">
-            <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
-            <span className="text-xs font-semibold">Loading saved creators...</span>
+            <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
+            <span className="text-xs font-semibold text-slate-500">Loading saved creators...</span>
           </div>
         ) : savedCreators.length > 0 ? (
-          <div className="bg-slate-900/90 border border-slate-800 rounded-3xl overflow-hidden shadow-xs">
+          <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-slate-950/80 text-slate-400 font-bold uppercase tracking-wider text-[10px] border-b border-slate-800">
+                <thead className="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider text-[10px] border-b border-slate-200">
                   <tr>
                     <th className="py-3.5 px-4">Creator</th>
                     <th className="py-3.5 px-4">Category</th>
@@ -95,51 +95,51 @@ export default function SavedCreatorsPage() {
                     <th className="py-3.5 px-4 text-center">Actions</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/60">
+                <tbody className="divide-y divide-slate-100">
                   {savedCreators.map((creator) => (
-                    <tr key={creator.id} className="hover:bg-slate-850/50 transition-colors">
+                    <tr key={creator.id} className="hover:bg-slate-50/60 transition-colors">
                       <td className="py-3.5 px-4">
                         <div className="flex items-center gap-3">
                           <img
                             src={creator.avatar}
                             alt={creator.name}
-                            className="w-10 h-10 rounded-xl object-cover border border-slate-700"
+                            className="w-10 h-10 rounded-xl object-cover border border-slate-200"
                           />
                           <div>
                             <div className="flex items-center gap-1.5">
                               <Link
                                 href={`/creators/${creator.id}`}
-                                className="font-bold text-slate-100 hover:text-blue-400 transition-colors"
+                                className="font-bold text-slate-900 hover:text-blue-600 transition-colors"
                               >
                                 {creator.username}
                               </Link>
                               {creator.verifiedBadge && <VerificationBadge size="sm" showText={false} />}
                             </div>
-                            <span className="text-[11px] text-slate-400">{creator.name}</span>
+                            <span className="text-[11px] text-slate-500">{creator.name}</span>
                           </div>
                         </div>
                       </td>
 
-                      <td className="py-3.5 px-4 text-slate-300">
-                        <span className="px-2 py-0.5 rounded-md bg-slate-800 text-slate-300 text-[11px]">
+                      <td className="py-3.5 px-4 text-slate-700">
+                        <span className="px-2 py-0.5 rounded-md bg-slate-100 text-slate-700 border border-slate-200 text-[11px]">
                           {creator.category}
                         </span>
                       </td>
 
-                      <td className="py-3.5 px-4 text-right font-bold text-slate-200">
+                      <td className="py-3.5 px-4 text-right font-bold text-slate-800">
                         {formatNumber(creator.followers)}
                       </td>
 
-                      <td className="py-3.5 px-4 text-right font-bold text-blue-400">
+                      <td className="py-3.5 px-4 text-right font-bold text-blue-600">
                         {creator.engagementRate}%
                       </td>
 
                       <td className="py-3.5 px-4 text-right">
-                        <span className="font-extrabold text-blue-400">{creator.trustScore}</span>
-                        <span className="text-[10px] text-slate-500">/100</span>
+                        <span className="font-extrabold text-blue-600">{creator.trustScore}</span>
+                        <span className="text-[10px] text-slate-400">/100</span>
                       </td>
 
-                      <td className="py-3.5 px-4 text-right font-bold text-emerald-400">
+                      <td className="py-3.5 px-4 text-right font-bold text-emerald-600">
                         ${creator.startingRate}
                       </td>
 
@@ -148,7 +148,7 @@ export default function SavedCreatorsPage() {
                           <button
                             type="button"
                             onClick={() => setSelectedCollabCreator(creator)}
-                            className="px-2.5 py-1 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-lg text-[11px] cursor-pointer flex items-center gap-1"
+                            className="px-2.5 py-1 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg text-[11px] cursor-pointer flex items-center gap-1 shadow-xs"
                           >
                             <Send className="w-3 h-3" />
                             <span>Collab</span>
@@ -156,7 +156,7 @@ export default function SavedCreatorsPage() {
                           <button
                             type="button"
                             onClick={() => handleRemove(creator.id)}
-                            className="p-1.5 text-slate-400 hover:text-rose-400 hover:bg-rose-950/30 rounded-lg transition-colors cursor-pointer"
+                            className="p-1.5 text-slate-400 hover:text-rose-600 hover:bg-rose-50 rounded-lg transition-colors cursor-pointer"
                             title="Remove from saved"
                           >
                             <Trash2 className="w-3.5 h-3.5" />
@@ -170,16 +170,16 @@ export default function SavedCreatorsPage() {
             </div>
           </div>
         ) : (
-          <div className="bg-slate-900/60 border border-slate-800 rounded-3xl p-16 text-center space-y-3">
-            <Bookmark className="w-8 h-8 text-slate-500 mx-auto" />
-            <h3 className="text-base font-bold text-slate-200">You haven&apos;t saved any creators yet</h3>
-            <p className="text-xs text-slate-400 max-w-md mx-auto">
+          <div className="bg-white border border-slate-200 rounded-2xl p-16 text-center space-y-3 shadow-xs">
+            <Bookmark className="w-8 h-8 text-slate-400 mx-auto" />
+            <h3 className="text-base font-bold text-slate-800">You haven&apos;t saved any creators yet</h3>
+            <p className="text-xs text-slate-500 max-w-md mx-auto">
               Bookmark creators from the marketplace or leaderboard to track their authenticity and invite them to collaboration campaigns.
             </p>
             <div className="pt-2">
               <Link
                 href="/creators"
-                className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl"
+                className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-xs"
               >
                 <span>Browse Creator Marketplace</span>
                 <ArrowRight className="w-3.5 h-3.5" />

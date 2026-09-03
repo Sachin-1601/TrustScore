@@ -53,28 +53,28 @@ export function CreatorProfileCompletion({ creator }: CreatorProfileCompletionPr
   const percentage = Math.round((completedCount / items.length) * 100);
 
   return (
-    <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-7 space-y-4 shadow-lg">
+    <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-7 space-y-4 shadow-xs">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
-          <Award className="w-4 h-4 text-emerald-400" />
-          <h3 className="text-base font-bold text-slate-100">
+          <Award className="w-4 h-4 text-emerald-600" />
+          <h3 className="text-base font-bold text-slate-900">
             Profile Completion
           </h3>
         </div>
-        <span className="text-sm font-black text-emerald-400">
+        <span className="text-sm font-black text-emerald-600">
           {percentage}%
         </span>
       </div>
 
       {/* Progress Bar */}
-      <div className="w-full h-2.5 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
+      <div className="w-full h-2.5 bg-slate-100 rounded-full overflow-hidden border border-slate-200/80">
         <div
-          className="h-full bg-gradient-to-r from-blue-600 via-teal-500 to-emerald-400 rounded-full transition-all duration-700 ease-out"
+          className="h-full bg-gradient-to-r from-blue-600 via-teal-500 to-emerald-500 rounded-full transition-all duration-700 ease-out"
           style={{ width: `${percentage}%` }}
         />
       </div>
 
-      <p className="text-xs text-slate-400">
+      <p className="text-xs text-slate-500">
         {percentage >= 80
           ? "Your profile is ranked in priority brand search filters."
           : "Complete remaining items to maximize brand collaboration discovery."}
@@ -86,17 +86,17 @@ export function CreatorProfileCompletion({ creator }: CreatorProfileCompletionPr
           <Link
             key={item.id}
             href={item.href}
-            className={`p-2.5 rounded-2xl border flex items-center justify-between transition-all group ${
+            className={`p-2.5 rounded-xl border flex items-center justify-between transition-all group ${
               item.isComplete
-                ? "bg-emerald-500/5 border-emerald-500/20 text-emerald-300"
-                : "bg-slate-950/80 hover:bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200"
+                ? "bg-emerald-50/60 border-emerald-200 text-emerald-800"
+                : "bg-slate-50/80 hover:bg-slate-100/70 border-slate-200/80 text-slate-600 hover:text-slate-900"
             }`}
           >
             <div className="flex items-center gap-2.5">
               {item.isComplete ? (
-                <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0" />
+                <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0" />
               ) : (
-                <Circle className="w-4 h-4 text-slate-500 shrink-0" />
+                <Circle className="w-4 h-4 text-slate-400 shrink-0" />
               )}
               <span className="font-semibold">{item.label}</span>
             </div>

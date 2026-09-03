@@ -211,14 +211,14 @@ function CreatorsMarketplaceContent() {
       {/* A. HERO / HEADER */}
       {/* ---------------------------------------------------- */}
       <div className="text-center space-y-3.5 max-w-3xl mx-auto">
-        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-500/10 text-blue-400 border border-blue-500/20 text-xs font-bold uppercase tracking-wider">
+        <div className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full bg-blue-50 text-blue-700 border border-blue-200 text-xs font-bold uppercase tracking-wider">
           <Sparkles className="w-3.5 h-3.5" />
           <span>Creator Intelligence Marketplace</span>
         </div>
-        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-100 tracking-tight">
+        <h1 className="text-3xl sm:text-4xl lg:text-5xl font-black text-slate-900 tracking-tight">
           Find creators you can trust.
         </h1>
-        <p className="text-sm sm:text-base text-slate-400 leading-relaxed max-w-2xl mx-auto">
+        <p className="text-sm sm:text-base text-slate-500 leading-relaxed max-w-2xl mx-auto">
           Discover verified creators using TrustScore authenticity intelligence, engagement quality, and creator insights.
         </p>
       </div>
@@ -226,7 +226,7 @@ function CreatorsMarketplaceContent() {
       {/* ---------------------------------------------------- */}
       {/* B. SEARCH & FILTER CONTROLS */}
       {/* ---------------------------------------------------- */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 sm:p-6 space-y-5 shadow-xl">
+      <div className="bg-white border border-slate-200 rounded-2xl p-5 sm:p-6 space-y-5 shadow-xs">
         {/* Top: Search Input + Mobile Filter Drawer Button */}
         <div className="flex items-center gap-3">
           <div className="relative flex-1">
@@ -235,14 +235,14 @@ function CreatorsMarketplaceContent() {
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               placeholder="Search creators by name, handle, niche, or location..."
-              className="w-full py-3.5 px-4 pl-11 pr-10 bg-slate-950 border border-slate-800 rounded-2xl text-slate-100 placeholder-slate-500 text-sm font-semibold focus:outline-hidden focus:border-blue-500 focus:ring-1 focus:ring-blue-500 transition-all"
+              className="w-full py-3.5 px-4 pl-11 pr-10 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder-slate-400 text-sm font-semibold focus:outline-hidden focus:border-blue-600 focus:bg-white transition-all shadow-xs"
             />
             <Search className="w-5 h-5 text-slate-400 absolute left-3.5 top-3.5 pointer-events-none" />
             {searchQuery && (
               <button
                 type="button"
                 onClick={() => setSearchQuery("")}
-                className="absolute right-3.5 top-3.5 text-slate-400 hover:text-slate-200 cursor-pointer p-0.5"
+                className="absolute right-3.5 top-3.5 text-slate-400 hover:text-slate-600 cursor-pointer p-0.5"
               >
                 <X className="w-4 h-4" />
               </button>
@@ -253,12 +253,12 @@ function CreatorsMarketplaceContent() {
           <button
             type="button"
             onClick={() => setIsMobileFilterOpen(true)}
-            className="lg:hidden px-4 py-3.5 bg-slate-950 border border-slate-800 rounded-2xl text-slate-200 text-xs font-bold flex items-center gap-2 hover:border-slate-700 transition-colors cursor-pointer shrink-0"
+            className="lg:hidden px-4 py-3.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-700 text-xs font-bold flex items-center gap-2 hover:border-slate-300 transition-colors cursor-pointer shrink-0"
           >
-            <Filter className="w-4 h-4 text-blue-400" />
+            <Filter className="w-4 h-4 text-blue-600" />
             <span>Filters</span>
             {hasActiveFilters && (
-              <span className="w-2 h-2 rounded-full bg-blue-500 animate-pulse" />
+              <span className="w-2 h-2 rounded-full bg-blue-600" />
             )}
           </button>
         </div>
@@ -277,8 +277,8 @@ function CreatorsMarketplaceContent() {
                 }}
                 className={`px-3.5 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer capitalize shrink-0 ${
                   isSelected
-                    ? "bg-blue-600 text-white shadow-md shadow-blue-600/25 font-bold"
-                    : "bg-slate-950 text-slate-400 hover:text-slate-200 border border-slate-800 hover:border-slate-700"
+                    ? "bg-blue-600 text-white shadow-xs font-bold"
+                    : "bg-slate-50 text-slate-600 hover:text-slate-900 border border-slate-200 hover:border-slate-300"
                 }`}
               >
                 {cat === "all" ? "All Categories" : cat}
@@ -288,7 +288,7 @@ function CreatorsMarketplaceContent() {
         </div>
 
         {/* Desktop Multi-Dimensional Filter Bar */}
-        <div className="hidden lg:grid grid-cols-6 gap-3 pt-3 border-t border-slate-800/80 text-xs">
+        <div className="hidden lg:grid grid-cols-6 gap-3 pt-3 border-t border-slate-100 text-xs">
           {/* 1. Platform */}
           <div>
             <label className="block text-[10px] uppercase font-bold text-slate-500 mb-1">
@@ -300,7 +300,7 @@ function CreatorsMarketplaceContent() {
                 setSelectedPlatform(e.target.value);
                 setPage(1);
               }}
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 font-semibold focus:outline-hidden cursor-pointer"
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-semibold focus:outline-hidden focus:border-blue-600 focus:bg-white cursor-pointer"
             >
               <option value="all">All Platforms</option>
               <option value="instagram">Instagram</option>
@@ -320,7 +320,7 @@ function CreatorsMarketplaceContent() {
                 setMinTrustScore(Number(e.target.value));
                 setPage(1);
               }}
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 font-semibold focus:outline-hidden cursor-pointer"
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-semibold focus:outline-hidden focus:border-blue-600 focus:bg-white cursor-pointer"
             >
               <option value={0}>Any Score</option>
               <option value={90}>90+ (Very High)</option>
@@ -341,7 +341,7 @@ function CreatorsMarketplaceContent() {
                 setFollowerRange(e.target.value);
                 setPage(1);
               }}
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 font-semibold focus:outline-hidden cursor-pointer"
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-semibold focus:outline-hidden focus:border-blue-600 focus:bg-white cursor-pointer"
             >
               <option value="all">All Audiences</option>
               <option value="nano">Nano (1K – 10K)</option>
@@ -364,7 +364,7 @@ function CreatorsMarketplaceContent() {
                 setSocialVerifiedOnly(v === "social");
                 setPage(1);
               }}
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 font-semibold focus:outline-hidden cursor-pointer"
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-semibold focus:outline-hidden focus:border-blue-600 focus:bg-white cursor-pointer"
             >
               <option value="all">All Creators</option>
               <option value="verified">TrustScore Verified</option>
@@ -383,7 +383,7 @@ function CreatorsMarketplaceContent() {
                 setSortBy(e.target.value as any);
                 setPage(1);
               }}
-              className="w-full px-3 py-2 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 font-semibold focus:outline-hidden cursor-pointer"
+              className="w-full px-3 py-2 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-semibold focus:outline-hidden focus:border-blue-600 focus:bg-white cursor-pointer"
             >
               <option value="trust">Highest TrustScore</option>
               <option value="verified">Verified First</option>
@@ -403,8 +403,8 @@ function CreatorsMarketplaceContent() {
               }}
               className={`w-full py-2 px-2.5 rounded-xl border font-bold text-xs flex items-center justify-center gap-1.5 transition-colors cursor-pointer ${
                 availableOnly
-                  ? "bg-blue-600/15 border-blue-500/40 text-blue-400"
-                  : "bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200"
+                  ? "bg-blue-50 border-blue-300 text-blue-700 shadow-xs"
+                  : "bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-900"
               }`}
             >
               <CheckCircle2 className="w-3.5 h-3.5" />
@@ -415,18 +415,18 @@ function CreatorsMarketplaceContent() {
 
         {/* Active Filter Badges Bar */}
         {hasActiveFilters && (
-          <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-800/60 text-xs">
+          <div className="flex flex-wrap items-center gap-2 pt-2 border-t border-slate-100 text-xs">
             <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
               Active Filters:
             </span>
 
             {debouncedQuery && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-slate-950 border border-slate-800 text-slate-300 text-[11px]">
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-700 text-[11px]">
                 <span>Query: &quot;{debouncedQuery}&quot;</span>
                 <button
                   type="button"
                   onClick={() => setSearchQuery("")}
-                  className="hover:text-white"
+                  className="hover:text-slate-900 cursor-pointer"
                 >
                   <X className="w-3 h-3" />
                 </button>
@@ -434,12 +434,12 @@ function CreatorsMarketplaceContent() {
             )}
 
             {selectedCategory !== "all" && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-slate-950 border border-slate-800 text-slate-300 text-[11px]">
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-700 text-[11px]">
                 <span>Category: {selectedCategory}</span>
                 <button
                   type="button"
                   onClick={() => setSelectedCategory("all")}
-                  className="hover:text-white"
+                  className="hover:text-slate-900 cursor-pointer"
                 >
                   <X className="w-3 h-3" />
                 </button>
@@ -447,12 +447,12 @@ function CreatorsMarketplaceContent() {
             )}
 
             {selectedPlatform !== "all" && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-slate-950 border border-slate-800 text-slate-300 text-[11px] capitalize">
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-700 text-[11px] capitalize">
                 <span>Platform: {selectedPlatform}</span>
                 <button
                   type="button"
                   onClick={() => setSelectedPlatform("all")}
-                  className="hover:text-white"
+                  className="hover:text-slate-900 cursor-pointer"
                 >
                   <X className="w-3 h-3" />
                 </button>
@@ -460,12 +460,12 @@ function CreatorsMarketplaceContent() {
             )}
 
             {minTrustScore > 0 && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-slate-950 border border-slate-800 text-slate-300 text-[11px]">
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-700 text-[11px]">
                 <span>TrustScore: {minTrustScore}+</span>
                 <button
                   type="button"
                   onClick={() => setMinTrustScore(0)}
-                  className="hover:text-white"
+                  className="hover:text-slate-900 cursor-pointer"
                 >
                   <X className="w-3 h-3" />
                 </button>
@@ -473,12 +473,12 @@ function CreatorsMarketplaceContent() {
             )}
 
             {followerRange !== "all" && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-slate-950 border border-slate-800 text-slate-300 text-[11px] capitalize">
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-slate-50 border border-slate-200 text-slate-700 text-[11px] capitalize">
                 <span>Tier: {followerRange}</span>
                 <button
                   type="button"
                   onClick={() => setFollowerRange("all")}
-                  className="hover:text-white"
+                  className="hover:text-slate-900 cursor-pointer"
                 >
                   <X className="w-3 h-3" />
                 </button>
@@ -486,12 +486,12 @@ function CreatorsMarketplaceContent() {
             )}
 
             {verifiedOnly && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-emerald-500/10 border border-emerald-500/30 text-emerald-300 text-[11px]">
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-emerald-50 border border-emerald-200 text-emerald-700 text-[11px]">
                 <span>TrustScore Verified</span>
                 <button
                   type="button"
                   onClick={() => setVerifiedOnly(false)}
-                  className="hover:text-white"
+                  className="hover:text-emerald-900 cursor-pointer"
                 >
                   <X className="w-3 h-3" />
                 </button>
@@ -499,12 +499,12 @@ function CreatorsMarketplaceContent() {
             )}
 
             {availableOnly && (
-              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-blue-500/10 border border-blue-500/30 text-blue-300 text-[11px]">
+              <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-lg bg-blue-50 border border-blue-200 text-blue-700 text-[11px]">
                 <span>Open for Collabs</span>
                 <button
                   type="button"
                   onClick={() => setAvailableOnly(false)}
-                  className="hover:text-white"
+                  className="hover:text-blue-900 cursor-pointer"
                 >
                   <X className="w-3 h-3" />
                 </button>
@@ -514,7 +514,7 @@ function CreatorsMarketplaceContent() {
             <button
               type="button"
               onClick={handleClearFilters}
-              className="text-blue-400 hover:text-blue-300 font-bold text-[11px] ml-auto cursor-pointer"
+              className="text-blue-600 hover:underline font-bold text-[11px] ml-auto cursor-pointer"
             >
               Reset all filters
             </button>
@@ -525,17 +525,17 @@ function CreatorsMarketplaceContent() {
       {/* ---------------------------------------------------- */}
       {/* C. RESULTS SUMMARY HEADER */}
       {/* ---------------------------------------------------- */}
-      <div className="flex items-center justify-between text-xs text-slate-400 px-1">
+      <div className="flex items-center justify-between text-xs text-slate-500 px-1">
         <div className="flex items-center gap-2">
           <span>
             {isLoading ? (
-              <span className="flex items-center gap-1.5 text-slate-400">
-                <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-400" />
+              <span className="flex items-center gap-1.5 text-slate-500">
+                <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-600" />
                 <span>Querying marketplace records...</span>
               </span>
             ) : totalCount > 0 ? (
               <span>
-                Showing <strong className="text-slate-100">{(page - 1) * limit + 1}–{Math.min(page * limit, totalCount)}</strong> of <strong className="text-slate-100">{totalCount}</strong> verified creators
+                Showing <strong className="text-slate-900">{(page - 1) * limit + 1}–{Math.min(page * limit, totalCount)}</strong> of <strong className="text-slate-900">{totalCount}</strong> verified creators
               </span>
             ) : (
               <span>0 creators found</span>
@@ -544,7 +544,7 @@ function CreatorsMarketplaceContent() {
         </div>
 
         {totalCount > 0 && totalPages > 1 && (
-          <span className="text-slate-500 font-medium">
+          <span className="text-slate-400 font-medium">
             Page {page} of {totalPages}
           </span>
         )}
@@ -562,20 +562,20 @@ function CreatorsMarketplaceContent() {
         </div>
       ) : isError ? (
         /* Error State */
-        <div className="bg-slate-900/80 border border-rose-900/40 rounded-3xl p-10 sm:p-14 text-center space-y-4 shadow-lg">
-          <div className="w-14 h-14 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 mx-auto flex items-center justify-center">
+        <div className="bg-white border border-rose-200 rounded-2xl p-10 sm:p-14 text-center space-y-4 shadow-xs">
+          <div className="w-14 h-14 rounded-xl bg-rose-50 border border-rose-200 text-rose-600 mx-auto flex items-center justify-center">
             <AlertCircle className="w-7 h-7" />
           </div>
           <div className="space-y-1">
-            <h3 className="text-lg font-bold text-slate-100">Unable to load creators</h3>
-            <p className="text-xs text-slate-400 max-w-sm mx-auto">
+            <h3 className="text-lg font-bold text-slate-900">Unable to load creators</h3>
+            <p className="text-xs text-slate-500 max-w-sm mx-auto">
               Something went wrong while retrieving creator directory records from the database.
             </p>
           </div>
           <button
             type="button"
             onClick={() => fetchCreators()}
-            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow-xs transition-colors cursor-pointer inline-flex items-center gap-2"
+            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors cursor-pointer inline-flex items-center gap-2"
           >
             <RefreshCw className="w-3.5 h-3.5" />
             <span>Try Again</span>
@@ -595,48 +595,48 @@ function CreatorsMarketplaceContent() {
         </div>
       ) : hasActiveFilters ? (
         /* Filtered Empty State */
-        <div className="bg-slate-900/60 border border-slate-800 rounded-3xl p-10 sm:p-14 text-center space-y-4">
-          <div className="w-14 h-14 rounded-2xl bg-slate-950 border border-slate-800 text-slate-400 mx-auto flex items-center justify-center">
-            <SlidersHorizontal className="w-6 h-6 text-blue-400" />
+        <div className="bg-white border border-slate-200 rounded-2xl p-10 sm:p-14 text-center space-y-4 shadow-xs">
+          <div className="w-14 h-14 rounded-xl bg-slate-50 border border-slate-200 text-slate-400 mx-auto flex items-center justify-center">
+            <SlidersHorizontal className="w-6 h-6 text-blue-600" />
           </div>
           <div className="space-y-1">
-            <h3 className="text-lg font-bold text-slate-100">No creators match your current filters</h3>
-            <p className="text-xs text-slate-400 max-w-sm mx-auto">
+            <h3 className="text-lg font-bold text-slate-900">No creators match your current filters</h3>
+            <p className="text-xs text-slate-500 max-w-sm mx-auto">
               Try relaxing your TrustScore threshold, clearing niche filters, or searching for broader terms.
             </p>
           </div>
           <button
             type="button"
             onClick={handleClearFilters}
-            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow-xs transition-colors cursor-pointer"
+            className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors cursor-pointer"
           >
             Clear Filters
           </button>
         </div>
       ) : (
         /* Zero Database Records Empty State */
-        <div className="bg-slate-900/70 border border-slate-800 rounded-3xl p-10 sm:p-14 text-center space-y-5 shadow-md">
-          <div className="w-16 h-16 rounded-3xl bg-blue-500/10 border border-blue-500/30 text-blue-400 mx-auto flex items-center justify-center">
+        <div className="bg-white border border-slate-200 rounded-2xl p-10 sm:p-14 text-center space-y-5 shadow-xs">
+          <div className="w-16 h-16 rounded-2xl bg-blue-50 border border-blue-200 text-blue-600 mx-auto flex items-center justify-center">
             <Compass className="w-8 h-8" />
           </div>
 
           <div className="space-y-1.5 max-w-md mx-auto">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-blue-400 bg-blue-500/10 px-2.5 py-0.5 rounded-full border border-blue-500/20">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">
               Creator Marketplace Launch
             </span>
-            <h3 className="text-xl font-bold text-slate-100">
+            <h3 className="text-xl font-bold text-slate-900">
               No creators available yet
             </h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
+            <p className="text-xs text-slate-500 leading-relaxed">
               Creators will appear here once they complete their TrustScore authenticity profile and link their verified social accounts.
             </p>
           </div>
 
-          <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 max-w-md mx-auto text-xs text-slate-300 text-left flex items-start gap-3">
-            <ShieldCheck className="w-5 h-5 text-emerald-400 shrink-0 mt-0.5" />
+          <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 max-w-md mx-auto text-xs text-slate-700 text-left flex items-start gap-3">
+            <ShieldCheck className="w-5 h-5 text-emerald-600 shrink-0 mt-0.5" />
             <div className="space-y-0.5">
-              <strong className="text-slate-100 block">Are you a creator or influencer?</strong>
-              <span className="text-slate-400 text-[11px]">
+              <strong className="text-slate-900 block">Are you a creator or influencer?</strong>
+              <span className="text-slate-500 text-[11px]">
                 Create your verified profile to be listed on TrustScore&apos;s authenticity marketplace for brand sponsorships.
               </span>
             </div>
@@ -645,14 +645,14 @@ function CreatorsMarketplaceContent() {
           <div className="pt-2 flex flex-col sm:flex-row items-center justify-center gap-3">
             <Link
               href="/signup?role=CREATOR"
-              className="w-full sm:w-auto px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2"
+              className="w-full sm:w-auto px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors flex items-center justify-center gap-2"
             >
               <span>Join as a Creator</span>
               <ArrowRight className="w-3.5 h-3.5" />
             </Link>
             <Link
               href="/how-it-works"
-              className="w-full sm:w-auto px-5 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-300 font-semibold text-xs rounded-xl transition-colors text-center"
+              className="w-full sm:w-auto px-5 py-2.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-semibold text-xs rounded-xl transition-colors text-center"
             >
               Explore How TrustScore Works
             </Link>
@@ -664,9 +664,9 @@ function CreatorsMarketplaceContent() {
       {/* E. SERVER-SIDE PAGINATION CONTROLS */}
       {/* ---------------------------------------------------- */}
       {totalCount > 0 && totalPages > 1 && (
-        <div className="pt-6 border-t border-slate-800/80 flex flex-col sm:flex-row items-center justify-between gap-4">
-          <span className="text-xs text-slate-400">
-            Showing <strong className="text-slate-200">{(page - 1) * limit + 1}–{Math.min(page * limit, totalCount)}</strong> of <strong className="text-slate-200">{totalCount}</strong> creators
+        <div className="pt-6 border-t border-slate-200 flex flex-col sm:flex-row items-center justify-between gap-4">
+          <span className="text-xs text-slate-500">
+            Showing <strong className="text-slate-900">{(page - 1) * limit + 1}–{Math.min(page * limit, totalCount)}</strong> of <strong className="text-slate-900">{totalCount}</strong> creators
           </span>
 
           <div className="flex items-center gap-1.5">
@@ -674,7 +674,7 @@ function CreatorsMarketplaceContent() {
               type="button"
               disabled={page <= 1 || isLoading}
               onClick={() => handlePageChange(page - 1)}
-              className="p-2 rounded-xl border border-slate-800 bg-slate-900 text-slate-300 hover:bg-slate-800 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+              className="p-2 rounded-xl border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer shadow-xs"
             >
               <ChevronLeft className="w-4 h-4" />
             </button>
@@ -688,7 +688,7 @@ function CreatorsMarketplaceContent() {
                 return (
                   <React.Fragment key={p}>
                     {showEllipsis && (
-                      <span className="px-2 text-xs text-slate-600 font-bold">...</span>
+                      <span className="px-2 text-xs text-slate-400 font-bold">...</span>
                     )}
                     <button
                       type="button"
@@ -696,7 +696,7 @@ function CreatorsMarketplaceContent() {
                       className={`w-8 h-8 rounded-xl text-xs font-bold transition-all cursor-pointer ${
                         p === page
                           ? "bg-blue-600 text-white shadow-xs"
-                          : "bg-slate-900 border border-slate-800 text-slate-400 hover:text-slate-200 hover:bg-slate-800"
+                          : "bg-white border border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-50 shadow-xs"
                       }`}
                     >
                       {p}
@@ -709,7 +709,7 @@ function CreatorsMarketplaceContent() {
               type="button"
               disabled={page >= totalPages || isLoading}
               onClick={() => handlePageChange(page + 1)}
-              className="p-2 rounded-xl border border-slate-800 bg-slate-900 text-slate-300 hover:bg-slate-800 hover:text-white disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer"
+              className="p-2 rounded-xl border border-slate-200 bg-white text-slate-700 hover:bg-slate-50 disabled:opacity-40 disabled:cursor-not-allowed transition-colors cursor-pointer shadow-xs"
             >
               <ChevronRight className="w-4 h-4" />
             </button>
@@ -721,18 +721,18 @@ function CreatorsMarketplaceContent() {
       {/* F. MOBILE FILTER DRAWER MODAL */}
       {/* ---------------------------------------------------- */}
       {isMobileFilterOpen && (
-        <div className="fixed inset-0 z-50 bg-black/80 backdrop-blur-sm flex justify-end">
-          <div className="w-full max-w-sm bg-slate-900 h-full p-6 space-y-6 overflow-y-auto border-l border-slate-800 flex flex-col justify-between">
+        <div className="fixed inset-0 z-50 bg-slate-900/50 backdrop-blur-xs flex justify-end">
+          <div className="w-full max-w-sm bg-white h-full p-6 space-y-6 overflow-y-auto border-l border-slate-200 flex flex-col justify-between shadow-2xl">
             <div className="space-y-5">
-              <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+              <div className="flex items-center justify-between pb-4 border-b border-slate-100">
                 <div className="flex items-center gap-2">
-                  <Filter className="w-4 h-4 text-blue-400" />
-                  <h3 className="font-bold text-slate-100 text-base">Filters</h3>
+                  <Filter className="w-4 h-4 text-blue-600" />
+                  <h3 className="font-bold text-slate-900 text-base">Filters</h3>
                 </div>
                 <button
                   type="button"
                   onClick={() => setIsMobileFilterOpen(false)}
-                  className="p-1 rounded-lg text-slate-400 hover:text-slate-100"
+                  className="p-1 rounded-lg text-slate-400 hover:text-slate-700 cursor-pointer"
                 >
                   <X className="w-5 h-5" />
                 </button>
@@ -740,7 +740,7 @@ function CreatorsMarketplaceContent() {
 
               {/* Platform */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider">
+                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider">
                   Platform
                 </label>
                 <select
@@ -749,7 +749,7 @@ function CreatorsMarketplaceContent() {
                     setSelectedPlatform(e.target.value);
                     setPage(1);
                   }}
-                  className="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 text-xs font-semibold"
+                  className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-xs font-semibold focus:bg-white focus:border-blue-600"
                 >
                   <option value="all">All Platforms</option>
                   <option value="instagram">Instagram</option>
@@ -760,7 +760,7 @@ function CreatorsMarketplaceContent() {
 
               {/* TrustScore */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider">
+                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider">
                   Min. TrustScore
                 </label>
                 <select
@@ -769,7 +769,7 @@ function CreatorsMarketplaceContent() {
                     setMinTrustScore(Number(e.target.value));
                     setPage(1);
                   }}
-                  className="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 text-xs font-semibold"
+                  className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-xs font-semibold focus:bg-white focus:border-blue-600"
                 >
                   <option value={0}>Any Score</option>
                   <option value={90}>90+ (Very High)</option>
@@ -781,7 +781,7 @@ function CreatorsMarketplaceContent() {
 
               {/* Follower Tier */}
               <div className="space-y-1.5">
-                <label className="block text-xs font-bold text-slate-300 uppercase tracking-wider">
+                <label className="block text-xs font-bold text-slate-600 uppercase tracking-wider">
                   Follower Range
                 </label>
                 <select
@@ -790,7 +790,7 @@ function CreatorsMarketplaceContent() {
                     setFollowerRange(e.target.value);
                     setPage(1);
                   }}
-                  className="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 text-xs font-semibold"
+                  className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-xs font-semibold focus:bg-white focus:border-blue-600"
                 >
                   <option value="all">All Audiences</option>
                   <option value="nano">Nano (1K – 10K)</option>
@@ -808,10 +808,10 @@ function CreatorsMarketplaceContent() {
                     setVerifiedOnly(!verifiedOnly);
                     setPage(1);
                   }}
-                  className={`w-full py-2.5 px-3 rounded-xl border text-xs font-bold flex items-center justify-between ${
+                  className={`w-full py-2.5 px-3 rounded-xl border text-xs font-bold flex items-center justify-between cursor-pointer ${
                     verifiedOnly
-                      ? "bg-emerald-500/15 border-emerald-500/40 text-emerald-400"
-                      : "bg-slate-950 border-slate-800 text-slate-400"
+                      ? "bg-emerald-50 border-emerald-300 text-emerald-700 shadow-xs"
+                      : "bg-slate-50 border-slate-200 text-slate-600"
                   }`}
                 >
                   <span>TrustScore Verified Only</span>
@@ -824,10 +824,10 @@ function CreatorsMarketplaceContent() {
                     setAvailableOnly(!availableOnly);
                     setPage(1);
                   }}
-                  className={`w-full py-2.5 px-3 rounded-xl border text-xs font-bold flex items-center justify-between ${
+                  className={`w-full py-2.5 px-3 rounded-xl border text-xs font-bold flex items-center justify-between cursor-pointer ${
                     availableOnly
-                      ? "bg-blue-600/15 border-blue-500/40 text-blue-400"
-                      : "bg-slate-950 border-slate-800 text-slate-400"
+                      ? "bg-blue-50 border-blue-300 text-blue-700 shadow-xs"
+                      : "bg-slate-50 border-slate-200 text-slate-600"
                   }`}
                 >
                   <span>Available for Collabs</span>
@@ -837,11 +837,11 @@ function CreatorsMarketplaceContent() {
             </div>
 
             {/* Bottom Actions */}
-            <div className="pt-4 border-t border-slate-800 space-y-2">
+            <div className="pt-4 border-t border-slate-100 space-y-2">
               <button
                 type="button"
                 onClick={() => setIsMobileFilterOpen(false)}
-                className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow-xs transition-colors cursor-pointer"
+                className="w-full py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors cursor-pointer"
               >
                 View Results ({totalCount})
               </button>
@@ -851,7 +851,7 @@ function CreatorsMarketplaceContent() {
                   handleClearFilters();
                   setIsMobileFilterOpen(false);
                 }}
-                className="w-full py-2.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-400 font-semibold text-xs rounded-xl transition-colors cursor-pointer"
+                className="w-full py-2.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-600 font-semibold text-xs rounded-xl transition-colors cursor-pointer"
               >
                 Reset Filters
               </button>
@@ -865,10 +865,10 @@ function CreatorsMarketplaceContent() {
 
 export default function CreatorsMarketplacePage() {
   return (
-    <div className="min-h-screen flex flex-col bg-[#090d16] text-slate-100">
+    <div className="min-h-screen flex flex-col bg-[#f8f9fb] text-slate-900">
       <LandingNavbar />
       <main className="flex-1">
-        <Suspense fallback={<div className="p-12 text-center text-xs text-slate-500">Loading marketplace...</div>}>
+        <Suspense fallback={<div className="p-12 text-center text-xs text-slate-400">Loading marketplace...</div>}>
           <CreatorsMarketplaceContent />
         </Suspense>
       </main>
@@ -876,3 +876,4 @@ export default function CreatorsMarketplacePage() {
     </div>
   );
 }
+

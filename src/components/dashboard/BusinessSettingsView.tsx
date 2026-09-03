@@ -144,7 +144,7 @@ export function BusinessSettingsView() {
   ];
 
   return (
-    <div className="min-h-full flex flex-col bg-slate-950 text-slate-100">
+    <div className="min-h-full flex flex-col bg-[#f8f9fb] text-slate-900">
       <DashboardHeader
         title="Business Settings &amp; Configuration"
         subtitle="Manage brand identity, workspace team permissions, subscription quotas, and API access"
@@ -153,10 +153,10 @@ export function BusinessSettingsView() {
       <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full">
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8 items-start">
           {/* Left Navigation Sidebar */}
-          <div className="lg:col-span-4 bg-slate-900/90 border border-slate-800 rounded-3xl p-4 space-y-6 shadow-md">
+          <div className="lg:col-span-4 bg-white border border-slate-200 rounded-2xl p-4 space-y-6 shadow-xs">
             {navigationSections.map((group) => (
               <div key={group.group} className="space-y-1.5">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 px-3 block">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 px-3 block">
                   {group.group}
                 </span>
                 <div className="space-y-1">
@@ -171,10 +171,10 @@ export function BusinessSettingsView() {
                         className={`w-full px-3.5 py-2.5 rounded-xl text-xs font-semibold flex items-center gap-3 transition-colors cursor-pointer text-left ${
                           isActive
                             ? "bg-blue-600 text-white font-bold shadow-xs"
-                            : "text-slate-400 hover:text-slate-100 hover:bg-slate-800/60"
+                            : "text-slate-600 hover:text-slate-900 hover:bg-slate-50"
                         }`}
                       >
-                        <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-white" : "text-slate-400"}`} />
+                        <Icon className={`w-4 h-4 shrink-0 ${isActive ? "text-white" : "text-slate-500"}`} />
                         <span>{item.label}</span>
                       </button>
                     );
@@ -188,63 +188,63 @@ export function BusinessSettingsView() {
           <div className="lg:col-span-8 space-y-6">
             {/* 1. Business Account */}
             {activeSection === "account" && (
-              <div className="bg-slate-900/90 rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-md space-y-6">
-                <div className="pb-4 border-b border-slate-800">
-                  <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-                    <Building2 className="w-5 h-5 text-blue-400" />
+              <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6">
+                <div className="pb-4 border-b border-slate-100">
+                  <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <Building2 className="w-5 h-5 text-blue-600" />
                     <span>Business Account Overview</span>
                   </h3>
-                  <p className="text-xs text-slate-400 mt-0.5">
+                  <p className="text-xs text-slate-500 mt-0.5">
                     Primary organization account identifier and credentials
                   </p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
                   <div>
-                    <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">
                       Organization Name
                     </label>
                     <input
                       type="text"
                       readOnly
                       value={user?.name || "Acme Brand"}
-                      className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 font-semibold"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-semibold"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">
                       Primary Contact Email
                     </label>
                     <input
                       type="text"
                       readOnly
                       value={user?.email || "business@domain.com"}
-                      className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 font-semibold"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-semibold"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">
                       Account Type
                     </label>
                     <input
                       type="text"
                       readOnly
                       value="Business / Brand Organization"
-                      className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 font-semibold"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-semibold"
                     />
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-400 mb-1">
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-500 mb-1">
                       Account Identifier
                     </label>
                     <input
                       type="text"
                       readOnly
                       value={user?.id || ""}
-                      className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 font-mono text-xs select-all"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-800 font-mono text-xs select-all"
                     />
                   </div>
                 </div>
@@ -255,21 +255,21 @@ export function BusinessSettingsView() {
             {activeSection === "profile" && (
               <form
                 onSubmit={handleSaveProfile}
-                className="bg-slate-900/90 rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-md space-y-6"
+                className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6"
               >
-                <div className="pb-4 border-b border-slate-800">
-                  <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-                    <Info className="w-5 h-5 text-blue-400" />
+                <div className="pb-4 border-b border-slate-100">
+                  <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <Info className="w-5 h-5 text-blue-600" />
                     <span>Public Brand Profile</span>
                   </h3>
-                  <p className="text-xs text-slate-400 mt-0.5">
+                  <p className="text-xs text-slate-500 mt-0.5">
                     Information visible to creators when you send collaboration requests
                   </p>
                 </div>
 
                 <div className="space-y-4 text-xs">
                   <div>
-                    <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1">
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-600 mb-1">
                       Brand / Company Display Name
                     </label>
                     <input
@@ -277,19 +277,19 @@ export function BusinessSettingsView() {
                       required
                       value={companyName}
                       onChange={(e) => setCompanyName(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-slate-100 text-xs font-semibold focus:outline-hidden focus:border-blue-500"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-xs font-semibold focus:outline-hidden focus:border-blue-600 focus:bg-white"
                     />
                   </div>
 
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                     <div>
-                      <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1">
+                      <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-600 mb-1">
                         Industry Vertical
                       </label>
                       <select
                         value={companyCategory}
                         onChange={(e) => setCompanyCategory(e.target.value)}
-                        className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-slate-100 text-xs font-semibold focus:outline-hidden"
+                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-xs font-semibold focus:outline-hidden focus:border-blue-600 focus:bg-white"
                       >
                         <option value="Fitness & Nutrition">Fitness &amp; Nutrition</option>
                         <option value="Beauty & Wellness">Beauty &amp; Wellness</option>
@@ -300,7 +300,7 @@ export function BusinessSettingsView() {
                     </div>
 
                     <div>
-                      <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1">
+                      <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-600 mb-1">
                         Official Website URL
                       </label>
                       <input
@@ -308,20 +308,20 @@ export function BusinessSettingsView() {
                         required
                         value={companyWebsite}
                         onChange={(e) => setCompanyWebsite(e.target.value)}
-                        className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-slate-100 text-xs font-semibold focus:outline-hidden focus:border-blue-500"
+                        className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-xs font-semibold focus:outline-hidden focus:border-blue-600 focus:bg-white"
                       />
                     </div>
                   </div>
 
                   <div>
-                    <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-300 mb-1">
+                    <label className="block text-[10px] font-bold uppercase tracking-wider text-slate-600 mb-1">
                       Company Bio &amp; Collaboration Focus
                     </label>
                     <textarea
                       rows={3}
                       value={companyBio}
                       onChange={(e) => setCompanyBio(e.target.value)}
-                      className="w-full px-3.5 py-2.5 bg-slate-950 border border-slate-700 rounded-xl text-slate-100 text-xs font-semibold focus:outline-hidden focus:border-blue-500 leading-relaxed"
+                      className="w-full px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-xs font-semibold focus:outline-hidden focus:border-blue-600 focus:bg-white leading-relaxed"
                     />
                   </div>
                 </div>
@@ -329,7 +329,7 @@ export function BusinessSettingsView() {
                 <div className="pt-2 flex justify-end">
                   <button
                     type="submit"
-                    className="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow-xs transition-colors cursor-pointer"
+                    className="px-5 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors cursor-pointer"
                   >
                     Save Changes
                   </button>
@@ -339,14 +339,14 @@ export function BusinessSettingsView() {
 
             {/* 3. Team Members */}
             {activeSection === "team" && (
-              <div className="bg-slate-900/90 rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-md space-y-6">
-                <div className="pb-4 border-b border-slate-800 flex items-center justify-between">
+              <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6">
+                <div className="pb-4 border-b border-slate-100 flex items-center justify-between">
                   <div>
-                    <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-                      <Users className="w-5 h-5 text-purple-400" />
+                    <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                      <Users className="w-5 h-5 text-purple-600" />
                       <span>Workspace Team Members</span>
                     </h3>
-                    <p className="text-xs text-slate-400 mt-0.5">
+                    <p className="text-xs text-slate-500 mt-0.5">
                       Collaborate with media planners, campaign directors, and analysts
                     </p>
                   </div>
@@ -360,11 +360,11 @@ export function BusinessSettingsView() {
                     value={inviteEmail}
                     onChange={(e) => setInviteEmail(e.target.value)}
                     placeholder="colleague@yourbrand.com"
-                    className="flex-1 px-3.5 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-xs text-slate-100 placeholder:text-slate-500 focus:outline-hidden focus:border-blue-500 font-semibold"
+                    className="flex-1 px-3.5 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-xs text-slate-900 placeholder:text-slate-400 focus:outline-hidden focus:border-blue-600 focus:bg-white font-semibold"
                   />
                   <button
                     type="submit"
-                    className="px-4 py-2.5 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl transition-colors shrink-0 flex items-center gap-1.5 cursor-pointer"
+                    className="px-4 py-2.5 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs rounded-xl transition-colors shrink-0 flex items-center gap-1.5 cursor-pointer shadow-xs"
                   >
                     <Plus className="w-3.5 h-3.5" />
                     <span>Invite Member</span>
@@ -372,21 +372,21 @@ export function BusinessSettingsView() {
                 </form>
 
                 {/* Team List */}
-                <div className="divide-y divide-slate-800/60 pt-2">
+                <div className="divide-y divide-slate-100 pt-2">
                   {teamMembers.map((member) => (
                     <div key={member.id} className="py-3.5 flex items-center justify-between">
                       <div className="flex items-center gap-3">
                         <img
                           src={member.avatar}
                           alt={member.name}
-                          className="w-10 h-10 rounded-xl object-cover border border-slate-700"
+                          className="w-10 h-10 rounded-xl object-cover border border-slate-200"
                         />
                         <div>
-                          <strong className="text-slate-100 font-bold text-xs block">{member.name}</strong>
-                          <span className="text-[11px] text-slate-400">{member.email}</span>
+                          <strong className="text-slate-900 font-bold text-xs block">{member.name}</strong>
+                          <span className="text-[11px] text-slate-500">{member.email}</span>
                         </div>
                       </div>
-                      <span className="px-2.5 py-1 bg-slate-950 border border-slate-800 rounded-lg text-slate-300 font-semibold text-[11px]">
+                      <span className="px-2.5 py-1 bg-slate-100 border border-slate-200 rounded-lg text-slate-700 font-semibold text-[11px]">
                         {member.role}
                       </span>
                     </div>
@@ -397,36 +397,36 @@ export function BusinessSettingsView() {
 
             {/* 4. Subscription */}
             {activeSection === "subscription" && (
-              <div className="bg-slate-900/90 rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-md space-y-6">
-                <div className="pb-4 border-b border-slate-800 flex items-center justify-between">
+              <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6">
+                <div className="pb-4 border-b border-slate-100 flex items-center justify-between">
                   <div>
-                    <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-                      <CreditCard className="w-5 h-5 text-emerald-400" />
+                    <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                      <CreditCard className="w-5 h-5 text-emerald-600" />
                       <span>SaaS Subscription Tier</span>
                     </h3>
-                    <p className="text-xs text-slate-400 mt-0.5">
+                    <p className="text-xs text-slate-500 mt-0.5">
                       Manage monthly audit limits and team seat allocation
                     </p>
                   </div>
-                  <span className="px-3 py-1 bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-xs font-bold rounded-full">
+                  <span className="px-3 py-1 bg-emerald-50 text-emerald-700 border border-emerald-200 text-xs font-bold rounded-full">
                     Active Subscription
                   </span>
                 </div>
 
-                <div className="p-5 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
+                <div className="p-5 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
                   <div className="flex items-center justify-between">
                     <div>
                       <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">Subscription Management</span>
-                      <h4 className="text-xl font-black text-slate-100">B2B SaaS Plan &amp; Quotas</h4>
+                      <h4 className="text-xl font-black text-slate-900">B2B SaaS Plan &amp; Quotas</h4>
                     </div>
                     <Link
                       href="/dashboard/billing"
-                      className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow-xs transition-colors"
+                      className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors"
                     >
                       Open Billing Dashboard
                     </Link>
                   </div>
-                  <p className="text-xs text-slate-400 leading-relaxed">
+                  <p className="text-xs text-slate-500 leading-relaxed">
                     View your active plan tier, upgrade or downgrade tiers, top up authenticity audits, and manage Stripe payment methods in the billing console.
                   </p>
                 </div>
@@ -435,32 +435,32 @@ export function BusinessSettingsView() {
 
             {/* 5. Usage & Limits */}
             {activeSection === "usage" && (
-              <div className="bg-slate-900/90 rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-md space-y-6">
-                <div className="pb-4 border-b border-slate-800 flex items-center justify-between">
+              <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6">
+                <div className="pb-4 border-b border-slate-100 flex items-center justify-between">
                   <div>
-                    <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-                      <Zap className="w-5 h-5 text-amber-400" />
+                    <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                      <Zap className="w-5 h-5 text-amber-600" />
                       <span>Monthly Usage &amp; Quotas</span>
                     </h3>
-                    <p className="text-xs text-slate-400 mt-0.5">
+                    <p className="text-xs text-slate-500 mt-0.5">
                       Real-time quota tracking for creator authenticity audits
                     </p>
                   </div>
                   <Link
                     href="/dashboard/billing"
-                    className="px-3 py-1.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow-xs transition-colors"
+                    className="px-3 py-1.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors"
                   >
                     Top Up Credits
                   </Link>
                 </div>
 
-                <div className="p-5 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
-                  <p className="text-xs text-slate-300">
+                <div className="p-5 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+                  <p className="text-xs text-slate-600">
                     Audit quotas are managed and tracked per billing cycle. Track detailed breakdown and quota reset schedule in the dedicated billing hub.
                   </p>
                   <Link
                     href="/dashboard/billing"
-                    className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-400 hover:text-blue-300"
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-700"
                   >
                     <span>Go to Billing &amp; Quota Tracker</span>
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -471,32 +471,32 @@ export function BusinessSettingsView() {
 
             {/* 6. Payment History */}
             {activeSection === "invoices" && (
-              <div className="bg-slate-900/90 rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-md space-y-6">
-                <div className="pb-4 border-b border-slate-800 flex items-center justify-between">
+              <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6">
+                <div className="pb-4 border-b border-slate-100 flex items-center justify-between">
                   <div>
-                    <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-                      <Download className="w-5 h-5 text-blue-400" />
+                    <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                      <Download className="w-5 h-5 text-blue-600" />
                       <span>Payment History &amp; Invoices</span>
                     </h3>
-                    <p className="text-xs text-slate-400 mt-0.5">
+                    <p className="text-xs text-slate-500 mt-0.5">
                       Download official VAT receipts and Stripe transaction records
                     </p>
                   </div>
                   <Link
                     href="/dashboard/billing"
-                    className="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold text-xs rounded-xl"
+                    className="px-3 py-1.5 bg-slate-100 hover:bg-slate-200 text-slate-700 border border-slate-200 font-bold text-xs rounded-xl"
                   >
                     Billing Center
                   </Link>
                 </div>
 
-                <div className="p-5 bg-slate-950 rounded-2xl border border-slate-800 space-y-3">
-                  <p className="text-xs text-slate-300">
+                <div className="p-5 bg-slate-50 rounded-xl border border-slate-200 space-y-3">
+                  <p className="text-xs text-slate-600">
                     Official Stripe invoice receipts, PDF downloads, and billing records are available in your centralized billing dashboard.
                   </p>
                   <Link
                     href="/dashboard/billing"
-                    className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-400 hover:text-blue-300"
+                    className="inline-flex items-center gap-1.5 text-xs font-bold text-blue-600 hover:text-blue-700"
                   >
                     <span>View All Invoices in Billing Hub</span>
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -507,22 +507,22 @@ export function BusinessSettingsView() {
 
             {/* 7. Notifications */}
             {activeSection === "notifications" && (
-              <div className="bg-slate-900/90 rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-md space-y-6">
-                <div className="pb-4 border-b border-slate-800">
-                  <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-                    <Bell className="w-5 h-5 text-blue-400" />
+              <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6">
+                <div className="pb-4 border-b border-slate-100">
+                  <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <Bell className="w-5 h-5 text-blue-600" />
                     <span>Communication &amp; Alerts</span>
                   </h3>
-                  <p className="text-xs text-slate-400 mt-0.5">
+                  <p className="text-xs text-slate-500 mt-0.5">
                     Configure event triggers and platform email notifications
                   </p>
                 </div>
 
                 <div className="space-y-4 text-xs">
-                  <label className="flex items-center justify-between p-4 bg-slate-950 rounded-2xl border border-slate-800 cursor-pointer">
+                  <label className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200 cursor-pointer">
                     <div>
-                      <strong className="text-slate-200 block">Collaboration Proposal Updates</strong>
-                      <span className="text-[11px] text-slate-400">Receive alerts when a creator accepts or messages about an offer.</span>
+                      <strong className="text-slate-800 block">Collaboration Proposal Updates</strong>
+                      <span className="text-[11px] text-slate-500">Receive alerts when a creator accepts or messages about an offer.</span>
                     </div>
                     <input
                       type="checkbox"
@@ -532,10 +532,10 @@ export function BusinessSettingsView() {
                     />
                   </label>
 
-                  <label className="flex items-center justify-between p-4 bg-slate-950 rounded-2xl border border-slate-800 cursor-pointer">
+                  <label className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-slate-200 cursor-pointer">
                     <div>
-                      <strong className="text-slate-200 block">Monthly Quota Threshold Warning</strong>
-                      <span className="text-[11px] text-slate-400">Alert team members when remaining checks fall below 10%.</span>
+                      <strong className="text-slate-800 block">Monthly Quota Threshold Warning</strong>
+                      <span className="text-[11px] text-slate-500">Alert team members when remaining checks fall below 10%.</span>
                     </div>
                     <input
                       type="checkbox"
@@ -550,25 +550,25 @@ export function BusinessSettingsView() {
 
             {/* 8. API Keys & Security */}
             {activeSection === "security" && (
-              <div className="bg-slate-900/90 rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-md space-y-6">
-                <div className="pb-4 border-b border-slate-800 flex items-center justify-between">
+              <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6">
+                <div className="pb-4 border-b border-slate-100 flex items-center justify-between">
                   <div>
-                    <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-                      <Key className="w-5 h-5 text-blue-400" />
+                    <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                      <Key className="w-5 h-5 text-blue-600" />
                       <span>REST API Access &amp; Webhooks</span>
                     </h3>
-                    <p className="text-xs text-slate-400 mt-0.5">
+                    <p className="text-xs text-slate-500 mt-0.5">
                       Connect TrustScore directly to internal CRM pipelines
                     </p>
                   </div>
-                  <span className="px-2.5 py-1 bg-emerald-500/10 text-emerald-400 font-bold text-[11px] rounded-full border border-emerald-500/20">
+                  <span className="px-2.5 py-1 bg-emerald-50 text-emerald-700 font-bold text-[11px] rounded-full border border-emerald-200">
                     Active Key
                   </span>
                 </div>
 
                 <div className="space-y-4">
                   <div>
-                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-300 mb-1">
+                    <label className="block text-xs font-bold uppercase tracking-wider text-slate-600 mb-1">
                       Live Production Secret Key
                     </label>
                     <div className="flex items-center gap-2">
@@ -576,14 +576,14 @@ export function BusinessSettingsView() {
                         type="text"
                         readOnly
                         value={apiKey}
-                        className="w-full px-3.5 py-2.5 bg-slate-950 font-mono text-xs text-slate-200 rounded-xl border border-slate-800 select-all"
+                        className="w-full px-3.5 py-2.5 bg-slate-50 font-mono text-xs text-slate-800 rounded-xl border border-slate-200 select-all"
                       />
                       <button
                         type="button"
                         onClick={handleCopyKey}
-                        className="px-4 py-2.5 bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-200 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer"
+                        className="px-4 py-2.5 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 rounded-xl text-xs font-bold transition-colors flex items-center gap-1.5 shrink-0 cursor-pointer shadow-xs"
                       >
-                        {copiedKey ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
+                        {copiedKey ? <Check className="w-3.5 h-3.5 text-emerald-600" /> : <Copy className="w-3.5 h-3.5" />}
                         <span>{copiedKey ? "Copied" : "Copy"}</span>
                       </button>
                     </div>
@@ -593,7 +593,7 @@ export function BusinessSettingsView() {
                     <button
                       type="button"
                       onClick={handleGenerateKey}
-                      className="px-4 py-2 bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-300 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer"
+                      className="px-4 py-2 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-xl text-xs font-semibold flex items-center gap-1.5 transition-colors cursor-pointer shadow-xs"
                     >
                       <RefreshCw className="w-3.5 h-3.5" />
                       <span>Roll / Regenerate Secret Key</span>
@@ -605,28 +605,28 @@ export function BusinessSettingsView() {
 
             {/* 9. Help & Support */}
             {activeSection === "help" && (
-              <div className="bg-slate-900/90 rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-md space-y-6">
-                <div className="pb-4 border-b border-slate-800">
-                  <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-                    <HelpCircle className="w-5 h-5 text-blue-400" />
+              <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6">
+                <div className="pb-4 border-b border-slate-100">
+                  <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <HelpCircle className="w-5 h-5 text-blue-600" />
                     <span>Help &amp; Enterprise Support</span>
                   </h3>
-                  <p className="text-xs text-slate-400 mt-0.5">
+                  <p className="text-xs text-slate-500 mt-0.5">
                     Dedicated account management and API integration resources
                   </p>
                 </div>
 
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-xs">
-                  <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
-                    <strong className="text-slate-200 block font-bold">API Documentation</strong>
-                    <p className="text-slate-400 leading-relaxed text-[11px]">
+                  <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                    <strong className="text-slate-800 block font-bold">API Documentation</strong>
+                    <p className="text-slate-500 leading-relaxed text-[11px]">
                       Access REST endpoints for creator authenticity lookups and webhook payloads.
                     </p>
                   </div>
 
-                  <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800 space-y-2">
-                    <strong className="text-slate-200 block font-bold">Enterprise Concierge</strong>
-                    <p className="text-slate-400 leading-relaxed text-[11px]">
+                  <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 space-y-2">
+                    <strong className="text-slate-800 block font-bold">Enterprise Concierge</strong>
+                    <p className="text-slate-500 leading-relaxed text-[11px]">
                       Direct communication channel with TrustScore campaign specialists.
                     </p>
                   </div>
@@ -636,25 +636,25 @@ export function BusinessSettingsView() {
 
             {/* 10. About */}
             {activeSection === "about" && (
-              <div className="bg-slate-900/90 rounded-3xl p-6 sm:p-8 border border-slate-800 shadow-md space-y-6">
-                <div className="pb-4 border-b border-slate-800">
-                  <h3 className="text-lg font-bold text-slate-100 flex items-center gap-2">
-                    <Shield className="w-5 h-5 text-blue-400" />
+              <div className="bg-white rounded-2xl p-6 sm:p-8 border border-slate-200 shadow-xs space-y-6">
+                <div className="pb-4 border-b border-slate-100">
+                  <h3 className="text-lg font-bold text-slate-900 flex items-center gap-2">
+                    <Shield className="w-5 h-5 text-blue-600" />
                     <span>About TrustScore Platform</span>
                   </h3>
-                  <p className="text-xs text-slate-400 mt-0.5">
+                  <p className="text-xs text-slate-500 mt-0.5">
                     Production Data Science Engine v1.2
                   </p>
                 </div>
 
-                <div className="space-y-3 text-xs text-slate-300 leading-relaxed">
+                <div className="space-y-3 text-xs text-slate-600 leading-relaxed">
                   <p>
                     TrustScore connects businesses and authentic creators with probabilistic integrity guarantees. By screening out artificial engagement pods, bot clusters, and step-jump follower spikes, TrustScore eliminates marketing waste and protects sponsorship investments.
                   </p>
-                  <div className="pt-2 flex items-center gap-4 text-slate-400">
-                    <Link href="/terms" className="hover:text-slate-200 underline">Terms of Service</Link>
-                    <Link href="/privacy" className="hover:text-slate-200 underline">Privacy Policy</Link>
-                    <Link href="/methodology" className="hover:text-slate-200 underline">Scoring Methodology</Link>
+                  <div className="pt-2 flex items-center gap-4 text-slate-500">
+                    <Link href="/terms" className="hover:text-slate-800 underline">Terms of Service</Link>
+                    <Link href="/privacy" className="hover:text-slate-800 underline">Privacy Policy</Link>
+                    <Link href="/methodology" className="hover:text-slate-800 underline">Scoring Methodology</Link>
                   </div>
                 </div>
               </div>

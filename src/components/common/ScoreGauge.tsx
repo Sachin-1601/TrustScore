@@ -50,9 +50,9 @@ export function ScoreGauge({
   return (
     <div className={`flex flex-col items-center justify-center ${className}`}>
       <div className="relative inline-flex items-center justify-center">
-        {/* Background glow */}
+        {/* Subtle background glow */}
         <div
-          className="absolute inset-0 rounded-full blur-xl opacity-25"
+          className="absolute inset-0 rounded-full blur-xl opacity-15"
           style={{ backgroundColor: color.hex }}
         />
 
@@ -61,12 +61,12 @@ export function ScoreGauge({
           height={currentDim.size}
           className="relative block transform -rotate-90"
         >
-          {/* Track */}
+          {/* Light Track */}
           <circle
             cx={currentDim.size / 2}
             cy={currentDim.size / 2}
             r={radius}
-            stroke="#1e293b"
+            stroke="#e2e8f0"
             strokeWidth={currentDim.strokeWidth}
             fill="transparent"
           />
@@ -88,10 +88,10 @@ export function ScoreGauge({
 
         {/* Center Text */}
         <div className="absolute inset-0 flex flex-col items-center justify-center text-center p-2">
-          <span className={`font-black tracking-tight text-slate-100 ${currentDim.fontSize}`}>
+          <span className={`font-black tracking-tight text-slate-900 ${currentDim.fontSize}`}>
             {animatedScore}
           </span>
-          <span className={`font-bold uppercase tracking-widest text-slate-400 ${currentDim.labelSize}`}>
+          <span className={`font-bold uppercase tracking-widest text-slate-500 ${currentDim.labelSize}`}>
             TrustScore
           </span>
         </div>
@@ -104,19 +104,19 @@ export function ScoreGauge({
               className="w-2 h-2 rounded-full"
               style={{ backgroundColor: color.hex }}
             />
-            <span className="text-sm font-bold text-slate-200">
+            <span className="text-sm font-bold text-slate-800">
               {scoreBand}
             </span>
           </div>
 
           {inflatedProbability !== undefined && (
-            <div className="mt-1 flex items-center justify-center gap-1 text-xs text-slate-400">
+            <div className="mt-1 flex items-center justify-center gap-1 text-xs text-slate-500">
               <span>Estimated inflated engagement:</span>
-              <strong className="text-slate-200 font-semibold">
+              <strong className="text-slate-800 font-semibold">
                 {inflatedProbability}%
               </strong>
               {uncertaintyMargin && (
-                <span className="text-slate-500 text-[11px]">
+                <span className="text-slate-400 text-[11px]">
                   (±{uncertaintyMargin}%)
                 </span>
               )}

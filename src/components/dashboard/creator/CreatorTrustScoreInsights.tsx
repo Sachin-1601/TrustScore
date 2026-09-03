@@ -15,17 +15,17 @@ export function CreatorTrustScoreInsights({ creator }: CreatorTrustScoreInsights
   const warningFactors = creator.warningFactors || [];
 
   return (
-    <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-7 space-y-4 shadow-lg">
-      <div className="flex items-center justify-between pb-3 border-b border-slate-800/80">
+    <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-7 space-y-4 shadow-xs">
+      <div className="flex items-center justify-between pb-3 border-b border-slate-100">
         <div className="flex items-center gap-2">
-          <BarChart3 className="w-4 h-4 text-blue-400" />
-          <h3 className="text-base font-bold text-slate-100">
+          <BarChart3 className="w-4 h-4 text-blue-600" />
+          <h3 className="text-base font-bold text-slate-900">
             TrustScore Insights &amp; Signals
           </h3>
         </div>
         <Link
           href="/dashboard/creator/analytics"
-          className="text-xs font-bold text-blue-400 hover:text-blue-300 transition-colors flex items-center gap-1"
+          className="text-xs font-bold text-blue-600 hover:text-blue-700 transition-colors flex items-center gap-1"
         >
           <span>Deep Dive</span>
           <ArrowRight className="w-3 h-3" />
@@ -36,7 +36,7 @@ export function CreatorTrustScoreInsights({ creator }: CreatorTrustScoreInsights
         <div className="space-y-4">
           {/* Positive Signals */}
           <div className="space-y-2">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 block">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 block">
               Positive Authenticity Signals
             </span>
             {positiveFactors.length > 0 ? (
@@ -44,31 +44,31 @@ export function CreatorTrustScoreInsights({ creator }: CreatorTrustScoreInsights
                 {positiveFactors.map((signal, idx) => (
                   <div
                     key={idx}
-                    className="p-2.5 rounded-2xl bg-emerald-500/5 border border-emerald-500/20 flex items-start gap-2 text-xs text-emerald-300"
+                    className="p-2.5 rounded-xl bg-emerald-50/60 border border-emerald-200 flex items-start gap-2 text-xs text-emerald-800"
                   >
-                    <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                    <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                     <span className="leading-tight">{signal}</span>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-xs text-slate-500">No primary positive factors identified.</p>
+              <p className="text-xs text-slate-400">No primary positive factors identified.</p>
             )}
           </div>
 
           {/* Warning Signals / Improvement Areas */}
           {warningFactors.length > 0 && (
             <div className="space-y-2 pt-1">
-              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400 block">
+              <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 block">
                 Signals To Monitor / Improve
               </span>
               <div className="space-y-1.5">
                 {warningFactors.map((warn, idx) => (
                   <div
                     key={idx}
-                    className="p-2.5 rounded-2xl bg-amber-500/5 border border-amber-500/20 flex items-start gap-2 text-xs text-amber-300"
+                    className="p-2.5 rounded-xl bg-amber-50/60 border border-amber-200 flex items-start gap-2 text-xs text-amber-800"
                   >
-                    <AlertCircle className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+                    <AlertCircle className="w-4 h-4 text-amber-600 shrink-0 mt-0.5" />
                     <span className="leading-tight">{warn}</span>
                   </div>
                 ))}
@@ -77,18 +77,18 @@ export function CreatorTrustScoreInsights({ creator }: CreatorTrustScoreInsights
           )}
         </div>
       ) : (
-        <div className="p-6 bg-slate-950/80 rounded-2xl border border-slate-800 text-center space-y-3">
-          <Sparkles className="w-8 h-8 text-blue-400 mx-auto" />
-          <h4 className="text-sm font-bold text-slate-200">
+        <div className="p-6 bg-slate-50 rounded-xl border border-slate-200 text-center space-y-3">
+          <Sparkles className="w-8 h-8 text-blue-600 mx-auto" />
+          <h4 className="text-sm font-bold text-slate-800">
             Insights will appear after your first TrustScore analysis
           </h4>
-          <p className="text-xs text-slate-400 max-w-sm mx-auto">
+          <p className="text-xs text-slate-500 max-w-sm mx-auto">
             Once social engagement telemetry is ingested, the engine evaluates lexical comment variance, pod detection, and follower stability curves.
           </p>
           <div className="pt-1">
             <Link
               href="/dashboard/creator/analytics"
-              className="inline-flex items-center gap-1.5 py-2 px-4 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition-all shadow-xs"
+              className="inline-flex items-center gap-1.5 py-2 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl transition-all shadow-xs"
             >
               <span>Run TrustScore Analysis</span>
               <ArrowRight className="w-3 h-3" />

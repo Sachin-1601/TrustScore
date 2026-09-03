@@ -84,20 +84,33 @@ async function runInstagramIntegrationTests() {
   process.env.INSTAGRAM_APP_SECRET = "mock_secret_for_test";
   process.env.INSTAGRAM_REDIRECT_URI = "http://localhost:3000/api/auth/instagram/callback";
 
-  const { getInstagramClientId, getInstagramClientSecret, getInstagramOAuthCallbackUrl } = await import("../lib/instagramOAuth");
+  const { getInstagramClientId, getInstagramClientSecret, getInstagramOAuthCallbackUrl, getAppBaseUrl } = await import("../lib/instagramOAuth");
   assert.strictEqual(getInstagramClientId(), "987654321098765", "INSTAGRAM_APP_ID is resolved");
   assert.strictEqual(getInstagramClientSecret(), "mock_secret_for_test", "INSTAGRAM_APP_SECRET is resolved");
   assert.strictEqual(getInstagramOAuthCallbackUrl(), "http://localhost:3000/api/auth/instagram/callback", "INSTAGRAM_REDIRECT_URI takes exact precedence");
+  assert.strictEqual(getAppBaseUrl(), "http://localhost:3000", "Base URL matches origin of INSTAGRAM_REDIRECT_URI");
 
-  // Test custom production redirect URI precedence
-  process.env.INSTAGRAM_REDIRECT_URI = "https://app.trustscore.io/api/auth/instagram/callback";
-  assert.strictEqual(getInstagramOAuthCallbackUrl(), "https://app.trustscore.io/api/auth/instagram/callback", "Custom production redirect URI resolved exactly");
+  // Test custom ngrok / production redirect URI precedence
+  process.env.INSTAGRAM_REDIRECT_URI = "https://sector-unsocial-cupcake.ngrok-free.dev/api/auth/instagram/callback";
+  assert.strictEqual(getInstagramOAuthCallbackUrl(), "https://sector-unsocial-cupcake.ngrok-free.dev/api/auth/instagram/callback", "Ngrok redirect URI resolved exactly");
+  assert.strictEqual(getAppBaseUrl(), "https://sector-unsocial-cupcake.ngrok-free.dev", "Base URL matches ngrok origin");
+
+  // Test request headers fallback (when INSTAGRAM_REDIRECT_URI is unset)
+  delete process.env.INSTAGRAM_REDIRECT_URI;
+  const mockNgrokReq = new Request("http://localhost:3000/api/auth/instagram/callback", {
+    headers: {
+      "x-forwarded-host": "sector-unsocial-cupcake.ngrok-free.dev",
+      "x-forwarded-proto": "https",
+    },
+  });
+  assert.strictEqual(getAppBaseUrl(mockNgrokReq), "https://sector-unsocial-cupcake.ngrok-free.dev", "Base URL derived from forwarded headers");
+  assert.strictEqual(getInstagramOAuthCallbackUrl(mockNgrokReq), "https://sector-unsocial-cupcake.ngrok-free.dev/api/auth/instagram/callback", "Callback URL derived from forwarded headers");
 
   // Restore
   if (originalAppId) process.env.INSTAGRAM_APP_ID = originalAppId; else delete process.env.INSTAGRAM_APP_ID;
   if (originalAppSecret) process.env.INSTAGRAM_APP_SECRET = originalAppSecret; else delete process.env.INSTAGRAM_APP_SECRET;
   if (originalRedirectUri) process.env.INSTAGRAM_REDIRECT_URI = originalRedirectUri; else delete process.env.INSTAGRAM_REDIRECT_URI;
-  console.log("  ✅ PASS: Dedicated INSTAGRAM_APP_ID, INSTAGRAM_APP_SECRET & INSTAGRAM_REDIRECT_URI verified");
+  console.log("  ✅ PASS: Dedicated INSTAGRAM_APP_ID, INSTAGRAM_APP_SECRET & public origin preservation verified");
 
   // 5. End-to-End Creator Telemetry Sync & Model Ingestion
   console.log("\n[TEST 6] End-to-End Database Mapping & Synchronization Pipeline");

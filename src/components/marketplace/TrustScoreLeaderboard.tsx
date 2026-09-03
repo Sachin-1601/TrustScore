@@ -90,7 +90,7 @@ export function TrustScoreLeaderboard({
                 className={`px-3 py-1.5 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer ${
                   selectedCategory === cat.id
                     ? "bg-blue-600 text-white shadow-xs font-bold"
-                    : "bg-slate-900/80 text-slate-400 hover:text-slate-200 border border-slate-800"
+                    : "bg-white text-slate-600 hover:text-slate-900 border border-slate-200 shadow-xs"
                 }`}
               >
                 {cat.label}
@@ -103,7 +103,7 @@ export function TrustScoreLeaderboard({
             <select
               value={selectedPlatform}
               onChange={(e) => setSelectedPlatform(e.target.value)}
-              className="px-2.5 py-1.5 bg-slate-900 border border-slate-800 rounded-xl text-xs font-semibold text-slate-300 focus:outline-hidden"
+              className="px-2.5 py-1.5 bg-white border border-slate-200 rounded-xl text-xs font-semibold text-slate-700 focus:outline-hidden shadow-xs cursor-pointer"
             >
               <option value="all">All Platforms</option>
               <option value="instagram">Instagram</option>
@@ -111,12 +111,12 @@ export function TrustScoreLeaderboard({
               <option value="youtube">YouTube</option>
             </select>
 
-            <div className="flex items-center bg-slate-900 border border-slate-800 p-0.5 rounded-xl text-xs">
+            <div className="flex items-center bg-slate-50 border border-slate-200 p-0.5 rounded-xl text-xs shadow-xs">
               <button
                 type="button"
                 onClick={() => setSelectedTimeframe("month")}
                 className={`px-2.5 py-1 rounded-lg transition-colors cursor-pointer ${
-                  selectedTimeframe === "month" ? "bg-slate-800 text-slate-100 font-bold" : "text-slate-500"
+                  selectedTimeframe === "month" ? "bg-white text-slate-900 font-bold shadow-xs" : "text-slate-500 hover:text-slate-800"
                 }`}
               >
                 This Month
@@ -125,7 +125,7 @@ export function TrustScoreLeaderboard({
                 type="button"
                 onClick={() => setSelectedTimeframe("all")}
                 className={`px-2.5 py-1 rounded-lg transition-colors cursor-pointer ${
-                  selectedTimeframe === "all" ? "bg-slate-800 text-slate-100 font-bold" : "text-slate-500"
+                  selectedTimeframe === "all" ? "bg-white text-slate-900 font-bold shadow-xs" : "text-slate-500 hover:text-slate-800"
                 }`}
               >
                 All Time
@@ -136,20 +136,20 @@ export function TrustScoreLeaderboard({
       )}
 
       {/* Leaderboard Table Container */}
-      <div className="bg-slate-900/90 border border-slate-800 rounded-3xl overflow-hidden shadow-md">
+      <div className="bg-white border border-slate-200 rounded-2xl overflow-hidden shadow-xs">
         {isLoading ? (
           <div className="py-16 flex flex-col items-center justify-center gap-3 text-slate-400">
-            <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
-            <span className="text-xs font-semibold">Loading verified leaderboard rankings...</span>
+            <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
+            <span className="text-xs font-semibold text-slate-500">Loading verified leaderboard rankings...</span>
           </div>
         ) : creators.length === 0 ? (
-          <div className="p-12 text-center text-xs text-slate-400">
+          <div className="p-12 text-center text-xs text-slate-500">
             No creators found meeting the criteria for this category.
           </div>
         ) : (
           <div className="overflow-x-auto">
             <table className="w-full text-left text-xs">
-              <thead className="bg-slate-950/80 text-slate-400 font-bold uppercase tracking-wider text-[10px] border-b border-slate-800">
+              <thead className="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider text-[10px] border-b border-slate-200">
                 <tr>
                   <th className="py-3.5 px-4 w-12 text-center">Rank</th>
                   <th className="py-3.5 px-4">Creator</th>
@@ -163,13 +163,13 @@ export function TrustScoreLeaderboard({
                 </tr>
               </thead>
 
-              <tbody className="divide-y divide-slate-800/60">
+              <tbody className="divide-y divide-slate-100">
                 {creators.map((creator, idx) => {
                   const rank = idx + 1;
                   return (
                     <tr
                       key={creator.id}
-                      className="hover:bg-slate-850/60 transition-colors group"
+                      className="hover:bg-slate-50/80 transition-colors group"
                     >
                       {/* Rank */}
                       <td className="py-3.5 px-4 text-center font-bold">
@@ -183,20 +183,20 @@ export function TrustScoreLeaderboard({
                             <img
                               src={creator.avatar}
                               alt={creator.name}
-                              className="w-10 h-10 rounded-xl object-cover border border-slate-700 group-hover:border-blue-500/50 transition-colors"
+                              className="w-10 h-10 rounded-xl object-cover border border-slate-200 group-hover:border-blue-500 transition-colors"
                             />
                           </Link>
                           <div className="min-w-0">
                             <div className="flex items-center gap-1.5">
                               <Link
                                 href={`/creators/${creator.id}`}
-                                className="font-bold text-slate-100 group-hover:text-blue-400 transition-colors truncate block"
+                                className="font-bold text-slate-900 group-hover:text-blue-600 transition-colors truncate block"
                               >
                                 {creator.username}
                               </Link>
                               {creator.verifiedBadge && <VerificationBadge size="sm" showText={false} />}
                             </div>
-                            <span className="text-[11px] text-slate-400 truncate block">
+                            <span className="text-[11px] text-slate-500 truncate block">
                               {creator.name} • {creator.location.split(",")[0]}
                             </span>
                           </div>
@@ -204,39 +204,39 @@ export function TrustScoreLeaderboard({
                       </td>
 
                       {/* Category */}
-                      <td className="py-3.5 px-4 text-slate-300 font-medium">
-                        <span className="px-2 py-0.5 rounded-md bg-slate-800/80 text-slate-300 border border-slate-700/50 text-[11px]">
+                      <td className="py-3.5 px-4 text-slate-700 font-medium">
+                        <span className="px-2 py-0.5 rounded-md bg-slate-50 text-slate-700 border border-slate-200 text-[11px]">
                           {creator.category}
                         </span>
                       </td>
 
                       {/* Platform Icon */}
                       <td className="py-3.5 px-4 text-center">
-                        <div className="inline-flex p-1.5 bg-slate-950 rounded-lg border border-slate-800">
+                        <div className="inline-flex p-1.5 bg-slate-50 rounded-lg border border-slate-200">
                           <PlatformIcon platform={creator.platform} size="sm" />
                         </div>
                       </td>
 
                       {/* Followers */}
-                      <td className="py-3.5 px-4 text-right font-bold text-slate-200">
+                      <td className="py-3.5 px-4 text-right font-bold text-slate-800">
                         {formatNumber(creator.followers)}
                       </td>
 
                       {/* Engagement Rate */}
-                      <td className="py-3.5 px-4 text-right font-bold text-blue-400">
+                      <td className="py-3.5 px-4 text-right font-bold text-blue-600">
                         {creator.engagementRate}%
                       </td>
 
                       {/* Authenticity Probability */}
-                      <td className="py-3.5 px-4 text-right font-bold text-emerald-400">
+                      <td className="py-3.5 px-4 text-right font-bold text-emerald-700">
                         {creator.authenticityProbability ? `${creator.authenticityProbability.toFixed(0)}%` : `${100 - creator.inflatedEngagementProbability}%`}
                       </td>
 
                       {/* TrustScore */}
                       <td className="py-3.5 px-4 text-right">
-                        <div className="inline-flex items-baseline gap-1 px-2.5 py-1 rounded-lg bg-blue-500/10 border border-blue-500/20 text-blue-400 font-extrabold text-sm">
+                        <div className="inline-flex items-baseline gap-1 px-2.5 py-1 rounded-lg bg-blue-50 border border-blue-200 text-blue-700 font-extrabold text-sm">
                           <span>{creator.trustScore}</span>
-                          <span className="text-[10px] text-blue-300/60 font-semibold">/100</span>
+                          <span className="text-[10px] text-blue-500 font-semibold">/100</span>
                         </div>
                       </td>
 
@@ -245,14 +245,14 @@ export function TrustScoreLeaderboard({
                         <div className="flex items-center justify-center gap-1.5">
                           <Link
                             href={`/creators/${creator.id}`}
-                            className="px-2.5 py-1.5 rounded-lg bg-slate-800 hover:bg-slate-700 text-slate-200 font-semibold text-[11px] transition-colors"
+                            className="px-2.5 py-1.5 rounded-lg bg-slate-50 hover:bg-slate-100 text-slate-700 font-semibold text-[11px] border border-slate-200 transition-colors"
                           >
                             Profile
                           </Link>
                           <button
                             type="button"
                             onClick={() => setSelectedCollabCreator(creator)}
-                            className="px-2.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-500 text-white font-bold text-[11px] transition-colors cursor-pointer"
+                            className="px-2.5 py-1.5 rounded-lg bg-blue-600 hover:bg-blue-700 text-white font-bold text-[11px] transition-colors cursor-pointer shadow-xs"
                           >
                             Collab
                           </button>
@@ -267,17 +267,17 @@ export function TrustScoreLeaderboard({
         )}
 
         {/* Leaderboard Callout / Educational Footer */}
-        <div className="p-4 sm:p-5 bg-slate-950/90 border-t border-slate-800 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
-          <div className="flex items-start gap-2.5 text-xs text-slate-400">
-            <Info className="w-4 h-4 text-blue-400 shrink-0 mt-0.5" />
+        <div className="p-4 sm:p-5 bg-slate-50 border-t border-slate-200 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+          <div className="flex items-start gap-2.5 text-xs text-slate-600">
+            <Info className="w-4 h-4 text-blue-600 shrink-0 mt-0.5" />
             <p className="leading-relaxed text-[11px]">
-              <strong className="text-slate-200">Follower count isn&apos;t everything.</strong> TrustScore ranks creators using authenticity and engagement quality signals, helping businesses discover partners based on trust rather than audience vanity metrics alone.
+              <strong className="text-slate-900">Follower count isn&apos;t everything.</strong> TrustScore ranks creators using authenticity and engagement quality signals, helping businesses discover partners based on trust rather than audience vanity metrics alone.
             </p>
           </div>
 
           <Link
             href="/creators"
-            className="inline-flex items-center gap-1 text-xs font-bold text-blue-400 hover:text-blue-300 whitespace-nowrap"
+            className="inline-flex items-center gap-1 text-xs font-bold text-blue-600 hover:underline whitespace-nowrap"
           >
             <span>Explore All Creators</span>
             <ArrowRight className="w-3.5 h-3.5" />
@@ -295,3 +295,4 @@ export function TrustScoreLeaderboard({
     </div>
   );
 }
+

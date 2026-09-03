@@ -113,23 +113,23 @@ export function DashboardSidebar() {
 
   return (
     <aside
-      className={`relative bg-slate-900 border-r border-slate-800 flex flex-col justify-between transition-all duration-300 z-30 shrink-0 text-slate-200 ${
+      className={`relative bg-white border-r border-slate-200 flex flex-col justify-between transition-all duration-300 z-30 shrink-0 text-slate-700 ${
         isCollapsed ? "w-20" : "w-64"
       }`}
     >
       {/* Top Section */}
       <div className="flex flex-col min-h-0 flex-1">
         {/* Logo Bar */}
-        <div className="h-16 px-4 flex items-center justify-between border-b border-slate-800 shrink-0">
+        <div className="h-16 px-4 flex items-center justify-between border-b border-slate-100 shrink-0">
           {!isCollapsed ? (
             <Logo
               size="md"
               href={role === "CREATOR" ? "/dashboard/creator" : "/dashboard/businesses"}
-              variant="light"
+              variant="dark"
             />
           ) : (
             <div className="mx-auto">
-              <div className="w-9 h-9 rounded-lg bg-blue-600 flex items-center justify-center text-white font-bold shadow-md shadow-blue-500/20">
+              <div className="w-9 h-9 rounded-xl bg-blue-600 flex items-center justify-center text-white font-bold shadow-xs">
                 T
               </div>
             </div>
@@ -138,7 +138,7 @@ export function DashboardSidebar() {
           <button
             type="button"
             onClick={() => setIsCollapsed(!isCollapsed)}
-            className="hidden lg:flex p-1.5 rounded-lg text-slate-400 hover:text-slate-200 hover:bg-slate-800 transition-colors cursor-pointer"
+            className="hidden lg:flex p-1.5 rounded-lg text-slate-400 hover:text-slate-700 hover:bg-slate-100 transition-colors cursor-pointer"
             title={isCollapsed ? "Expand sidebar" : "Collapse sidebar"}
           >
             {isCollapsed ? <ChevronRight className="w-4 h-4" /> : <ChevronLeft className="w-4 h-4" />}
@@ -150,7 +150,7 @@ export function DashboardSidebar() {
           {sections.map((section, sIdx) => (
             <div key={sIdx} className="space-y-1">
               {section.title && !isCollapsed && (
-                <div className="px-3 py-1 text-[10px] font-extrabold uppercase tracking-wider text-slate-500">
+                <div className="px-3 py-1 text-[10px] font-bold uppercase tracking-wider text-slate-400">
                   {section.title}
                 </div>
               )}
@@ -168,29 +168,29 @@ export function DashboardSidebar() {
                   <Link
                     key={item.label}
                     href={item.href}
-                    className={`flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-colors ${
+                    className={`flex items-center gap-3 px-3 py-2 rounded-xl text-xs font-semibold transition-all ${
                       isActive
-                        ? "bg-blue-600 text-white shadow-xs font-bold"
+                        ? "bg-blue-50 text-blue-700 font-bold border-l-2 border-blue-600 shadow-xs"
                         : item.highlight
-                        ? "text-amber-400 hover:bg-slate-800/60 hover:text-amber-300"
-                        : "text-slate-400 hover:text-slate-100 hover:bg-slate-800/50"
+                        ? "text-amber-600 hover:bg-amber-50/60 hover:text-amber-700 font-medium"
+                        : "text-slate-600 hover:text-slate-900 hover:bg-slate-50 font-medium"
                     } ${isCollapsed ? "justify-center px-2" : ""}`}
                     title={isCollapsed ? item.label : undefined}
                   >
                     <Icon
                       className={`w-4 h-4 shrink-0 ${
                         isActive
-                          ? "text-white"
+                          ? "text-blue-600"
                           : item.highlight
-                          ? "text-amber-400"
-                          : "text-slate-400"
+                          ? "text-amber-500"
+                          : "text-slate-400 group-hover:text-slate-600"
                       }`}
                     />
                     {!isCollapsed && (
                       <div className="flex-1 flex items-center justify-between min-w-0">
                         <span className="truncate">{item.label}</span>
                         {item.badge && (
-                          <span className="px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider bg-blue-500/20 text-blue-300 border border-blue-500/30 rounded-sm">
+                          <span className="px-1.5 py-0.5 text-[9px] font-bold uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200/80 rounded">
                             {item.badge}
                           </span>
                         )}
@@ -205,7 +205,7 @@ export function DashboardSidebar() {
       </div>
 
       {/* Bottom Section: User Profile & Logout */}
-      <div className="p-3 border-t border-slate-800 shrink-0">
+      <div className="p-3 border-t border-slate-100 shrink-0 bg-white">
         <div className={`flex items-center gap-3 px-2 ${isCollapsed ? "justify-center" : ""}`}>
           <img
             src={
@@ -213,14 +213,14 @@ export function DashboardSidebar() {
               "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=100&auto=format&fit=crop&q=80"
             }
             alt={user?.name || "Business User"}
-            className="w-8 h-8 rounded-full object-cover ring-1 ring-slate-700 shrink-0"
+            className="w-8 h-8 rounded-full object-cover ring-1 ring-slate-200 shrink-0"
           />
           {!isCollapsed && (
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-bold text-slate-100 truncate">
+              <p className="text-xs font-bold text-slate-900 truncate">
                 {user?.name || "Business Workspace"}
               </p>
-              <p className="text-[11px] text-slate-400 truncate capitalize">
+              <p className="text-[11px] text-slate-500 truncate capitalize">
                 {role === "CREATOR" ? "Creator Account" : role === "ADMIN" ? "Admin Account" : "Business Account"}
               </p>
             </div>
@@ -229,7 +229,7 @@ export function DashboardSidebar() {
             <button
               type="button"
               onClick={handleLogout}
-              className="text-slate-400 hover:text-rose-400 p-1.5 rounded-lg hover:bg-slate-800 transition-colors cursor-pointer"
+              className="text-slate-400 hover:text-rose-600 p-1.5 rounded-lg hover:bg-slate-100 transition-colors cursor-pointer"
               title="Sign out"
             >
               <LogOut className="w-4 h-4" />

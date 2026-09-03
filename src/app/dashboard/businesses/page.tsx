@@ -237,7 +237,7 @@ export default function DedicatedBusinessDashboardPage() {
   const analysesCount = recentAnalyses.length;
 
   return (
-    <div className="min-h-full flex flex-col bg-slate-950 text-slate-100">
+    <div className="min-h-full flex flex-col bg-[#f8f9fb] text-slate-900">
       {/* Top Header */}
       <DashboardHeader
         title={`Welcome back, ${businessDisplayName}`}
@@ -247,15 +247,15 @@ export default function DedicatedBusinessDashboardPage() {
       <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-8">
         {/* Error Alert with Retry */}
         {hasError && (
-          <div className="p-4 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-300 text-xs flex items-center justify-between gap-3 animate-in fade-in">
+          <div className="p-4 rounded-xl bg-rose-50 border border-rose-200 text-rose-800 text-xs flex items-center justify-between gap-3 animate-in fade-in">
             <div className="flex items-center gap-2">
-              <AlertCircle className="w-4 h-4 shrink-0 text-rose-400" />
+              <AlertCircle className="w-4 h-4 shrink-0 text-rose-600" />
               <span>{errorMessage || "Unable to load some dashboard metrics."}</span>
             </div>
             <button
               type="button"
               onClick={loadBusinessDashboardData}
-              className="px-3 py-1.5 bg-rose-500/20 hover:bg-rose-500/30 text-rose-200 font-bold rounded-xl transition-colors flex items-center gap-1 cursor-pointer"
+              className="px-3 py-1.5 bg-rose-100 hover:bg-rose-200 text-rose-800 font-bold rounded-lg transition-colors flex items-center gap-1 cursor-pointer"
             >
               <RefreshCw className="w-3 h-3" />
               <span>Retry</span>
@@ -268,7 +268,7 @@ export default function DedicatedBusinessDashboardPage() {
         {/* ============================================================ */}
         <section className="space-y-3">
           <div className="flex items-center justify-between">
-            <h2 className="text-sm font-bold uppercase tracking-wider text-slate-400">
+            <h2 className="text-sm font-bold uppercase tracking-wider text-slate-500">
               What would you like to do?
             </h2>
           </div>
@@ -277,21 +277,21 @@ export default function DedicatedBusinessDashboardPage() {
             {/* ACTION 1: DISCOVER CREATORS */}
             <Link
               href="/creators"
-              className="group bg-slate-900/90 hover:bg-slate-900 border border-slate-800 hover:border-blue-500/50 rounded-3xl p-6 transition-all shadow-md hover:shadow-blue-500/10 space-y-3 flex flex-col justify-between"
+              className="group bg-white hover:bg-slate-50/80 border border-slate-200 hover:border-blue-300 rounded-2xl p-6 transition-all shadow-xs space-y-3 flex flex-col justify-between"
             >
               <div className="space-y-2">
-                <div className="w-12 h-12 rounded-2xl bg-blue-600/15 border border-blue-500/30 text-blue-400 flex items-center justify-center group-hover:scale-105 transition-transform">
+                <div className="w-12 h-12 rounded-xl bg-blue-50 border border-blue-200 text-blue-600 flex items-center justify-center group-hover:scale-105 transition-transform">
                   <Users className="w-6 h-6" />
                 </div>
-                <h3 className="text-base font-black text-slate-100 group-hover:text-blue-400 transition-colors">
+                <h3 className="text-base font-black text-slate-900 group-hover:text-blue-600 transition-colors">
                   DISCOVER CREATORS
                 </h3>
-                <p className="text-xs text-slate-400 leading-relaxed">
+                <p className="text-xs text-slate-500 leading-relaxed">
                   Find creators based on authenticity, audience, niche and availability.
                 </p>
               </div>
 
-              <div className="pt-2 flex items-center gap-1.5 text-xs font-bold text-blue-400 group-hover:translate-x-1 transition-transform">
+              <div className="pt-2 flex items-center gap-1.5 text-xs font-bold text-blue-600 group-hover:translate-x-1 transition-transform">
                 <span>Browse Marketplace</span>
                 <ArrowRight className="w-4 h-4" />
               </div>
@@ -300,21 +300,21 @@ export default function DedicatedBusinessDashboardPage() {
             {/* ACTION 2: ANALYZE A CREATOR */}
             <Link
               href="/dashboard/analyze"
-              className="group bg-slate-900/90 hover:bg-slate-900 border border-slate-800 hover:border-purple-500/50 rounded-3xl p-6 transition-all shadow-md hover:shadow-purple-500/10 space-y-3 flex flex-col justify-between"
+              className="group bg-white hover:bg-slate-50/80 border border-slate-200 hover:border-purple-300 rounded-2xl p-6 transition-all shadow-xs space-y-3 flex flex-col justify-between"
             >
               <div className="space-y-2">
-                <div className="w-12 h-12 rounded-2xl bg-purple-600/15 border border-purple-500/30 text-purple-400 flex items-center justify-center group-hover:scale-105 transition-transform">
+                <div className="w-12 h-12 rounded-xl bg-purple-50 border border-purple-200 text-purple-600 flex items-center justify-center group-hover:scale-105 transition-transform">
                   <Search className="w-6 h-6" />
                 </div>
-                <h3 className="text-base font-black text-slate-100 group-hover:text-purple-400 transition-colors">
+                <h3 className="text-base font-black text-slate-900 group-hover:text-purple-600 transition-colors">
                   ANALYZE A CREATOR
                 </h3>
-                <p className="text-xs text-slate-400 leading-relaxed">
+                <p className="text-xs text-slate-500 leading-relaxed">
                   Evaluate creator authenticity and Bayesian TrustScore risk models.
                 </p>
               </div>
 
-              <div className="pt-2 flex items-center gap-1.5 text-xs font-bold text-purple-400 group-hover:translate-x-1 transition-transform">
+              <div className="pt-2 flex items-center gap-1.5 text-xs font-bold text-purple-600 group-hover:translate-x-1 transition-transform">
                 <span>Run Authenticity Audit</span>
                 <ArrowRight className="w-4 h-4" />
               </div>
@@ -323,21 +323,21 @@ export default function DedicatedBusinessDashboardPage() {
             {/* ACTION 3: CREATE A CAMPAIGN */}
             <Link
               href="/dashboard/campaigns"
-              className="group bg-slate-900/90 hover:bg-slate-900 border border-slate-800 hover:border-emerald-500/50 rounded-3xl p-6 transition-all shadow-md hover:shadow-emerald-500/10 space-y-3 flex flex-col justify-between"
+              className="group bg-white hover:bg-slate-50/80 border border-slate-200 hover:border-emerald-300 rounded-2xl p-6 transition-all shadow-xs space-y-3 flex flex-col justify-between"
             >
               <div className="space-y-2">
-                <div className="w-12 h-12 rounded-2xl bg-emerald-600/15 border border-emerald-500/30 text-emerald-400 flex items-center justify-center group-hover:scale-105 transition-transform">
+                <div className="w-12 h-12 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center group-hover:scale-105 transition-transform">
                   <Briefcase className="w-6 h-6" />
                 </div>
-                <h3 className="text-base font-black text-slate-100 group-hover:text-emerald-400 transition-colors">
+                <h3 className="text-base font-black text-slate-900 group-hover:text-emerald-600 transition-colors">
                   CREATE A CAMPAIGN
                 </h3>
-                <p className="text-xs text-slate-400 leading-relaxed">
+                <p className="text-xs text-slate-500 leading-relaxed">
                   Launch a campaign and find authentic creators to work with.
                 </p>
               </div>
 
-              <div className="pt-2 flex items-center gap-1.5 text-xs font-bold text-emerald-400 group-hover:translate-x-1 transition-transform">
+              <div className="pt-2 flex items-center gap-1.5 text-xs font-bold text-emerald-600 group-hover:translate-x-1 transition-transform">
                 <span>Launch New Campaign</span>
                 <ArrowRight className="w-4 h-4" />
               </div>
@@ -351,105 +351,105 @@ export default function DedicatedBusinessDashboardPage() {
         <section className="space-y-3">
           <div className="grid grid-cols-2 lg:grid-cols-4 gap-4">
             {/* KPI 1: Creator Analyses */}
-            <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 space-y-2 shadow-xs hover:border-slate-700 transition-colors">
+            <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-2 shadow-xs hover:border-slate-300 transition-colors">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
                   Creator Analyses
                 </span>
-                <div className="w-8 h-8 rounded-xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-xl bg-purple-50 border border-purple-200 text-purple-600 flex items-center justify-center">
                   <Search className="w-4 h-4" />
                 </div>
               </div>
               {isLoading ? (
-                <div className="h-8 w-16 bg-slate-800 animate-pulse rounded-md" />
+                <div className="h-8 w-16 bg-slate-100 animate-pulse rounded-md" />
               ) : (
-                <p className="text-3xl font-black text-slate-100">
+                <p className="text-3xl font-black text-slate-900">
                   {analysesCount > 0 ? analysesCount : "—"}
                 </p>
               )}
               <div className="flex items-center justify-between text-[11px] pt-1">
-                <span className="text-slate-400">Audits conducted</span>
-                <Link href="/dashboard/analyze" className="text-purple-400 hover:text-purple-300 font-semibold flex items-center gap-0.5">
+                <span className="text-slate-500">Audits conducted</span>
+                <Link href="/dashboard/analyze" className="text-purple-600 hover:text-purple-700 font-semibold flex items-center gap-0.5">
                   <span>Audit</span>
-                  <ChevronRight className="w-3 h-3" />
+                  <ChevronRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
             </div>
 
             {/* KPI 2: Saved Creators */}
-            <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 space-y-2 shadow-xs hover:border-slate-700 transition-colors">
+            <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-2 shadow-xs hover:border-slate-300 transition-colors">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
                   Saved Creators
                 </span>
-                <div className="w-8 h-8 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-xl bg-blue-50 border border-blue-200 text-blue-600 flex items-center justify-center">
                   <Bookmark className="w-4 h-4" />
                 </div>
               </div>
               {isLoading ? (
-                <div className="h-8 w-16 bg-slate-800 animate-pulse rounded-md" />
+                <div className="h-8 w-16 bg-slate-100 animate-pulse rounded-md" />
               ) : (
-                <p className="text-3xl font-black text-slate-100">
+                <p className="text-3xl font-black text-slate-900">
                   {savedCreators.length > 0 ? savedCreators.length : "—"}
                 </p>
               )}
               <div className="flex items-center justify-between text-[11px] pt-1">
-                <span className="text-slate-400">Shortlisted candidates</span>
-                <Link href="/dashboard/saved" className="text-blue-400 hover:text-blue-300 font-semibold flex items-center gap-0.5">
+                <span className="text-slate-500">Shortlisted candidates</span>
+                <Link href="/dashboard/saved" className="text-blue-600 hover:text-blue-700 font-semibold flex items-center gap-0.5">
                   <span>View</span>
-                  <ChevronRight className="w-3 h-3" />
+                  <ChevronRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
             </div>
 
             {/* KPI 3: Active Campaigns */}
-            <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 space-y-2 shadow-xs hover:border-slate-700 transition-colors">
+            <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-2 shadow-xs hover:border-slate-300 transition-colors">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
                   Active Campaigns
                 </span>
-                <div className="w-8 h-8 rounded-xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center">
                   <Briefcase className="w-4 h-4" />
                 </div>
               </div>
               {isLoading ? (
-                <div className="h-8 w-16 bg-slate-800 animate-pulse rounded-md" />
+                <div className="h-8 w-16 bg-slate-100 animate-pulse rounded-md" />
               ) : (
-                <p className="text-3xl font-black text-slate-100">
+                <p className="text-3xl font-black text-slate-900">
                   {activeCampaignsCount > 0 ? activeCampaignsCount : "—"}
                 </p>
               )}
               <div className="flex items-center justify-between text-[11px] pt-1">
-                <span className="text-slate-400">Campaign rosters</span>
-                <Link href="/dashboard/campaigns" className="text-emerald-400 hover:text-emerald-300 font-semibold flex items-center gap-0.5">
+                <span className="text-slate-500">Campaign rosters</span>
+                <Link href="/dashboard/campaigns" className="text-emerald-600 hover:text-emerald-700 font-semibold flex items-center gap-0.5">
                   <span>Manage</span>
-                  <ChevronRight className="w-3 h-3" />
+                  <ChevronRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
             </div>
 
             {/* KPI 4: Active Collaborations */}
-            <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-5 space-y-2 shadow-xs hover:border-slate-700 transition-colors">
+            <div className="bg-white border border-slate-200 rounded-2xl p-5 space-y-2 shadow-xs hover:border-slate-300 transition-colors">
               <div className="flex items-center justify-between">
                 <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500">
                   Active Collaborations
                 </span>
-                <div className="w-8 h-8 rounded-xl bg-amber-500/10 border border-amber-500/20 text-amber-400 flex items-center justify-center">
+                <div className="w-8 h-8 rounded-xl bg-amber-50 border border-amber-200 text-amber-600 flex items-center justify-center">
                   <Send className="w-4 h-4" />
                 </div>
               </div>
               {isLoading ? (
-                <div className="h-8 w-16 bg-slate-800 animate-pulse rounded-md" />
+                <div className="h-8 w-16 bg-slate-100 animate-pulse rounded-md" />
               ) : (
-                <p className="text-3xl font-black text-slate-100">
+                <p className="text-3xl font-black text-slate-900">
                   {activeCollaborationsCount > 0 ? activeCollaborationsCount : "—"}
                 </p>
               )}
               <div className="flex items-center justify-between text-[11px] pt-1">
-                <span className="text-slate-400">Partnership deals</span>
-                <Link href="/dashboard/collaborations" className="text-amber-400 hover:text-amber-300 font-semibold flex items-center gap-0.5">
+                <span className="text-slate-500">Partnership deals</span>
+                <Link href="/dashboard/collaborations" className="text-amber-600 hover:text-amber-700 font-semibold flex items-center gap-0.5">
                   <span>Pipeline</span>
-                  <ChevronRight className="w-3 h-3" />
+                  <ChevronRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
             </div>
@@ -459,23 +459,23 @@ export default function DedicatedBusinessDashboardPage() {
         {/* ============================================================ */}
         {/* DISCOVER AUTHENTIC CREATORS                                  */}
         {/* ============================================================ */}
-        <section className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
+        <section className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 space-y-6 shadow-xs">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2">
-                <Sparkles className="w-5 h-5 text-blue-400" />
-                <h3 className="text-lg font-black text-slate-100 tracking-tight">
+                <Sparkles className="w-5 h-5 text-blue-600" />
+                <h3 className="text-lg font-black text-slate-900 tracking-tight">
                   Discover Authentic Creators
                 </h3>
               </div>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <p className="text-xs text-slate-500 mt-0.5">
                 Find creators with strong authenticity signals for your next campaign.
               </p>
             </div>
 
             <Link
               href="/creators"
-              className="text-xs font-bold text-blue-400 hover:text-blue-300 flex items-center gap-1 self-start sm:self-auto"
+              className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-1 self-start sm:self-auto"
             >
               <span>View All Creators</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -486,7 +486,7 @@ export default function DedicatedBusinessDashboardPage() {
           {isLoading ? (
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {[1, 2, 3].map((i) => (
-                <div key={i} className="h-64 rounded-3xl bg-slate-950 animate-pulse border border-slate-800" />
+                <div key={i} className="h-64 rounded-2xl bg-slate-100 animate-pulse border border-slate-200" />
               ))}
             </div>
           ) : authenticCreators.length > 0 ? (
@@ -498,7 +498,7 @@ export default function DedicatedBusinessDashboardPage() {
                 return (
                   <div
                     key={creator.id}
-                    className="bg-slate-950 border border-slate-800 hover:border-slate-700 rounded-3xl p-5 space-y-4 transition-all shadow-md flex flex-col justify-between"
+                    className="bg-slate-50/80 border border-slate-200 hover:border-slate-300 rounded-2xl p-5 space-y-4 transition-all shadow-xs flex flex-col justify-between"
                   >
                     <div className="space-y-3">
                       {/* Top Creator Header */}
@@ -507,19 +507,19 @@ export default function DedicatedBusinessDashboardPage() {
                           <img
                             src={creator.avatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80"}
                             alt={creator.name}
-                            className="w-12 h-12 rounded-2xl object-cover border border-slate-700 shrink-0"
+                            className="w-12 h-12 rounded-xl object-cover border border-slate-200 shrink-0"
                           />
                           <div className="min-w-0">
                             <div className="flex items-center gap-1.5">
                               <Link
                                 href={`/creators/${creator.id}`}
-                                className="font-bold text-sm text-slate-100 hover:text-blue-400 truncate transition-colors"
+                                className="font-bold text-sm text-slate-900 hover:text-blue-600 truncate transition-colors"
                               >
                                 {creator.username}
                               </Link>
                               {creator.verifiedBadge && <VerificationBadge size="sm" showText={false} />}
                             </div>
-                            <span className="text-xs text-slate-400 block truncate">{creator.name}</span>
+                            <span className="text-xs text-slate-500 block truncate">{creator.name}</span>
                           </div>
                         </div>
 
@@ -530,33 +530,33 @@ export default function DedicatedBusinessDashboardPage() {
                           onClick={() => handleToggleSaveCreator(creator)}
                           className={`p-2 rounded-xl border transition-colors cursor-pointer ${
                             isSaved
-                              ? "bg-blue-600/20 border-blue-500/40 text-blue-400 hover:bg-rose-950/40 hover:text-rose-400"
-                              : "bg-slate-900 border-slate-800 text-slate-400 hover:text-slate-100 hover:bg-slate-800"
+                              ? "bg-blue-50 border-blue-200 text-blue-600 hover:bg-rose-50 hover:text-rose-600 hover:border-rose-200"
+                              : "bg-white border-slate-200 text-slate-500 hover:text-slate-900 hover:bg-slate-100"
                           }`}
                           title={isSaved ? "Remove from saved" : "Save creator"}
                         >
-                          {isSaved ? <BookmarkCheck className="w-4 h-4 text-blue-400" /> : <Bookmark className="w-4 h-4" />}
+                          {isSaved ? <BookmarkCheck className="w-4 h-4 text-blue-600" /> : <Bookmark className="w-4 h-4" />}
                         </button>
                       </div>
 
                       {/* Score and Metric Badges */}
-                      <div className="flex items-center justify-between p-3 rounded-2xl bg-slate-900/80 border border-slate-800/80 text-xs">
+                      <div className="flex items-center justify-between p-3 rounded-xl bg-white border border-slate-200/80 text-xs">
                         <div>
-                          <span className="text-[10px] uppercase font-bold text-slate-500 block">TrustScore</span>
-                          <span className="font-extrabold text-blue-400 text-sm">
+                          <span className="text-[10px] uppercase font-bold text-slate-400 block">TrustScore</span>
+                          <span className="font-extrabold text-blue-600 text-sm">
                             {creator.trustScore}
-                            <span className="text-[10px] text-slate-500 font-normal">/100</span>
+                            <span className="text-[10px] text-slate-400 font-normal">/100</span>
                           </span>
                         </div>
                         <div className="text-right">
-                          <span className="text-[10px] uppercase font-bold text-slate-500 block">Audience</span>
-                          <span className="font-bold text-slate-200 text-xs">
+                          <span className="text-[10px] uppercase font-bold text-slate-400 block">Audience</span>
+                          <span className="font-bold text-slate-800 text-xs">
                             {formatNumber(creator.followers)}
                           </span>
                         </div>
                         <div className="text-right">
-                          <span className="text-[10px] uppercase font-bold text-slate-500 block">Engagement</span>
-                          <span className="font-bold text-emerald-400 text-xs">
+                          <span className="text-[10px] uppercase font-bold text-slate-400 block">Engagement</span>
+                          <span className="font-bold text-emerald-600 text-xs">
                             {creator.engagementRate}%
                           </span>
                         </div>
@@ -564,26 +564,26 @@ export default function DedicatedBusinessDashboardPage() {
 
                       {/* Category & Availability tags */}
                       <div className="flex items-center gap-2 flex-wrap">
-                        <span className="px-2.5 py-1 rounded-lg bg-slate-900 border border-slate-800 text-slate-300 text-[11px] font-semibold flex items-center gap-1.5">
+                        <span className="px-2.5 py-1 rounded-lg bg-white border border-slate-200 text-slate-700 text-[11px] font-semibold flex items-center gap-1.5">
                           <PlatformIcon platform={creator.platform} size="sm" />
                           <span>{creator.category}</span>
                         </span>
 
-                        <span className="px-2 py-0.5 rounded-lg bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 text-[10px] font-bold uppercase">
+                        <span className="px-2 py-0.5 rounded-lg bg-emerald-50 text-emerald-700 border border-emerald-200 text-[10px] font-bold uppercase">
                           {creator.availabilityStatus === "OPEN_TO_WORK" ? "Available" : creator.availabilityStatus || "Open"}
                         </span>
                       </div>
                     </div>
 
                     {/* View Profile CTA */}
-                    <div className="pt-3 border-t border-slate-900 flex items-center justify-between">
+                    <div className="pt-3 border-t border-slate-200/60 flex items-center justify-between">
                       <span className="text-[11px] text-slate-500">
-                        Est. Rate: <strong className="text-slate-300 font-bold">${creator.startingRate}</strong>
+                        Est. Rate: <strong className="text-slate-800 font-bold">${creator.startingRate}</strong>
                       </span>
 
                       <Link
                         href={`/creators/${creator.id}`}
-                        className="px-3.5 py-1.5 bg-slate-900 hover:bg-blue-600 hover:text-white border border-slate-800 text-slate-200 text-xs font-bold rounded-xl transition-all inline-flex items-center gap-1"
+                        className="px-3.5 py-1.5 bg-white hover:bg-blue-600 hover:text-white border border-slate-200 text-slate-700 text-xs font-bold rounded-xl transition-all inline-flex items-center gap-1 shadow-xs"
                       >
                         <span>View Profile</span>
                         <ChevronRight className="w-3.5 h-3.5" />
@@ -594,16 +594,16 @@ export default function DedicatedBusinessDashboardPage() {
               })}
             </div>
           ) : (
-            <div className="p-12 text-center bg-slate-950/60 border border-slate-800 rounded-3xl space-y-3">
-              <Compass className="w-8 h-8 text-slate-600 mx-auto" />
-              <h4 className="text-sm font-bold text-slate-200">No creators available yet</h4>
-              <p className="text-xs text-slate-400 max-w-sm mx-auto">
+            <div className="p-12 text-center bg-slate-50 border border-slate-200 rounded-2xl space-y-3">
+              <Compass className="w-8 h-8 text-slate-400 mx-auto" />
+              <h4 className="text-sm font-bold text-slate-800">No creators available yet</h4>
+              <p className="text-xs text-slate-500 max-w-sm mx-auto">
                 Explore the marketplace directory to discover and evaluate authentic creators across all categories.
               </p>
               <div className="pt-2">
                 <Link
                   href="/creators"
-                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-xs"
                 >
                   <Users className="w-3.5 h-3.5" />
                   <span>Browse Creators</span>
@@ -616,18 +616,18 @@ export default function DedicatedBusinessDashboardPage() {
         {/* ============================================================ */}
         {/* RECENT CREATOR ANALYSES                                      */}
         {/* ============================================================ */}
-        <section className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-xl">
+        <section className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 space-y-6 shadow-xs">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-lg font-bold text-slate-100">Recent Creator Analyses</h3>
-              <p className="text-xs text-slate-400 mt-0.5">
+              <h3 className="text-lg font-bold text-slate-900">Recent Creator Analyses</h3>
+              <p className="text-xs text-slate-500 mt-0.5">
                 Authenticity audits and Bayesian risk assessments.
               </p>
             </div>
 
             <Link
               href="/dashboard/analyze"
-              className="text-xs font-bold text-purple-400 hover:text-purple-300 flex items-center gap-1"
+              className="text-xs font-bold text-purple-600 hover:text-purple-700 flex items-center gap-1"
             >
               <span>Analyze a Creator</span>
               <ArrowRight className="w-3.5 h-3.5" />
@@ -637,13 +637,13 @@ export default function DedicatedBusinessDashboardPage() {
           {isLoading ? (
             <div className="space-y-3">
               {[1, 2].map((i) => (
-                <div key={i} className="h-16 rounded-2xl bg-slate-950 animate-pulse border border-slate-800" />
+                <div key={i} className="h-16 rounded-xl bg-slate-100 animate-pulse border border-slate-200" />
               ))}
             </div>
           ) : recentAnalyses.length > 0 ? (
             <div className="overflow-x-auto">
               <table className="w-full text-left text-xs">
-                <thead className="bg-slate-950/80 text-slate-400 font-bold uppercase tracking-wider text-[10px] border-b border-slate-800">
+                <thead className="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider text-[10px] border-b border-slate-200">
                   <tr>
                     <th className="py-3 px-4">Creator</th>
                     <th className="py-3 px-4">Category</th>
@@ -654,58 +654,58 @@ export default function DedicatedBusinessDashboardPage() {
                     <th className="py-3 px-4 text-center">Action</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/60">
+                <tbody className="divide-y divide-slate-100">
                   {recentAnalyses.map((analysis) => (
-                    <tr key={analysis.id} className="hover:bg-slate-850/50 transition-colors">
+                    <tr key={analysis.id} className="hover:bg-slate-50/60 transition-colors">
                       <td className="py-3 px-4">
                         <div className="flex items-center gap-3">
                           <img
                             src={analysis.creatorAvatar || "https://images.unsplash.com/photo-1534528741775-53994a69daeb?w=100&auto=format&fit=crop&q=80"}
                             alt={analysis.creatorName}
-                            className="w-8 h-8 rounded-xl object-cover border border-slate-700"
+                            className="w-8 h-8 rounded-lg object-cover border border-slate-200"
                           />
                           <div>
                             <div className="flex items-center gap-1.5">
-                              <span className="font-bold text-slate-100">{analysis.creatorUsername}</span>
+                              <span className="font-bold text-slate-900">{analysis.creatorUsername}</span>
                               {analysis.verifiedBadge && <VerificationBadge size="sm" showText={false} />}
                             </div>
-                            <span className="text-[10px] text-slate-400">{analysis.creatorName}</span>
+                            <span className="text-[10px] text-slate-500">{analysis.creatorName}</span>
                           </div>
                         </div>
                       </td>
-                      <td className="py-3 px-4 text-slate-300">
-                        <span className="px-2 py-0.5 rounded-md bg-slate-950 border border-slate-800 text-[11px]">
+                      <td className="py-3 px-4 text-slate-700">
+                        <span className="px-2 py-0.5 rounded-md bg-slate-100 border border-slate-200 text-[11px]">
                           {analysis.category}
                         </span>
                       </td>
-                      <td className="py-3 px-4 text-right font-semibold text-slate-200">
+                      <td className="py-3 px-4 text-right font-semibold text-slate-800">
                         {formatNumber(analysis.followers)}
                       </td>
                       <td className="py-3 px-4 text-right">
-                        <span className="font-extrabold text-blue-400 text-sm">{analysis.trustScore}</span>
-                        <span className="text-[10px] text-slate-500">/100</span>
+                        <span className="font-extrabold text-blue-600 text-sm">{analysis.trustScore}</span>
+                        <span className="text-[10px] text-slate-400">/100</span>
                       </td>
                       <td className="py-3 px-4 text-right">
                         <span className={`px-2 py-0.5 rounded-md text-[10px] font-bold uppercase ${
                           analysis.riskLevel === "LOW"
-                            ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                            ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                             : analysis.riskLevel === "HIGH"
-                            ? "bg-rose-500/10 text-rose-400 border border-rose-500/20"
-                            : "bg-amber-500/10 text-amber-400 border border-amber-500/20"
+                            ? "bg-rose-50 text-rose-700 border border-rose-200"
+                            : "bg-amber-50 text-amber-700 border border-amber-200"
                         }`}>
                           {analysis.riskLevel === "LOW" ? "High Authenticity" : `${analysis.riskLevel} Risk`}
                         </span>
                       </td>
-                      <td className="py-3 px-4 text-right text-slate-400 text-[11px]">
+                      <td className="py-3 px-4 text-right text-slate-500 text-[11px]">
                         {new Date(analysis.calculatedAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                       </td>
                       <td className="py-3 px-4 text-center">
                         <Link
                           href={`/creators/${analysis.creatorUsername.replace("@", "")}`}
-                          className="px-3 py-1 bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold rounded-lg text-[11px] transition-colors inline-flex items-center gap-1"
+                          className="px-3 py-1 bg-slate-100 hover:bg-slate-200 text-slate-700 font-bold rounded-lg text-[11px] transition-colors inline-flex items-center gap-1"
                         >
                           <span>View Analysis</span>
-                          <ArrowRight className="w-3 h-3 text-slate-400" />
+                          <ArrowRight className="w-3 h-3 text-slate-500" />
                         </Link>
                       </td>
                     </tr>
@@ -714,16 +714,16 @@ export default function DedicatedBusinessDashboardPage() {
               </table>
             </div>
           ) : (
-            <div className="p-10 text-center bg-slate-950/60 border border-slate-800 rounded-3xl space-y-2">
-              <Search className="w-8 h-8 text-slate-600 mx-auto" />
-              <h4 className="text-sm font-bold text-slate-200">No creator analyses yet</h4>
-              <p className="text-xs text-slate-400 max-w-md mx-auto leading-relaxed">
+            <div className="p-10 text-center bg-slate-50 border border-slate-200 rounded-2xl space-y-2">
+              <Search className="w-8 h-8 text-slate-400 mx-auto" />
+              <h4 className="text-sm font-bold text-slate-800">No creator analyses yet</h4>
+              <p className="text-xs text-slate-500 max-w-md mx-auto leading-relaxed">
                 Analyze a creator to understand audience authenticity and engagement quality.
               </p>
               <div className="pt-2">
                 <Link
                   href="/dashboard/analyze"
-                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-purple-600 hover:bg-purple-500 text-white font-bold text-xs rounded-xl shadow-md shadow-purple-600/20"
+                  className="inline-flex items-center gap-1.5 px-4 py-2 bg-purple-600 hover:bg-purple-700 text-white font-bold text-xs rounded-xl shadow-xs"
                 >
                   <Search className="w-3.5 h-3.5" />
                   <span>Analyze a Creator</span>
@@ -738,19 +738,19 @@ export default function DedicatedBusinessDashboardPage() {
         {/* ============================================================ */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* LEFT: SAVED CREATORS */}
-          <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-7 space-y-5 shadow-xl flex flex-col justify-between">
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-7 space-y-5 shadow-xs flex flex-col justify-between">
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                 <div className="flex items-center gap-2">
-                  <Bookmark className="w-4 h-4 text-blue-400" />
-                  <h3 className="text-base font-bold text-slate-100">
+                  <Bookmark className="w-4 h-4 text-blue-600" />
+                  <h3 className="text-base font-bold text-slate-900">
                     Saved Creators ({savedCreators.length})
                   </h3>
                 </div>
 
                 <Link
                   href="/dashboard/saved"
-                  className="text-xs font-bold text-blue-400 hover:text-blue-300 flex items-center gap-0.5"
+                  className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-0.5"
                 >
                   <span>View Saved Creators</span>
                   <ChevronRight className="w-3.5 h-3.5" />
@@ -760,7 +760,7 @@ export default function DedicatedBusinessDashboardPage() {
               {isLoading ? (
                 <div className="space-y-3">
                   {[1, 2].map((i) => (
-                    <div key={i} className="h-16 rounded-2xl bg-slate-950 animate-pulse border border-slate-800" />
+                    <div key={i} className="h-16 rounded-xl bg-slate-100 animate-pulse border border-slate-200" />
                   ))}
                 </div>
               ) : savedCreators.length > 0 ? (
@@ -768,37 +768,37 @@ export default function DedicatedBusinessDashboardPage() {
                   {savedCreators.slice(0, 3).map((creator) => (
                     <div
                       key={creator.id}
-                      className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-between gap-3 hover:border-slate-700 transition-colors"
+                      className="p-3.5 rounded-xl bg-slate-50/80 border border-slate-200 flex items-center justify-between gap-3 hover:border-slate-300 transition-colors"
                     >
                       <div className="flex items-center gap-3 min-w-0">
                         <img
                           src={creator.avatar}
                           alt={creator.name}
-                          className="w-9 h-9 rounded-xl object-cover border border-slate-700 shrink-0"
+                          className="w-9 h-9 rounded-lg object-cover border border-slate-200 shrink-0"
                         />
                         <div className="min-w-0">
                           <div className="flex items-center gap-1.5">
                             <Link
                               href={`/creators/${creator.id}`}
-                              className="font-bold text-xs text-slate-100 hover:text-blue-400 truncate"
+                              className="font-bold text-xs text-slate-900 hover:text-blue-600 truncate"
                             >
                               {creator.username}
                             </Link>
                             {creator.verifiedBadge && <VerificationBadge size="sm" showText={false} />}
                           </div>
-                          <span className="text-[10px] text-slate-400 truncate block">
+                          <span className="text-[10px] text-slate-500 truncate block">
                             {creator.category} • {formatNumber(creator.followers)} followers
                           </span>
                         </div>
                       </div>
 
                       <div className="text-right shrink-0">
-                        <span className="text-xs font-black text-blue-400 block">
+                        <span className="text-xs font-black text-blue-600 block">
                           {creator.trustScore}/100
                         </span>
                         <Link
                           href={`/creators/${creator.id}`}
-                          className="text-[10px] text-slate-400 hover:text-slate-200 font-medium"
+                          className="text-[10px] text-slate-500 hover:text-slate-800 font-medium"
                         >
                           View Profile →
                         </Link>
@@ -807,10 +807,10 @@ export default function DedicatedBusinessDashboardPage() {
                   ))}
                 </div>
               ) : (
-                <div className="p-8 text-center bg-slate-950/60 border border-slate-800 rounded-2xl space-y-2">
-                  <Bookmark className="w-6 h-6 text-slate-600 mx-auto" />
-                  <h4 className="text-xs font-bold text-slate-200">No saved creators yet</h4>
-                  <p className="text-[11px] text-slate-400 max-w-xs mx-auto leading-relaxed">
+                <div className="p-8 text-center bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                  <Bookmark className="w-6 h-6 text-slate-400 mx-auto" />
+                  <h4 className="text-xs font-bold text-slate-800">No saved creators yet</h4>
+                  <p className="text-[11px] text-slate-500 max-w-xs mx-auto leading-relaxed">
                     Save creators you&apos;re interested in so you can quickly return to them.
                   </p>
                 </div>
@@ -820,28 +820,28 @@ export default function DedicatedBusinessDashboardPage() {
             <div className="pt-2">
               <Link
                 href="/creators"
-                className="w-full py-2.5 px-4 bg-slate-950 hover:bg-slate-850 border border-slate-800 rounded-xl text-xs font-bold text-slate-200 transition-colors flex items-center justify-center gap-1.5"
+                className="w-full py-2.5 px-4 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 transition-colors flex items-center justify-center gap-1.5 shadow-xs"
               >
-                <Plus className="w-3.5 h-3.5 text-blue-400" />
+                <Plus className="w-3.5 h-3.5 text-blue-600" />
                 <span>Browse Marketplace</span>
               </Link>
             </div>
           </div>
 
           {/* RIGHT: CAMPAIGNS */}
-          <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-7 space-y-5 shadow-xl flex flex-col justify-between">
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-7 space-y-5 shadow-xs flex flex-col justify-between">
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                 <div className="flex items-center gap-2">
-                  <Briefcase className="w-4 h-4 text-emerald-400" />
-                  <h3 className="text-base font-bold text-slate-100">
+                  <Briefcase className="w-4 h-4 text-emerald-600" />
+                  <h3 className="text-base font-bold text-slate-900">
                     Campaigns ({campaigns.length})
                   </h3>
                 </div>
 
                 <Link
                   href="/dashboard/campaigns"
-                  className="text-xs font-bold text-emerald-400 hover:text-emerald-300 flex items-center gap-0.5"
+                  className="text-xs font-bold text-emerald-600 hover:text-emerald-700 flex items-center gap-0.5"
                 >
                   <span>Manage Campaigns</span>
                   <ChevronRight className="w-3.5 h-3.5" />
@@ -851,7 +851,7 @@ export default function DedicatedBusinessDashboardPage() {
               {isLoading ? (
                 <div className="space-y-3">
                   {[1, 2].map((i) => (
-                    <div key={i} className="h-16 rounded-2xl bg-slate-950 animate-pulse border border-slate-800" />
+                    <div key={i} className="h-16 rounded-xl bg-slate-100 animate-pulse border border-slate-200" />
                   ))}
                 </div>
               ) : campaigns.length > 0 ? (
@@ -859,32 +859,32 @@ export default function DedicatedBusinessDashboardPage() {
                   {campaigns.slice(0, 3).map((camp) => (
                     <div
                       key={camp.id}
-                      className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 space-y-2 hover:border-slate-700 transition-colors"
+                      className="p-3.5 rounded-xl bg-slate-50/80 border border-slate-200 space-y-2 hover:border-slate-300 transition-colors"
                     >
                       <div className="flex items-center justify-between gap-2">
-                        <h4 className="text-xs font-bold text-slate-100 truncate">{camp.title}</h4>
+                        <h4 className="text-xs font-bold text-slate-900 truncate">{camp.title}</h4>
                         <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase shrink-0 ${
                           camp.status === "ACTIVE"
-                            ? "bg-blue-500/10 text-blue-400 border border-blue-500/20"
+                            ? "bg-blue-50 text-blue-700 border border-blue-200"
                             : camp.status === "COMPLETED"
-                            ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
-                            : "bg-slate-800 text-slate-400"
+                            ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
+                            : "bg-slate-100 text-slate-600 border border-slate-200"
                         }`}>
                           {camp.status}
                         </span>
                       </div>
-                      <div className="flex items-center justify-between text-[11px] text-slate-400">
+                      <div className="flex items-center justify-between text-[11px] text-slate-500">
                         <span>{camp.category} • {camp.applications?.length || 0} Applications</span>
-                        <span className="font-bold text-emerald-400">${Math.round(camp.budget).toLocaleString()}</span>
+                        <span className="font-bold text-emerald-600">${Math.round(camp.budget).toLocaleString()}</span>
                       </div>
                     </div>
                   ))}
                 </div>
               ) : (
-                <div className="p-8 text-center bg-slate-950/60 border border-slate-800 rounded-2xl space-y-2">
-                  <Briefcase className="w-6 h-6 text-slate-600 mx-auto" />
-                  <h4 className="text-xs font-bold text-slate-200">No campaigns yet</h4>
-                  <p className="text-[11px] text-slate-400 max-w-xs mx-auto leading-relaxed">
+                <div className="p-8 text-center bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                  <Briefcase className="w-6 h-6 text-slate-400 mx-auto" />
+                  <h4 className="text-xs font-bold text-slate-800">No campaigns yet</h4>
+                  <p className="text-[11px] text-slate-500 max-w-xs mx-auto leading-relaxed">
                     Create structured influencer marketing campaigns to recruit authentic creators.
                   </p>
                 </div>
@@ -894,9 +894,9 @@ export default function DedicatedBusinessDashboardPage() {
             <div className="pt-2">
               <Link
                 href="/dashboard/campaigns"
-                className="w-full py-2.5 px-4 bg-emerald-600/15 hover:bg-emerald-600/25 border border-emerald-500/30 rounded-xl text-xs font-bold text-emerald-400 transition-colors flex items-center justify-center gap-1.5"
+                className="w-full py-2.5 px-4 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl text-xs font-bold text-emerald-700 transition-colors flex items-center justify-center gap-1.5 shadow-xs"
               >
-                <Plus className="w-3.5 h-3.5" />
+                <Plus className="w-3.5 h-3.5 text-emerald-600" />
                 <span>Create Campaign</span>
               </Link>
             </div>
@@ -908,19 +908,19 @@ export default function DedicatedBusinessDashboardPage() {
         {/* ============================================================ */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* LEFT: COLLABORATION ACTIVITY */}
-          <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-7 space-y-5 shadow-xl flex flex-col justify-between">
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-7 space-y-5 shadow-xs flex flex-col justify-between">
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                 <div className="flex items-center gap-2">
-                  <Send className="w-4 h-4 text-amber-400" />
-                  <h3 className="text-base font-bold text-slate-100">
+                  <Send className="w-4 h-4 text-amber-600" />
+                  <h3 className="text-base font-bold text-slate-900">
                     Collaboration Activity ({recentCollaborations.length})
                   </h3>
                 </div>
 
                 <Link
                   href="/dashboard/collaborations"
-                  className="text-xs font-bold text-amber-400 hover:text-amber-300 flex items-center gap-0.5"
+                  className="text-xs font-bold text-amber-600 hover:text-amber-700 flex items-center gap-0.5"
                 >
                   <span>View Collaborations</span>
                   <ChevronRight className="w-3.5 h-3.5" />
@@ -930,7 +930,7 @@ export default function DedicatedBusinessDashboardPage() {
               {isLoading ? (
                 <div className="space-y-3">
                   {[1, 2].map((i) => (
-                    <div key={i} className="h-16 rounded-2xl bg-slate-950 animate-pulse border border-slate-800" />
+                    <div key={i} className="h-16 rounded-xl bg-slate-100 animate-pulse border border-slate-200" />
                   ))}
                 </div>
               ) : recentCollaborations.length > 0 ? (
@@ -938,31 +938,31 @@ export default function DedicatedBusinessDashboardPage() {
                   {recentCollaborations.slice(0, 3).map((collab) => (
                     <div
                       key={collab.id}
-                      className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 flex items-center justify-between gap-3 hover:border-slate-700 transition-colors"
+                      className="p-3.5 rounded-xl bg-slate-50/80 border border-slate-200 flex items-center justify-between gap-3 hover:border-slate-300 transition-colors"
                     >
                       <div className="min-w-0 space-y-0.5">
                         <div className="flex items-center gap-2">
-                          <h4 className="text-xs font-bold text-slate-100 truncate">{collab.campaignName}</h4>
+                          <h4 className="text-xs font-bold text-slate-900 truncate">{collab.campaignName}</h4>
                           <span className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase ${
                             collab.status === "Active"
-                              ? "bg-blue-500/10 text-blue-400 border border-blue-500/20"
+                              ? "bg-blue-50 text-blue-700 border border-blue-200"
                               : collab.status === "Accepted"
-                              ? "bg-emerald-500/10 text-emerald-400 border border-emerald-500/20"
+                              ? "bg-emerald-50 text-emerald-700 border border-emerald-200"
                               : collab.status === "Pending"
-                              ? "bg-amber-500/10 text-amber-400 border border-amber-500/20"
-                              : "bg-slate-800 text-slate-400"
+                              ? "bg-amber-50 text-amber-700 border border-amber-200"
+                              : "bg-slate-100 text-slate-600 border border-slate-200"
                           }`}>
                             {collab.status}
                           </span>
                         </div>
-                        <span className="text-[11px] text-slate-400 block truncate">
+                        <span className="text-[11px] text-slate-500 block truncate">
                           Partner: {collab.creatorUsername || "Partner Creator"} • ${collab.budget.toLocaleString()}
                         </span>
                       </div>
 
                       <Link
                         href={`/dashboard/messages?collaborationId=${collab.id}`}
-                        className="px-3 py-1 bg-slate-800 hover:bg-slate-750 text-slate-200 text-[11px] font-bold rounded-lg shrink-0"
+                        className="px-3 py-1 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-[11px] font-bold rounded-lg shrink-0 shadow-xs"
                       >
                         Message
                       </Link>
@@ -970,10 +970,10 @@ export default function DedicatedBusinessDashboardPage() {
                   ))}
                 </div>
               ) : (
-                <div className="p-8 text-center bg-slate-950/60 border border-slate-800 rounded-2xl space-y-2">
-                  <Send className="w-6 h-6 text-slate-600 mx-auto" />
-                  <h4 className="text-xs font-bold text-slate-200">No collaboration activity yet.</h4>
-                  <p className="text-[11px] text-slate-400 max-w-xs mx-auto leading-relaxed">
+                <div className="p-8 text-center bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                  <Send className="w-6 h-6 text-slate-400 mx-auto" />
+                  <h4 className="text-xs font-bold text-slate-800">No collaboration activity yet.</h4>
+                  <p className="text-[11px] text-slate-500 max-w-xs mx-auto leading-relaxed">
                     Send structured proposals to verified creators with escrow milestone protections.
                   </p>
                 </div>
@@ -983,26 +983,26 @@ export default function DedicatedBusinessDashboardPage() {
             <div className="pt-2">
               <Link
                 href="/creators"
-                className="w-full py-2.5 px-4 bg-slate-950 hover:bg-slate-850 border border-slate-800 rounded-xl text-xs font-bold text-slate-200 transition-colors flex items-center justify-center gap-1.5"
+                className="w-full py-2.5 px-4 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 transition-colors flex items-center justify-center gap-1.5 shadow-xs"
               >
                 <span>Find Creators to Partner With</span>
-                <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
+                <ArrowRight className="w-3.5 h-3.5 text-slate-500" />
               </Link>
             </div>
           </div>
 
           {/* RIGHT: MESSAGES */}
-          <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-7 space-y-5 shadow-xl flex flex-col justify-between">
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-7 space-y-5 shadow-xs flex flex-col justify-between">
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                 <div className="flex items-center gap-2">
-                  <MessageSquare className="w-4 h-4 text-blue-400" />
-                  <h3 className="text-base font-bold text-slate-100">Messages</h3>
+                  <MessageSquare className="w-4 h-4 text-blue-600" />
+                  <h3 className="text-base font-bold text-slate-900">Messages</h3>
                 </div>
 
                 <Link
                   href="/dashboard/messages"
-                  className="text-xs font-bold text-blue-400 hover:text-blue-300 flex items-center gap-0.5"
+                  className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-0.5"
                 >
                   <span>View Messages</span>
                   <ChevronRight className="w-3.5 h-3.5" />
@@ -1011,7 +1011,7 @@ export default function DedicatedBusinessDashboardPage() {
 
               {isLoading ? (
                 <div className="space-y-3">
-                  <div className="h-16 rounded-2xl bg-slate-950 animate-pulse border border-slate-800" />
+                  <div className="h-16 rounded-xl bg-slate-100 animate-pulse border border-slate-200" />
                 </div>
               ) : recentCollaborations.length > 0 ? (
                 <div className="space-y-3">
@@ -1019,26 +1019,26 @@ export default function DedicatedBusinessDashboardPage() {
                     <Link
                       key={collab.id}
                       href={`/dashboard/messages?collaborationId=${collab.id}`}
-                      className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 hover:border-slate-700 flex items-center justify-between gap-3 transition-colors block"
+                      className="p-3.5 rounded-xl bg-slate-50/80 border border-slate-200 hover:border-slate-300 flex items-center justify-between gap-3 transition-colors block"
                     >
                       <div className="flex items-center gap-3 min-w-0">
-                        <div className="w-8 h-8 rounded-xl bg-blue-500/10 text-blue-400 flex items-center justify-center font-bold text-xs shrink-0">
+                        <div className="w-8 h-8 rounded-lg bg-blue-50 text-blue-600 flex items-center justify-center font-bold text-xs shrink-0 border border-blue-200">
                           <MessageSquare className="w-4 h-4" />
                         </div>
                         <div className="min-w-0">
-                          <h4 className="text-xs font-bold text-slate-200 truncate">{collab.creatorUsername || "Creator Partner"}</h4>
-                          <p className="text-[11px] text-slate-400 truncate">Re: {collab.campaignName}</p>
+                          <h4 className="text-xs font-bold text-slate-900 truncate">{collab.creatorUsername || "Creator Partner"}</h4>
+                          <p className="text-[11px] text-slate-500 truncate">Re: {collab.campaignName}</p>
                         </div>
                       </div>
-                      <span className="text-[10px] text-blue-400 font-bold shrink-0">Open Thread →</span>
+                      <span className="text-[10px] text-blue-600 font-bold shrink-0">Open Thread →</span>
                     </Link>
                   ))}
                 </div>
               ) : (
-                <div className="p-8 text-center bg-slate-950/60 border border-slate-800 rounded-2xl space-y-2">
-                  <MessageSquare className="w-6 h-6 text-slate-600 mx-auto" />
-                  <h4 className="text-xs font-bold text-slate-200">No conversations yet.</h4>
-                  <p className="text-[11px] text-slate-400 max-w-xs mx-auto leading-relaxed">
+                <div className="p-8 text-center bg-slate-50 border border-slate-200 rounded-xl space-y-2">
+                  <MessageSquare className="w-6 h-6 text-slate-400 mx-auto" />
+                  <h4 className="text-xs font-bold text-slate-800">No conversations yet.</h4>
+                  <p className="text-[11px] text-slate-500 max-w-xs mx-auto leading-relaxed">
                     Direct conversation threads open automatically when you create a collaboration proposal.
                   </p>
                 </div>
@@ -1048,10 +1048,10 @@ export default function DedicatedBusinessDashboardPage() {
             <div className="pt-2">
               <Link
                 href="/dashboard/messages"
-                className="w-full py-2.5 px-4 bg-slate-950 hover:bg-slate-850 border border-slate-800 rounded-xl text-xs font-bold text-slate-200 transition-colors flex items-center justify-center gap-1.5"
+                className="w-full py-2.5 px-4 bg-white hover:bg-slate-50 border border-slate-200 rounded-xl text-xs font-bold text-slate-700 transition-colors flex items-center justify-center gap-1.5 shadow-xs"
               >
                 <span>Open Communication Center</span>
-                <ArrowRight className="w-3.5 h-3.5 text-slate-400" />
+                <ArrowRight className="w-3.5 h-3.5 text-slate-500" />
               </Link>
             </div>
           </div>
@@ -1062,29 +1062,29 @@ export default function DedicatedBusinessDashboardPage() {
         {/* ============================================================ */}
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-8">
           {/* LEFT: BUSINESS ADVERTISING */}
-          <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-7 space-y-5 shadow-xl flex flex-col justify-between">
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-7 space-y-5 shadow-xs flex flex-col justify-between">
             <div className="space-y-3">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                 <div className="flex items-center gap-2">
-                  <Megaphone className="w-4 h-4 text-amber-400" />
-                  <h3 className="text-base font-bold text-slate-100">Promote Your Business</h3>
+                  <Megaphone className="w-4 h-4 text-amber-600" />
+                  <h3 className="text-base font-bold text-slate-900">Promote Your Business</h3>
                 </div>
 
                 <Link
                   href="/dashboard/advertise"
-                  className="text-xs font-bold text-amber-400 hover:text-amber-300 flex items-center gap-0.5"
+                  className="text-xs font-bold text-amber-600 hover:text-amber-700 flex items-center gap-0.5"
                 >
                   <span>Advertising</span>
                   <ChevronRight className="w-3.5 h-3.5" />
                 </Link>
               </div>
 
-              <p className="text-xs text-slate-400 leading-relaxed">
+              <p className="text-xs text-slate-500 leading-relaxed">
                 Reach creators and businesses across the TrustScore platform with targeted advertising.
               </p>
 
-              <div className="p-3.5 rounded-2xl bg-slate-950 border border-slate-800 text-[11px] text-slate-400 space-y-1">
-                <div className="font-bold text-slate-300">Strict Algorithmic Isolation</div>
+              <div className="p-3.5 rounded-xl bg-slate-50 border border-slate-200 text-[11px] text-slate-500 space-y-1">
+                <div className="font-bold text-slate-800">Strict Algorithmic Isolation</div>
                 <p>
                   Advertising placements are strictly separated from TrustScore evaluation and ranking algorithms.
                 </p>
@@ -1094,26 +1094,26 @@ export default function DedicatedBusinessDashboardPage() {
             <div className="pt-2">
               <Link
                 href="/dashboard/advertise"
-                className="w-full py-2.5 px-4 bg-amber-500/15 hover:bg-amber-500/25 border border-amber-500/30 rounded-xl text-xs font-bold text-amber-400 transition-colors flex items-center justify-center gap-1.5"
+                className="w-full py-2.5 px-4 bg-amber-50 hover:bg-amber-100 border border-amber-200 rounded-xl text-xs font-bold text-amber-800 transition-colors flex items-center justify-center gap-1.5 shadow-xs"
               >
-                <Megaphone className="w-3.5 h-3.5" />
+                <Megaphone className="w-3.5 h-3.5 text-amber-600" />
                 <span>Create Advertisement</span>
               </Link>
             </div>
           </div>
 
           {/* RIGHT: YOUR PLAN (SUBSCRIPTION / BILLING)                    */}
-          <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-7 space-y-5 shadow-xl flex flex-col justify-between">
+          <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-7 space-y-5 shadow-xs flex flex-col justify-between">
             <div className="space-y-4">
-              <div className="flex items-center justify-between">
+              <div className="flex items-center justify-between pb-3 border-b border-slate-100">
                 <div className="flex items-center gap-2">
-                  <CreditCard className="w-4 h-4 text-emerald-400" />
-                  <h3 className="text-base font-bold text-slate-100">Your Plan</h3>
+                  <CreditCard className="w-4 h-4 text-emerald-600" />
+                  <h3 className="text-base font-bold text-slate-900">Your Plan</h3>
                 </div>
 
                 <Link
                   href="/dashboard/billing"
-                  className="text-xs font-bold text-blue-400 hover:text-blue-300 flex items-center gap-0.5"
+                  className="text-xs font-bold text-blue-600 hover:text-blue-700 flex items-center gap-0.5"
                 >
                   <span>Manage Billing</span>
                   <ChevronRight className="w-3.5 h-3.5" />
@@ -1122,23 +1122,23 @@ export default function DedicatedBusinessDashboardPage() {
 
               {isLoading ? (
                 <div className="space-y-3">
-                  <div className="h-12 rounded-2xl bg-slate-950 animate-pulse border border-slate-800" />
-                  <div className="h-4 rounded-md bg-slate-950 animate-pulse" />
+                  <div className="h-12 rounded-xl bg-slate-100 animate-pulse border border-slate-200" />
+                  <div className="h-4 rounded-md bg-slate-100 animate-pulse" />
                 </div>
               ) : (
-                <div className="p-4 rounded-2xl bg-slate-950 border border-slate-800 space-y-3">
+                <div className="p-4 rounded-xl bg-slate-50/80 border border-slate-200 space-y-3">
                   <div className="flex items-center justify-between">
                     <div>
-                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-500 block">
+                      <span className="text-[10px] font-bold uppercase tracking-wider text-slate-400 block">
                         Active SaaS Subscription
                       </span>
-                      <h4 className="text-base font-black text-slate-100">
+                      <h4 className="text-base font-black text-slate-900">
                         {subscription?.planName || "Starter Plan"}
                       </h4>
                     </div>
 
-                    <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20 flex items-center gap-1">
-                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                    <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200 flex items-center gap-1">
+                      <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                       <span>{subscription?.status || "ACTIVE"}</span>
                     </span>
                   </div>
@@ -1146,14 +1146,14 @@ export default function DedicatedBusinessDashboardPage() {
                   {/* Quota Progress */}
                   <div className="space-y-1.5 pt-1">
                     <div className="flex justify-between text-xs">
-                      <span className="text-slate-400">Analysis Quota:</span>
-                      <span className="font-bold text-slate-200">
+                      <span className="text-slate-500">Analysis Quota:</span>
+                      <span className="font-bold text-slate-800">
                         {subscription?.creatorChecksRemaining ?? 0} remaining{" "}
-                        <span className="text-slate-500 font-normal">of {subscription?.creatorChecksLimit ?? 25}</span>
+                        <span className="text-slate-400 font-normal">of {subscription?.creatorChecksLimit ?? 25}</span>
                       </span>
                     </div>
 
-                    <div className="w-full bg-slate-900 rounded-full h-2 overflow-hidden border border-slate-800">
+                    <div className="w-full bg-slate-200 rounded-full h-2 overflow-hidden">
                       <div
                         className="bg-emerald-500 h-2 rounded-full transition-all"
                         style={{
@@ -1176,7 +1176,7 @@ export default function DedicatedBusinessDashboardPage() {
             <div className="pt-2">
               <Link
                 href="/dashboard/billing"
-                className="w-full py-2.5 px-4 bg-emerald-600/15 hover:bg-emerald-600/25 border border-emerald-500/30 rounded-xl text-xs font-bold text-emerald-400 transition-colors flex items-center justify-center gap-1.5"
+                className="w-full py-2.5 px-4 bg-emerald-50 hover:bg-emerald-100 border border-emerald-200 rounded-xl text-xs font-bold text-emerald-700 transition-colors flex items-center justify-center gap-1.5 shadow-xs"
               >
                 <span>Manage Billing</span>
                 <ArrowRight className="w-3.5 h-3.5" />

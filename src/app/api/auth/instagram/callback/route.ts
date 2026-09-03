@@ -2,6 +2,7 @@ import { NextResponse } from "next/server";
 import {
   verifyInstagramOAuthState,
   getInstagramOAuthCallbackUrl,
+  getAppBaseUrl,
   exchangeCodeForInstagramToken,
   exchangeForLongLivedInstagramToken,
 } from "@/lib/instagramOAuth";
@@ -10,6 +11,8 @@ import { prisma } from "@/lib/prisma";
 import { InstagramService } from "@/services/instagramService";
 
 export async function GET(req: Request) {
+  const baseUrl = getAppBaseUrl(req);
+
   try {
     const { searchParams } = new URL(req.url);
     const code = searchParams.get("code");
@@ -22,7 +25,7 @@ export async function GET(req: Request) {
       console.warn("[Instagram OAuth Callback] OAuth error from Meta:", errorParam, errorDescription);
       const destUrl = new URL(
         `/dashboard/creator/verification?error=${encodeURIComponent(errorDescription || errorReason || "Instagram authorization was declined")}`,
-        req.url
+        baseUrl
       );
       return NextResponse.redirect(destUrl);
     }
@@ -30,7 +33,7 @@ export async function GET(req: Request) {
     if (!code || !state) {
       const destUrl = new URL(
         "/dashboard/creator/verification?error=Missing+authorization+code+or+state+parameter",
-        req.url
+        baseUrl
       );
       return NextResponse.redirect(destUrl);
     }
@@ -40,7 +43,7 @@ export async function GET(req: Request) {
     if (!stateData || !stateData.userId) {
       const destUrl = new URL(
         "/dashboard/creator/verification?error=Invalid+or+expired+Instagram+OAuth+session.+Please+try+again.",
-        req.url
+        baseUrl
       );
       return NextResponse.redirect(destUrl);
     }
@@ -66,7 +69,7 @@ export async function GET(req: Request) {
     });
 
     if (!user) {
-      const destUrl = new URL("/login?error=User+not+found", req.url);
+      const destUrl = new URL("/login?error=User+not+found", baseUrl);
       return NextResponse.redirect(destUrl);
     }
 
@@ -128,14 +131,14 @@ export async function GET(req: Request) {
 
     const successUrl = new URL(
       "/dashboard/creator/verification?instagram=connected",
-      req.url
+      baseUrl
     );
     return NextResponse.redirect(successUrl);
   } catch (err: any) {
     console.error("[Instagram OAuth Callback] Critical error:", err);
     const destUrl = new URL(
       `/dashboard/creator/verification?error=${encodeURIComponent(err.message || "Instagram authentication failed")}`,
-      req.url
+      baseUrl
     );
     return NextResponse.redirect(destUrl);
   }

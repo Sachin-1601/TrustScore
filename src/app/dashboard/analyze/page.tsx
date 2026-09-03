@@ -73,19 +73,19 @@ function AnalyzeContent() {
   };
 
   return (
-    <div className="p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto w-full space-y-8 text-slate-100">
+    <div className="p-4 sm:p-6 lg:p-8 max-w-4xl mx-auto w-full space-y-8 text-slate-900">
       {/* Main Analysis Card */}
-      <div className="bg-slate-900/90 rounded-3xl p-6 sm:p-8 lg:p-10 border border-slate-800 shadow-md">
+      <div className="bg-white rounded-2xl p-6 sm:p-8 lg:p-10 border border-slate-200 shadow-xs">
         {/* Tab Switcher: URL Input vs Batch File Upload */}
-        <div className="flex items-center justify-between pb-6 border-b border-slate-800">
+        <div className="flex items-center justify-between pb-6 border-b border-slate-100">
           <div className="flex items-center gap-2">
             <button
               type="button"
               onClick={() => setActiveTab("url")}
               className={`px-4 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
                 activeTab === "url"
-                  ? "bg-blue-600/20 text-blue-400 border border-blue-500/40"
-                  : "text-slate-400 hover:bg-slate-800"
+                  ? "bg-blue-50 text-blue-700 border border-blue-200"
+                  : "text-slate-500 hover:bg-slate-100"
               }`}
             >
               Profile URL / Handle
@@ -95,16 +95,16 @@ function AnalyzeContent() {
               onClick={() => setActiveTab("upload")}
               className={`px-4 py-2 text-xs font-bold rounded-xl transition-all cursor-pointer ${
                 activeTab === "upload"
-                  ? "bg-blue-600/20 text-blue-400 border border-blue-500/40"
-                  : "text-slate-400 hover:bg-slate-800"
+                  ? "bg-blue-50 text-blue-700 border border-blue-200"
+                  : "text-slate-500 hover:bg-slate-100"
               }`}
             >
               CSV Telemetry Ingestion
             </button>
           </div>
 
-          <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-400 font-semibold">
-            <ShieldCheck className="w-4 h-4 text-emerald-400" />
+          <div className="hidden sm:flex items-center gap-1.5 text-xs text-slate-500 font-semibold">
+            <ShieldCheck className="w-4 h-4 text-emerald-600" />
             <span>Quota: 1 Creator Credit</span>
           </div>
         </div>
@@ -112,7 +112,7 @@ function AnalyzeContent() {
         {activeTab === "url" ? (
           <form onSubmit={handleRunAnalysis} className="mt-6 space-y-6">
             <div className="space-y-2">
-              <label className="block text-xs font-bold uppercase tracking-wider text-slate-300">
+              <label className="block text-xs font-bold uppercase tracking-wider text-slate-600">
                 Creator Profile URL or Handle
               </label>
               <div className="relative">
@@ -122,7 +122,7 @@ function AnalyzeContent() {
                   value={inputUrl}
                   onChange={(e) => setInputUrl(e.target.value)}
                   placeholder="https://instagram.com/creator or @handle"
-                  className="w-full px-4 py-3.5 pl-11 bg-slate-950 border border-slate-700 rounded-2xl text-slate-100 placeholder:text-slate-500 text-sm font-semibold focus:outline-hidden focus:border-blue-500 transition-all shadow-inner"
+                  className="w-full px-4 py-3.5 pl-11 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 placeholder:text-slate-400 text-sm font-semibold focus:outline-hidden focus:border-blue-600 focus:bg-white transition-all shadow-xs"
                 />
                 <Search className="w-5 h-5 text-slate-400 absolute left-3.5 top-3.5" />
               </div>
@@ -131,7 +131,7 @@ function AnalyzeContent() {
             {/* Platform & Category Selectors */}
             <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-300">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600">
                   Target Social Platform
                 </label>
                 <div className="grid grid-cols-3 gap-2">
@@ -142,8 +142,8 @@ function AnalyzeContent() {
                       onClick={() => setPlatform(p)}
                       className={`py-2.5 px-3 rounded-xl border text-xs font-bold capitalize flex items-center justify-center gap-1.5 transition-all cursor-pointer ${
                         platform === p
-                          ? "bg-blue-600 text-white border-blue-500 shadow-sm"
-                          : "bg-slate-950 border-slate-800 text-slate-400 hover:text-slate-200"
+                          ? "bg-blue-600 text-white border-blue-600 shadow-xs"
+                          : "bg-slate-50 border-slate-200 text-slate-600 hover:text-slate-900 hover:bg-slate-100"
                       }`}
                     >
                       <PlatformIcon platform={p} size="sm" />
@@ -154,13 +154,13 @@ function AnalyzeContent() {
               </div>
 
               <div className="space-y-2">
-                <label className="block text-xs font-bold uppercase tracking-wider text-slate-300">
+                <label className="block text-xs font-bold uppercase tracking-wider text-slate-600">
                   Industry Niche
                 </label>
                 <select
                   value={category}
                   onChange={(e) => setCategory(e.target.value)}
-                  className="w-full px-3 py-2.5 bg-slate-950 border border-slate-800 rounded-xl text-slate-200 text-xs font-semibold focus:outline-hidden focus:border-blue-500"
+                  className="w-full px-3 py-2.5 bg-slate-50 border border-slate-200 rounded-xl text-slate-900 text-xs font-semibold focus:outline-hidden focus:border-blue-600 focus:bg-white transition-all"
                 >
                   <option value="Fitness">Fitness &amp; Nutrition</option>
                   <option value="Beauty">Beauty &amp; Skincare</option>
@@ -174,7 +174,7 @@ function AnalyzeContent() {
 
             {/* Preset Demo Profiles */}
             <div className="space-y-2 pt-2">
-              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-400 block">
+              <span className="text-[11px] font-bold uppercase tracking-wider text-slate-500 block">
                 Quick Benchmarks in Database:
               </span>
               <div className="flex flex-wrap gap-2">
@@ -183,7 +183,7 @@ function AnalyzeContent() {
                     key={p.handle}
                     type="button"
                     onClick={() => handleSelectPreset(p)}
-                    className="px-3 py-1.5 bg-slate-950 hover:bg-slate-850 border border-slate-800 text-slate-300 rounded-xl text-xs font-semibold transition-colors cursor-pointer"
+                    className="px-3 py-1.5 bg-slate-50 hover:bg-slate-100 border border-slate-200 text-slate-700 rounded-xl text-xs font-semibold transition-colors cursor-pointer shadow-xs"
                   >
                     {p.handle} ({p.cat})
                   </button>
@@ -195,7 +195,7 @@ function AnalyzeContent() {
             <button
               type="submit"
               disabled={isAnalyzing}
-              className="w-full py-4 bg-blue-600 hover:bg-blue-500 active:bg-blue-700 text-white font-bold text-sm rounded-2xl shadow-lg shadow-blue-600/30 transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              className="w-full py-4 bg-blue-600 hover:bg-blue-700 active:bg-blue-800 text-white font-bold text-sm rounded-xl shadow-xs transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
             >
               <Sparkles className="w-4 h-4" />
               <span>{isAnalyzing ? "Executing Bayesian Assessment..." : "Run TrustScore Analysis"}</span>
@@ -203,9 +203,9 @@ function AnalyzeContent() {
           </form>
         ) : (
           <div className="py-12 text-center space-y-3">
-            <FileText className="w-10 h-10 text-slate-500 mx-auto" />
-            <h4 className="font-bold text-slate-200 text-sm">Batch CSV Ingestion</h4>
-            <p className="text-xs text-slate-400 max-w-sm mx-auto">
+            <FileText className="w-10 h-10 text-slate-400 mx-auto" />
+            <h4 className="font-bold text-slate-800 text-sm">Batch CSV Ingestion</h4>
+            <p className="text-xs text-slate-500 max-w-sm mx-auto">
               Upload exported CSV comment dumps or follower timestamp logs for batch scoring.
             </p>
           </div>
@@ -213,20 +213,20 @@ function AnalyzeContent() {
 
         {/* Live Step Progress Indicator */}
         {isAnalyzing && (
-          <div className="mt-8 pt-6 border-t border-slate-800 space-y-4">
-            <div className="flex items-center justify-between text-xs font-bold text-slate-300">
+          <div className="mt-8 pt-6 border-t border-slate-100 space-y-4">
+            <div className="flex items-center justify-between text-xs font-bold text-slate-700">
               <span className="flex items-center gap-2">
-                <Cpu className="w-4 h-4 text-blue-400 animate-spin" />
+                <Cpu className="w-4 h-4 text-blue-600 animate-spin" />
                 <span>{simulationSteps[currentStepIndex].title}</span>
               </span>
-              <span className="text-blue-400">{Math.round(((currentStepIndex + 1) / simulationSteps.length) * 100)}%</span>
+              <span className="text-blue-600">{Math.round(((currentStepIndex + 1) / simulationSteps.length) * 100)}%</span>
             </div>
 
-            <p className="text-[11px] text-slate-400">
+            <p className="text-[11px] text-slate-500">
               {simulationSteps[currentStepIndex].desc}
             </p>
 
-            <div className="w-full h-2 bg-slate-950 rounded-full overflow-hidden border border-slate-800">
+            <div className="w-full h-2 bg-slate-100 rounded-full overflow-hidden border border-slate-200">
               <div
                 className="h-full bg-blue-600 rounded-full transition-all duration-300"
                 style={{ width: `${((currentStepIndex + 1) / simulationSteps.length) * 100}%` }}
@@ -241,7 +241,7 @@ function AnalyzeContent() {
 
 export default function AnalyzePage() {
   return (
-    <div className="min-h-full flex flex-col bg-slate-950 text-slate-100">
+    <div className="min-h-full flex flex-col bg-[#f8f9fb] text-slate-900">
       <DashboardHeader
         title="Creator Authenticity Analysis"
         subtitle="Evaluate any creator profile against the Bayesian probabilistic fraud detection model"

@@ -83,15 +83,15 @@ export default function CollaborationsPage() {
     const s = status?.toLowerCase();
     switch (s) {
       case "active":
-        return <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-500/10 text-blue-400 border border-blue-500/20">Active</span>;
+        return <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200">Active</span>;
       case "accepted":
-        return <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">Accepted</span>;
+        return <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200">Accepted</span>;
       case "pending":
-        return <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-500/10 text-amber-400 border border-amber-500/20">Pending</span>;
+        return <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-amber-50 text-amber-700 border border-amber-200">Pending</span>;
       case "completed":
-        return <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-800 text-slate-300 border border-slate-700">Completed</span>;
+        return <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-slate-100 text-slate-700 border border-slate-200">Completed</span>;
       default:
-        return <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-rose-500/10 text-rose-400 border border-rose-500/20">{status || "Declined"}</span>;
+        return <span className="px-2.5 py-1 rounded-full text-[10px] font-bold uppercase tracking-wider bg-rose-50 text-rose-700 border border-rose-200">{status || "Declined"}</span>;
     }
   };
 
@@ -103,7 +103,7 @@ export default function CollaborationsPage() {
   const completedCount = requests.filter((r) => r.status?.toLowerCase() === "completed").length;
 
   return (
-    <div className="min-h-full flex flex-col bg-slate-950 text-slate-100">
+    <div className="min-h-full flex flex-col bg-[#f8f9fb] text-slate-900">
       <DashboardHeader
         title="Collaborations"
         subtitle="Manage brand proposals, active partnerships, and completed collaborations."
@@ -112,43 +112,43 @@ export default function CollaborationsPage() {
       <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-6">
         {/* Pipeline Summary Counters */}
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-3.5">
-          <div className="p-4 bg-slate-900/90 border border-slate-800 rounded-3xl space-y-1 shadow-sm">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-400 block">New Requests</span>
-            <div className="text-2xl font-black text-slate-100">{newRequestsCount}</div>
-            <p className="text-[10px] text-slate-500">Awaiting your review</p>
+          <div className="p-4 bg-white border border-slate-200 rounded-2xl space-y-1 shadow-xs">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-amber-600 block">New Requests</span>
+            <div className="text-2xl font-black text-slate-900">{newRequestsCount}</div>
+            <p className="text-[10px] text-slate-400">Awaiting your review</p>
           </div>
 
-          <div className="p-4 bg-slate-900/90 border border-slate-800 rounded-3xl space-y-1 shadow-sm">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-blue-400 block">In Discussion</span>
-            <div className="text-2xl font-black text-slate-100">{inDiscussionCount}</div>
-            <p className="text-[10px] text-slate-500">Accepted &amp; coordinating</p>
+          <div className="p-4 bg-white border border-slate-200 rounded-2xl space-y-1 shadow-xs">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-blue-600 block">In Discussion</span>
+            <div className="text-2xl font-black text-slate-900">{inDiscussionCount}</div>
+            <p className="text-[10px] text-slate-400">Accepted &amp; coordinating</p>
           </div>
 
-          <div className="p-4 bg-slate-900/90 border border-slate-800 rounded-3xl space-y-1 shadow-sm">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-purple-400 block">Active Deals</span>
-            <div className="text-2xl font-black text-slate-100">{activeCount}</div>
-            <p className="text-[10px] text-slate-500">Content in production</p>
+          <div className="p-4 bg-white border border-slate-200 rounded-2xl space-y-1 shadow-xs">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-purple-600 block">Active Deals</span>
+            <div className="text-2xl font-black text-slate-900">{activeCount}</div>
+            <p className="text-[10px] text-slate-400">Content in production</p>
           </div>
 
-          <div className="p-4 bg-slate-900/90 border border-slate-800 rounded-3xl space-y-1 shadow-sm">
-            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-400 block">Completed</span>
-            <div className="text-2xl font-black text-slate-100">{completedCount}</div>
-            <p className="text-[10px] text-slate-500">Delivered &amp; archived</p>
+          <div className="p-4 bg-white border border-slate-200 rounded-2xl space-y-1 shadow-xs">
+            <span className="text-[10px] font-bold uppercase tracking-wider text-emerald-600 block">Completed</span>
+            <div className="text-2xl font-black text-slate-900">{completedCount}</div>
+            <p className="text-[10px] text-slate-400">Delivered &amp; archived</p>
           </div>
         </div>
 
         {/* Filter Tab Switcher */}
         <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
-          <div className="flex items-center gap-1.5 overflow-x-auto p-1.5 bg-slate-900/90 border border-slate-800 rounded-2xl">
+          <div className="flex items-center gap-1.5 overflow-x-auto p-1.5 bg-white border border-slate-200 rounded-xl shadow-xs">
             {(["all", "Pending", "Accepted", "Active", "Completed", "Declined"] as const).map((tab) => (
               <button
                 key={tab}
                 type="button"
                 onClick={() => setActiveTab(tab)}
-                className={`px-4 py-2 rounded-xl text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer capitalize ${
+                className={`px-4 py-2 rounded-lg text-xs font-semibold whitespace-nowrap transition-colors cursor-pointer capitalize ${
                   activeTab === tab
                     ? "bg-blue-600 text-white font-bold shadow-xs"
-                    : "text-slate-400 hover:text-slate-200 hover:bg-slate-800/40"
+                    : "text-slate-500 hover:text-slate-900 hover:bg-slate-50"
                 }`}
               >
                 {tab === "all" ? `All (${requests.length})` : tab}
@@ -159,7 +159,7 @@ export default function CollaborationsPage() {
           {!isCreator && (
             <Link
               href="/creators"
-              className="py-2.5 px-4 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-2xl transition-colors flex items-center gap-1.5 self-start sm:self-auto shadow-xs"
+              className="py-2.5 px-4 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl transition-colors flex items-center gap-1.5 self-start sm:self-auto shadow-xs"
             >
               <Plus className="w-4 h-4" />
               <span>New Collaboration Request</span>
@@ -170,53 +170,53 @@ export default function CollaborationsPage() {
         {/* Requests List */}
         {isLoading ? (
           <div className="py-24 flex flex-col items-center justify-center gap-3 text-slate-400">
-            <Loader2 className="w-6 h-6 animate-spin text-blue-500" />
-            <span className="text-xs font-semibold">Loading collaboration pipeline...</span>
+            <Loader2 className="w-6 h-6 animate-spin text-blue-600" />
+            <span className="text-xs font-semibold text-slate-500">Loading collaboration pipeline...</span>
           </div>
         ) : filteredRequests.length > 0 ? (
           <div className="space-y-4">
             {filteredRequests.map((req) => (
               <div
                 key={req.id}
-                className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-7 space-y-4 shadow-md"
+                className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-7 space-y-4 shadow-xs hover:border-slate-300 transition-all"
               >
                 <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
                   <div className="flex items-center gap-4">
-                    <div className="w-12 h-12 rounded-2xl bg-blue-600/10 border border-blue-500/20 text-blue-400 flex items-center justify-center font-black text-sm shrink-0">
+                    <div className="w-12 h-12 rounded-xl bg-blue-50 border border-blue-200 text-blue-600 flex items-center justify-center font-black text-sm shrink-0">
                       <Building2 className="w-6 h-6" />
                     </div>
                     <div>
                       <div className="flex items-center gap-2.5 flex-wrap">
-                        <h4 className="font-bold text-slate-100 text-base">{req.businessName || "Verified Brand"}</h4>
+                        <h4 className="font-bold text-slate-900 text-base">{req.businessName || "Verified Brand"}</h4>
                         {getStatusBadge(req.status)}
                       </div>
-                      <span className="text-xs text-slate-400 mt-0.5 block">
-                        Campaign: <strong className="text-slate-200">{req.campaignName}</strong>
+                      <span className="text-xs text-slate-500 mt-0.5 block">
+                        Campaign: <strong className="text-slate-800">{req.campaignName}</strong>
                       </span>
                     </div>
                   </div>
 
                   <div className="flex items-center gap-5 text-xs font-bold self-start sm:self-auto">
-                    <div className="flex items-center gap-1 text-slate-200">
-                      <DollarSign className="w-4 h-4 text-emerald-400" />
-                      <span className="text-base font-black text-emerald-400">${req.budget.toLocaleString()}</span>
+                    <div className="flex items-center gap-1 text-slate-800">
+                      <DollarSign className="w-4 h-4 text-emerald-600" />
+                      <span className="text-base font-black text-emerald-600">${req.budget.toLocaleString()}</span>
                     </div>
-                    <div className="flex items-center gap-1.5 text-slate-400 font-normal">
-                      <Calendar className="w-3.5 h-3.5" />
+                    <div className="flex items-center gap-1.5 text-slate-500 font-normal">
+                      <Calendar className="w-3.5 h-3.5 text-slate-400" />
                       <span>{req.timeline}</span>
                     </div>
                   </div>
                 </div>
 
-                <div className="p-4 bg-slate-950 rounded-2xl border border-slate-800/80 text-xs text-slate-300 space-y-1.5">
+                <div className="p-4 bg-slate-50 rounded-xl border border-slate-200 text-xs text-slate-700 space-y-1.5">
                   <div className="flex items-start gap-2">
-                    <FileText className="w-4 h-4 text-slate-500 shrink-0 mt-0.5" />
+                    <FileText className="w-4 h-4 text-slate-400 shrink-0 mt-0.5" />
                     <p className="leading-relaxed">{req.deliverables}</p>
                   </div>
                 </div>
 
                 <div className="flex flex-wrap items-center justify-between gap-3 pt-1 text-xs">
-                  <span className="text-[11px] text-slate-500">
+                  <span className="text-[11px] text-slate-400">
                     Received: {new Date(req.createdAt).toLocaleDateString("en-US", { month: "short", day: "numeric", year: "numeric" })}
                   </span>
 
@@ -227,7 +227,7 @@ export default function CollaborationsPage() {
                           type="button"
                           disabled={processingId === req.id}
                           onClick={() => handleUpdateStatus(req.id, "Accepted")}
-                          className="px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white font-bold rounded-xl transition-colors cursor-pointer flex items-center gap-1.5 shadow-xs disabled:opacity-50"
+                          className="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white font-bold rounded-xl transition-colors cursor-pointer flex items-center gap-1.5 shadow-xs disabled:opacity-50"
                         >
                           <CheckCircle2 className="w-3.5 h-3.5" />
                           <span>Accept Offer</span>
@@ -236,7 +236,7 @@ export default function CollaborationsPage() {
                           type="button"
                           disabled={processingId === req.id}
                           onClick={() => handleUpdateStatus(req.id, "Declined")}
-                          className="px-4 py-2 bg-slate-800 hover:bg-rose-950 hover:text-rose-400 text-slate-300 font-semibold rounded-xl transition-colors cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
+                          className="px-4 py-2 bg-slate-100 hover:bg-rose-50 hover:text-rose-700 text-slate-700 border border-slate-200 font-semibold rounded-xl transition-colors cursor-pointer flex items-center gap-1.5 disabled:opacity-50"
                         >
                           <XCircle className="w-3.5 h-3.5" />
                           <span>Decline</span>
@@ -246,9 +246,9 @@ export default function CollaborationsPage() {
 
                     <Link
                       href={`/dashboard/messages?collaborationId=${req.id}`}
-                      className="px-4 py-2 bg-slate-950 hover:bg-slate-800 border border-slate-800 text-slate-200 font-semibold rounded-xl transition-colors flex items-center gap-1.5 shadow-xs"
+                      className="px-4 py-2 bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 font-semibold rounded-xl transition-colors flex items-center gap-1.5 shadow-xs"
                     >
-                      <MessageSquare className="w-3.5 h-3.5 text-blue-400" />
+                      <MessageSquare className="w-3.5 h-3.5 text-blue-600" />
                       <span>Thread Messages</span>
                       <ArrowRight className="w-3 h-3 text-slate-400" />
                     </Link>
@@ -258,13 +258,13 @@ export default function CollaborationsPage() {
             ))}
           </div>
         ) : (
-          <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-16 text-center space-y-4 shadow-md">
-            <Briefcase className="w-10 h-10 text-slate-500 mx-auto" />
+          <div className="bg-white border border-slate-200 rounded-2xl p-16 text-center space-y-4 shadow-xs">
+            <Briefcase className="w-10 h-10 text-slate-400 mx-auto" />
             <div className="space-y-1">
-              <h3 className="text-base font-bold text-slate-200">
+              <h3 className="text-base font-bold text-slate-800">
                 No collaborations in this view
               </h3>
-              <p className="text-xs text-slate-400 max-w-sm mx-auto leading-relaxed">
+              <p className="text-xs text-slate-500 max-w-sm mx-auto leading-relaxed">
                 {isCreator
                   ? "When businesses discover your public creator profile on the marketplace and send campaign proposals, they will appear here for your review."
                   : "Find authentic creators on the marketplace to send direct sponsorship agreements."}
@@ -273,7 +273,7 @@ export default function CollaborationsPage() {
             <div className="pt-2">
               <Link
                 href={isCreator ? "/dashboard/creator/profile" : "/creators"}
-                className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-2xl shadow-md shadow-blue-600/25"
+                className="inline-flex items-center gap-1.5 px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-xs"
               >
                 <span>{isCreator ? "Manage Profile Visibility" : "Browse Creator Marketplace"}</span>
                 <ArrowRight className="w-3.5 h-3.5" />

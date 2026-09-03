@@ -74,29 +74,29 @@ export default function CreatorDashboardPage() {
   // Loading Skeleton
   if (isLoading) {
     return (
-      <div className="min-h-full flex flex-col bg-slate-950 text-slate-100 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-8 animate-pulse">
+      <div className="min-h-full flex flex-col bg-[#f8f9fb] text-slate-900 p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-8 animate-pulse">
         {/* Header Skeleton */}
-        <div className="h-36 bg-slate-900/80 border border-slate-800 rounded-3xl" />
+        <div className="h-36 bg-white border border-slate-200 rounded-2xl shadow-xs" />
 
         {/* Hero TrustScore Skeleton */}
-        <div className="h-72 bg-slate-900/80 border border-slate-800 rounded-3xl" />
+        <div className="h-72 bg-white border border-slate-200 rounded-2xl shadow-xs" />
 
         {/* Metrics Overview Skeleton */}
         <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
           {[...Array(6)].map((_, i) => (
-            <div key={i} className="h-24 bg-slate-900/80 border border-slate-800 rounded-3xl" />
+            <div key={i} className="h-24 bg-white border border-slate-200 rounded-2xl shadow-xs" />
           ))}
         </div>
 
         {/* 2-Column Grid Skeleton */}
         <div className="grid grid-cols-1 lg:grid-cols-12 gap-8">
           <div className="lg:col-span-7 space-y-8">
-            <div className="h-64 bg-slate-900/80 border border-slate-800 rounded-3xl" />
-            <div className="h-48 bg-slate-900/80 border border-slate-800 rounded-3xl" />
+            <div className="h-64 bg-white border border-slate-200 rounded-2xl shadow-xs" />
+            <div className="h-48 bg-white border border-slate-200 rounded-2xl shadow-xs" />
           </div>
           <div className="lg:col-span-5 space-y-8">
-            <div className="h-64 bg-slate-900/80 border border-slate-800 rounded-3xl" />
-            <div className="h-48 bg-slate-900/80 border border-slate-800 rounded-3xl" />
+            <div className="h-64 bg-white border border-slate-200 rounded-2xl shadow-xs" />
+            <div className="h-48 bg-white border border-slate-200 rounded-2xl shadow-xs" />
           </div>
         </div>
       </div>
@@ -106,23 +106,23 @@ export default function CreatorDashboardPage() {
   // Error State
   if (hasError && !creator) {
     return (
-      <div className="min-h-full flex flex-col items-center justify-center py-24 px-4 bg-slate-950 text-slate-100">
-        <div className="max-w-md w-full p-8 bg-slate-900/90 border border-slate-800 rounded-3xl text-center space-y-4 shadow-xl">
-          <div className="w-12 h-12 rounded-2xl bg-rose-500/10 border border-rose-500/20 text-rose-400 flex items-center justify-center mx-auto">
+      <div className="min-h-full flex flex-col items-center justify-center py-24 px-4 bg-[#f8f9fb] text-slate-900">
+        <div className="max-w-md w-full p-8 bg-white border border-slate-200 rounded-2xl text-center space-y-4 shadow-xs">
+          <div className="w-12 h-12 rounded-2xl bg-rose-50 border border-rose-200 text-rose-600 flex items-center justify-center mx-auto">
             <AlertCircle className="w-6 h-6" />
           </div>
           <div className="space-y-1">
-            <h3 className="text-base font-bold text-slate-100">
+            <h3 className="text-base font-bold text-slate-900">
               Unable to load Creator Dashboard
             </h3>
-            <p className="text-xs text-slate-400 leading-relaxed">
+            <p className="text-xs text-slate-500 leading-relaxed">
               {errorMessage || "There was a problem connecting to the TrustScore servers."}
             </p>
           </div>
           <button
             type="button"
             onClick={loadData}
-            className="py-2.5 px-5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-2xl transition-all shadow-md shadow-blue-600/25 inline-flex items-center gap-2 cursor-pointer"
+            className="py-2.5 px-5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl transition-all shadow-xs inline-flex items-center gap-2 cursor-pointer"
           >
             <RefreshCw className="w-3.5 h-3.5" />
             <span>Try Again</span>
@@ -200,7 +200,7 @@ export default function CreatorDashboardPage() {
   };
 
   return (
-    <div className="min-h-full flex flex-col bg-slate-950 text-slate-100">
+    <div className="min-h-full flex flex-col bg-[#f8f9fb] text-slate-900">
       <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-8">
         {/* SECTION A: Creator Welcome Header */}
         <CreatorDashboardHeader creator={activeCreator} />

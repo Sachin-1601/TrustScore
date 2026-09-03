@@ -14,31 +14,31 @@ export function CreatorVisibilityCard({ creator }: CreatorVisibilityCardProps) {
   const isAvailable = creator.availabilityStatus !== "NOT_AVAILABLE";
 
   return (
-    <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-7 space-y-4 shadow-lg">
-      <div className="flex items-center justify-between pb-3 border-b border-slate-800/80">
+    <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-7 space-y-4 shadow-xs">
+      <div className="flex items-center justify-between pb-3 border-b border-slate-100">
         <div className="flex items-center gap-2">
-          <Eye className="w-4 h-4 text-blue-400" />
-          <h3 className="text-base font-bold text-slate-100">
+          <Eye className="w-4 h-4 text-blue-600" />
+          <h3 className="text-base font-bold text-slate-900">
             Marketplace Visibility
           </h3>
         </div>
-        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
-          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+        <span className="inline-flex items-center gap-1 px-2.5 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-emerald-50 text-emerald-700 border border-emerald-200/80">
+          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
           <span>{isProfilePublic ? "Public & Listed" : "Unlisted"}</span>
         </span>
       </div>
 
       <div className="space-y-2.5 text-xs">
-        <div className="p-3 bg-slate-950/80 rounded-2xl border border-slate-800 flex items-center justify-between">
-          <span className="text-slate-400">Discoverability Status</span>
-          <strong className="text-slate-200 font-bold">
+        <div className="p-3 bg-slate-50/80 rounded-xl border border-slate-200/80 flex items-center justify-between">
+          <span className="text-slate-500">Discoverability Status</span>
+          <strong className="text-slate-800 font-bold">
             {isProfilePublic ? "Search Indexed" : "Incomplete Profile"}
           </strong>
         </div>
 
-        <div className="p-3 bg-slate-950/80 rounded-2xl border border-slate-800 flex items-center justify-between">
-          <span className="text-slate-400">Availability</span>
-          <strong className={isAvailable ? "text-emerald-400 font-bold" : "text-rose-400 font-bold"}>
+        <div className="p-3 bg-slate-50/80 rounded-xl border border-slate-200/80 flex items-center justify-between">
+          <span className="text-slate-500">Availability</span>
+          <strong className={isAvailable ? "text-emerald-600 font-bold" : "text-rose-600 font-bold"}>
             {creator.availabilityStatus === "AVAILABLE_FOR_COLLABORATION"
               ? "Available for Collabs"
               : creator.availabilityStatus === "NOT_AVAILABLE"
@@ -47,9 +47,9 @@ export function CreatorVisibilityCard({ creator }: CreatorVisibilityCardProps) {
           </strong>
         </div>
 
-        <div className="p-3 bg-slate-950/80 rounded-2xl border border-slate-800 flex items-center justify-between">
-          <span className="text-slate-400">Primary Social Channel</span>
-          <strong className="text-slate-200 font-bold uppercase">
+        <div className="p-3 bg-slate-50/80 rounded-xl border border-slate-200/80 flex items-center justify-between">
+          <span className="text-slate-500">Primary Social Channel</span>
+          <strong className="text-slate-800 font-bold uppercase">
             {creator.platform || "Instagram"}
           </strong>
         </div>
@@ -58,9 +58,9 @@ export function CreatorVisibilityCard({ creator }: CreatorVisibilityCardProps) {
       <div className="pt-1">
         <Link
           href="/dashboard/creator/profile"
-          className="w-full py-2.5 px-4 bg-slate-950 hover:bg-slate-800 border border-slate-800 hover:border-slate-700 text-slate-200 font-bold text-xs rounded-2xl transition-all flex items-center justify-center gap-2 cursor-pointer"
+          className="w-full py-2.5 px-4 bg-white hover:bg-slate-50 border border-slate-200 hover:border-slate-300 text-slate-700 font-bold text-xs rounded-xl transition-all flex items-center justify-center gap-2 cursor-pointer shadow-xs"
         >
-          <Settings className="w-3.5 h-3.5 text-slate-400" />
+          <Settings className="w-3.5 h-3.5 text-slate-500" />
           <span>Manage Visibility &amp; Status</span>
         </Link>
       </div>

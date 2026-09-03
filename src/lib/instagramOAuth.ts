@@ -66,6 +66,46 @@ export function getInstagramApiVersion(): string {
 }
 
 /**
+ * Resolves the canonical public base URL of the application.
+ * Preserves public domain origins (such as ngrok tunnels, reverse proxies, and production domains)
+ * instead of falling back to internal localhost bindings.
+ */
+export function getAppBaseUrl(req?: Request): string {
+  // 1. If explicit INSTAGRAM_REDIRECT_URI is set, derive the origin from it (Highest Priority)
+  if (process.env.INSTAGRAM_REDIRECT_URI && process.env.INSTAGRAM_REDIRECT_URI.trim().length > 0) {
+    try {
+      return new URL(process.env.INSTAGRAM_REDIRECT_URI.trim()).origin;
+    } catch {
+      // safe fallback
+    }
+  }
+
+  // 2. Extract from incoming HTTP request headers (e.g. ngrok tunnel / reverse proxy)
+  if (req) {
+    const forwardedHost = req.headers.get("x-forwarded-host");
+    const forwardedProto = req.headers.get("x-forwarded-proto") || "https";
+    if (forwardedHost) {
+      return `${forwardedProto}://${forwardedHost}`;
+    }
+
+    const host = req.headers.get("host");
+    if (host) {
+      const url = new URL(req.url);
+      const proto = url.protocol.replace(":", "") || "http";
+      return `${proto}://${host}`;
+    }
+  }
+
+  // 3. If NEXT_PUBLIC_APP_URL is configured
+  if (process.env.NEXT_PUBLIC_APP_URL && process.env.NEXT_PUBLIC_APP_URL.trim().length > 0) {
+    return process.env.NEXT_PUBLIC_APP_URL.trim().replace(/\/+$/, "");
+  }
+
+  // 4. Default localhost development fallback
+  return "http://localhost:3000";
+}
+
+/**
  * Determines the exact OAuth callback URL based on environment configuration and request context
  */
 export function getInstagramOAuthCallbackUrl(req?: Request): string {
@@ -75,22 +115,9 @@ export function getInstagramOAuthCallbackUrl(req?: Request): string {
     return explicitUri.trim();
   }
 
-  // 2. Base platform URL configuration
-  if (process.env.NEXT_PUBLIC_APP_URL && process.env.NEXT_PUBLIC_APP_URL.trim().length > 0) {
-    const base = process.env.NEXT_PUBLIC_APP_URL.trim().replace(/\/+$/, "");
-    return `${base}/api/auth/instagram/callback`;
-  }
-
-  // 3. Fallback from incoming HTTP request headers (if available)
-  if (req) {
-    const url = new URL(req.url);
-    const host = req.headers.get("x-forwarded-host") || req.headers.get("host") || url.host;
-    const proto = req.headers.get("x-forwarded-proto") || (url.protocol.replace(":", "") || "http");
-    return `${proto}://${host}/api/auth/instagram/callback`;
-  }
-
-  // 4. Default localhost development fallback
-  return "http://localhost:3000/api/auth/instagram/callback";
+  // 2. Derive callback URL using canonical application base URL
+  const baseUrl = getAppBaseUrl(req);
+  return `${baseUrl}/api/auth/instagram/callback`;
 }
 
 /**

@@ -212,7 +212,7 @@ function BillingContent() {
   };
 
   return (
-    <div className="min-h-full flex flex-col bg-slate-950 text-slate-100">
+    <div className="min-h-full flex flex-col bg-[#f8f9fb] text-slate-900">
       <DashboardHeader
         title="Billing & Creator Audit Quotas"
         subtitle="Manage your brand subscription plan, check credits, and invoice history"
@@ -220,11 +220,11 @@ function BillingContent() {
 
       <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-8">
         {/* Usage Quota Card */}
-        <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-8 space-y-6 shadow-sm">
+        <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-8 space-y-6 shadow-xs">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
               <div className="flex items-center gap-2">
-                <span className="text-[10px] font-bold uppercase tracking-wider text-blue-400 bg-blue-500/10 px-2.5 py-0.5 rounded-full border border-blue-500/20">
+                <span className="text-[10px] font-bold uppercase tracking-wider text-blue-700 bg-blue-50 px-2.5 py-0.5 rounded-full border border-blue-200">
                   {subData?.status === "TRIALING" ? "14-Day Trial Active" : `${activePlan.name} Tier Active`}
                 </span>
                 {subData?.currentPeriodEnd && (
@@ -233,21 +233,21 @@ function BillingContent() {
                   </span>
                 )}
               </div>
-              <h3 className="text-xl font-bold text-slate-100 mt-1">
+              <h3 className="text-xl font-bold text-slate-900 mt-1">
                 Creator Authenticity Audit Quota
               </h3>
             </div>
 
             <div className="flex items-center gap-3">
               <div className="text-left sm:text-right">
-                <span className="text-3xl font-black text-blue-400">{checksRemaining}</span>
-                <span className="text-sm font-semibold text-slate-400"> / {checksLimit} Checks Remaining</span>
+                <span className="text-3xl font-black text-blue-600">{checksRemaining}</span>
+                <span className="text-sm font-semibold text-slate-500"> / {checksLimit} Checks Remaining</span>
               </div>
 
               <button
                 type="button"
                 onClick={() => setIsAddonModalOpen(true)}
-                className="px-4 py-2.5 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow-md shadow-blue-600/25 transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
+                className="px-4 py-2.5 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
               >
                 <Plus className="w-3.5 h-3.5" />
                 <span>Top Up Audits</span>
@@ -257,13 +257,13 @@ function BillingContent() {
                 type="button"
                 onClick={handleOpenCustomerPortal}
                 disabled={isPortalLoading}
-                className="px-4 py-2.5 bg-slate-800 hover:bg-slate-700 text-slate-200 border border-slate-700 font-bold text-xs rounded-xl transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
+                className="px-4 py-2.5 bg-white hover:bg-slate-50 text-slate-700 border border-slate-200 font-bold text-xs rounded-xl shadow-xs transition-all flex items-center gap-1.5 cursor-pointer shrink-0"
                 title="Manage billing details, cards, and invoices via Stripe"
               >
                 {isPortalLoading ? (
-                  <Loader2 className="w-3.5 h-3.5 animate-spin" />
+                  <Loader2 className="w-3.5 h-3.5 animate-spin text-blue-600" />
                 ) : (
-                  <ExternalLink className="w-3.5 h-3.5 text-slate-400" />
+                  <ExternalLink className="w-3.5 h-3.5 text-slate-500" />
                 )}
                 <span>Manage Billing</span>
               </button>
@@ -271,17 +271,17 @@ function BillingContent() {
           </div>
 
           <div className="space-y-2">
-            <div className="flex justify-between text-xs font-semibold text-slate-400">
+            <div className="flex justify-between text-xs font-semibold text-slate-500">
               <span>
                 {checksUsed} of {checksLimit} Audits Consumed ({usagePercentage}%)
               </span>
-              <span className="text-emerald-400 font-bold">
+              <span className="text-emerald-600 font-bold">
                 {subData?.currentPeriodEnd ? `Quota Resets on ${formatDate(subData.currentPeriodEnd)}` : "Quota Resets Monthly"}
               </span>
             </div>
-            <div className="w-full bg-slate-950 rounded-full h-3 overflow-hidden border border-slate-800">
+            <div className="w-full bg-slate-100 rounded-full h-3 overflow-hidden border border-slate-200">
               <div
-                className="bg-gradient-to-r from-blue-500 via-indigo-500 to-emerald-500 h-3 rounded-full transition-all duration-500"
+                className="bg-gradient-to-r from-blue-600 via-indigo-600 to-emerald-500 h-3 rounded-full transition-all duration-500"
                 style={{ width: `${usagePercentage}%` }}
               />
             </div>
@@ -292,18 +292,18 @@ function BillingContent() {
         <div className="space-y-6">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
             <div>
-              <h3 className="text-lg font-bold text-slate-100">Available SaaS Plans</h3>
-              <p className="text-xs text-slate-400">
+              <h3 className="text-lg font-bold text-slate-900">Available SaaS Plans</h3>
+              <p className="text-xs text-slate-500">
                 Upgrade or downgrade your team tier anytime with automated Stripe prorated billing.
               </p>
             </div>
 
-            <div className="flex items-center gap-2 p-1 bg-slate-900 border border-slate-800 rounded-2xl self-start sm:self-auto text-xs">
+            <div className="flex items-center gap-2 p-1 bg-slate-100 border border-slate-200 rounded-xl self-start sm:self-auto text-xs">
               <button
                 type="button"
                 onClick={() => setIsAnnual(false)}
-                className={`px-3.5 py-1.5 rounded-xl font-bold transition-colors cursor-pointer ${
-                  !isAnnual ? "bg-blue-600 text-white shadow-xs" : "text-slate-400 hover:text-slate-200"
+                className={`px-3.5 py-1.5 rounded-lg font-bold transition-colors cursor-pointer ${
+                  !isAnnual ? "bg-white text-slate-900 shadow-xs" : "text-slate-500 hover:text-slate-800"
                 }`}
               >
                 Monthly
@@ -311,12 +311,12 @@ function BillingContent() {
               <button
                 type="button"
                 onClick={() => setIsAnnual(true)}
-                className={`px-3.5 py-1.5 rounded-xl font-bold transition-colors cursor-pointer flex items-center gap-1 ${
-                  isAnnual ? "bg-blue-600 text-white shadow-xs" : "text-slate-400 hover:text-slate-200"
+                className={`px-3.5 py-1.5 rounded-lg font-bold transition-colors cursor-pointer flex items-center gap-1 ${
+                  isAnnual ? "bg-white text-slate-900 shadow-xs" : "text-slate-500 hover:text-slate-800"
                 }`}
               >
                 <span>Annual</span>
-                <span className="text-[10px] text-emerald-300 font-extrabold bg-emerald-500/20 px-1.5 py-0.2 rounded">
+                <span className="text-[10px] text-emerald-700 font-extrabold bg-emerald-50 border border-emerald-200 px-1.5 py-0.2 rounded">
                   Save 20–26%
                 </span>
               </button>
@@ -332,49 +332,49 @@ function BillingContent() {
               return (
                 <div
                   key={plan.id}
-                  className={`bg-slate-900/90 border rounded-3xl p-6 space-y-6 relative transition-all duration-200 ${
+                  className={`bg-white border rounded-2xl p-6 space-y-6 relative transition-all duration-200 ${
                     isCurrent
-                      ? "border-blue-500 shadow-xl shadow-blue-500/10 ring-1 ring-blue-500"
-                      : "border-slate-800 hover:border-slate-700"
+                      ? "border-2 border-blue-600 shadow-sm ring-1 ring-blue-600/20"
+                      : "border-slate-200 hover:border-slate-300 shadow-xs"
                   }`}
                 >
                   {isCurrent && (
-                    <span className="absolute -top-3 left-6 px-3 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-600 text-white shadow-md">
+                    <span className="absolute -top-3 left-6 px-3 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wider bg-blue-600 text-white shadow-xs">
                       Current Active Plan
                     </span>
                   )}
 
                   <div className="space-y-2">
                     <div className="flex items-center justify-between">
-                      <h4 className="font-bold text-slate-100 text-lg">{plan.name}</h4>
+                      <h4 className="font-bold text-slate-900 text-lg">{plan.name}</h4>
                       {isAnnual && (
-                        <span className="text-[10px] font-extrabold text-emerald-400 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-full">
+                        <span className="text-[10px] font-extrabold text-emerald-700 bg-emerald-50 border border-emerald-200 px-2 py-0.5 rounded-full">
                           Save {PricingService.getSavingsPercentage(plan)}%
                         </span>
                       )}
                     </div>
-                    <p className="text-xs text-slate-400 leading-relaxed min-h-[36px]">
+                    <p className="text-xs text-slate-500 leading-relaxed min-h-[36px]">
                       {plan.description}
                     </p>
                     <div className="flex items-baseline gap-1 pt-2">
-                      <span className="text-3xl font-black text-slate-100">${price}</span>
-                      <span className="text-xs text-slate-400 font-semibold">/ month</span>
+                      <span className="text-3xl font-black text-slate-900">${price}</span>
+                      <span className="text-xs text-slate-500 font-semibold">/ month</span>
                     </div>
                     {isAnnual && (
-                      <p className="text-[11px] text-slate-400">
-                        Billed annually at <strong className="text-slate-200">${billedTotal}/yr</strong>
+                      <p className="text-[11px] text-slate-500">
+                        Billed annually at <strong className="text-slate-800">${billedTotal}/yr</strong>
                       </p>
                     )}
                   </div>
 
-                  <div className="p-3 bg-slate-950 rounded-2xl border border-slate-800 text-xs font-semibold text-blue-300">
+                  <div className="p-3 bg-blue-50 rounded-xl border border-blue-100 text-xs font-semibold text-blue-700">
                     ⚡ {plan.creatorChecksMonthly} Creator Authenticity Audits / mo
                   </div>
 
-                  <ul className="space-y-2.5 text-xs text-slate-300">
+                  <ul className="space-y-2.5 text-xs text-slate-600">
                     {plan.features.map((feat) => (
                       <li key={feat} className="flex items-start gap-2">
-                        <CheckCircle2 className="w-4 h-4 text-emerald-400 shrink-0 mt-0.5" />
+                        <CheckCircle2 className="w-4 h-4 text-emerald-600 shrink-0 mt-0.5" />
                         <span>{feat}</span>
                       </li>
                     ))}
@@ -386,8 +386,8 @@ function BillingContent() {
                     onClick={() => handleUpgrade(plan)}
                     className={`w-full py-2.5 rounded-xl font-bold text-xs transition-all cursor-pointer ${
                       isCurrent
-                        ? "bg-slate-800 text-slate-400 cursor-default"
-                        : "bg-blue-600 hover:bg-blue-500 text-white shadow-md shadow-blue-600/25"
+                        ? "bg-slate-100 text-slate-400 cursor-default border border-slate-200"
+                        : "bg-blue-600 hover:bg-blue-700 text-white shadow-xs"
                     }`}
                   >
                     {isCurrent ? "Active Plan" : `Switch to ${plan.name}`}
@@ -399,14 +399,14 @@ function BillingContent() {
         </div>
 
         {/* Invoices History Table */}
-        <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 space-y-4 shadow-sm">
+        <div className="bg-white border border-slate-200 rounded-2xl p-6 space-y-4 shadow-xs">
           <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
             <div>
-              <h4 className="font-bold text-slate-100 text-base">Invoice &amp; Billing History</h4>
-              <p className="text-xs text-slate-400">Download official receipts and Stripe transaction records</p>
+              <h4 className="font-bold text-slate-900 text-base">Invoice &amp; Billing History</h4>
+              <p className="text-xs text-slate-500">Download official receipts and Stripe transaction records</p>
             </div>
-            <div className="flex items-center gap-2 text-xs text-slate-400">
-              <CreditCard className="w-3.5 h-3.5 text-blue-400" />
+            <div className="flex items-center gap-2 text-xs text-slate-500">
+              <CreditCard className="w-3.5 h-3.5 text-blue-600" />
               <span>
                 {paymentMethod ? (
                   `${paymentMethod.brand} •••• ${paymentMethod.last4} (Exp ${paymentMethod.expMonth}/${paymentMethod.expYear})`
@@ -420,7 +420,7 @@ function BillingContent() {
           <div className="overflow-x-auto">
             {invoices.length > 0 ? (
               <table className="w-full text-left text-xs">
-                <thead className="bg-slate-950 text-slate-400 font-bold uppercase tracking-wider text-[10px] border-b border-slate-800">
+                <thead className="bg-slate-50 text-slate-500 font-bold uppercase tracking-wider text-[10px] border-b border-slate-200">
                   <tr>
                     <th className="py-3 px-4">Invoice / Record</th>
                     <th className="py-3 px-4">Date</th>
@@ -430,15 +430,15 @@ function BillingContent() {
                     <th className="py-3 px-4 text-right">Receipt</th>
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-slate-800/60 text-slate-300">
+                <tbody className="divide-y divide-slate-100 text-slate-700">
                   {invoices.map((inv) => (
-                    <tr key={inv.id} className="hover:bg-slate-800/30 transition-colors">
-                      <td className="py-3 px-4 font-mono font-bold text-slate-100">{inv.id}</td>
+                    <tr key={inv.id} className="hover:bg-slate-50/60 transition-colors">
+                      <td className="py-3 px-4 font-mono font-bold text-slate-900">{inv.id}</td>
                       <td className="py-3 px-4">{inv.date}</td>
                       <td className="py-3 px-4">{inv.description}</td>
-                      <td className="py-3 px-4 font-bold text-slate-100">{formatCurrency(inv.amount)} {inv.currency}</td>
+                      <td className="py-3 px-4 font-bold text-slate-900">{formatCurrency(inv.amount)} {inv.currency}</td>
                       <td className="py-3 px-4">
-                        <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+                        <span className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-emerald-50 text-emerald-700 border border-emerald-200">
                           {inv.status}
                         </span>
                       </td>
@@ -448,7 +448,7 @@ function BillingContent() {
                             href={inv.hostedInvoiceUrl || inv.invoicePdfUrl}
                             target="_blank"
                             rel="noreferrer"
-                            className="text-blue-400 hover:text-blue-300 font-semibold inline-flex items-center gap-1 cursor-pointer"
+                            className="text-blue-600 hover:text-blue-700 font-semibold inline-flex items-center gap-1 cursor-pointer"
                           >
                             <Download className="w-3.5 h-3.5" />
                             <span>Stripe Receipt</span>
@@ -457,7 +457,7 @@ function BillingContent() {
                           <button
                             type="button"
                             onClick={() => setSelectedInvoice(inv)}
-                            className="text-blue-400 hover:text-blue-300 font-semibold inline-flex items-center gap-1 cursor-pointer"
+                            className="text-blue-600 hover:text-blue-700 font-semibold inline-flex items-center gap-1 cursor-pointer"
                           >
                             <Download className="w-3.5 h-3.5" />
                             <span>PDF Receipt</span>
@@ -469,9 +469,9 @@ function BillingContent() {
                 </tbody>
               </table>
             ) : (
-              <div className="py-8 text-center text-xs text-slate-400 space-y-1">
+              <div className="py-8 text-center text-xs text-slate-500 space-y-1">
                 <p>No billing invoices recorded yet.</p>
-                <p className="text-[11px] text-slate-500">Official invoice receipts will appear here after your first Stripe subscription payment.</p>
+                <p className="text-[11px] text-slate-400">Official invoice receipts will appear here after your first Stripe subscription payment.</p>
               </div>
             )}
           </div>
@@ -485,20 +485,20 @@ function BillingContent() {
         title="Top Up Creator Authenticity Audits"
         description="Purchase instant add-on credits to continue auditing creators without upgrading your monthly plan tier."
       >
-        <div className="space-y-4 pt-2 text-slate-100">
+        <div className="space-y-4 pt-2 text-slate-900">
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
             {ADDON_CREDIT_PACKS.map((pack) => (
               <div
                 key={pack.id}
-                className={`p-4 rounded-2xl border flex flex-col justify-between space-y-3 ${
+                className={`p-4 rounded-xl border flex flex-col justify-between space-y-3 ${
                   pack.popular
-                    ? "bg-blue-600/15 border-blue-500"
-                    : "bg-slate-950 border-slate-800"
+                    ? "bg-blue-50/60 border-blue-300"
+                    : "bg-slate-50 border-slate-200"
                 }`}
               >
                 <div>
                   <div className="flex justify-between items-center">
-                    <span className="font-bold text-sm text-slate-100">{pack.name}</span>
+                    <span className="font-bold text-sm text-slate-900">{pack.name}</span>
                     {pack.popular && (
                       <span className="px-1.5 py-0.5 rounded text-[8px] font-bold uppercase bg-blue-600 text-white">
                         Best Value
@@ -506,13 +506,13 @@ function BillingContent() {
                     )}
                   </div>
                   <div className="flex items-baseline gap-1 mt-2">
-                    <span className="text-2xl font-black text-blue-400">${pack.price}</span>
-                    <span className="text-[10px] text-slate-400">USD</span>
+                    <span className="text-2xl font-black text-blue-600">${pack.price}</span>
+                    <span className="text-[10px] text-slate-500">USD</span>
                   </div>
-                  <span className="text-xs text-emerald-400 font-bold block mt-1">
+                  <span className="text-xs text-emerald-600 font-bold block mt-1">
                     +{pack.checksCount} Creator Checks
                   </span>
-                  <span className="text-[10px] text-slate-500">
+                  <span className="text-[10px] text-slate-400">
                     ${pack.unitPrice} per audit
                   </span>
                 </div>
@@ -521,7 +521,7 @@ function BillingContent() {
                   type="button"
                   disabled={isProcessing}
                   onClick={() => handlePurchaseAddon(pack)}
-                  className="w-full py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow-xs transition-colors cursor-pointer disabled:opacity-50"
+                  className="w-full py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-xs transition-colors cursor-pointer disabled:opacity-50"
                 >
                   Buy +{pack.checksCount} Checks
                 </button>
@@ -529,8 +529,8 @@ function BillingContent() {
             ))}
           </div>
 
-          <div className="p-3 bg-slate-950 border border-slate-800 rounded-xl text-[11px] text-slate-400 flex items-center gap-2">
-            <ShieldCheck className="w-4 h-4 text-emerald-400 shrink-0" />
+          <div className="p-3 bg-slate-50 border border-slate-200 rounded-xl text-[11px] text-slate-500 flex items-center gap-2">
+            <ShieldCheck className="w-4 h-4 text-emerald-600 shrink-0" />
             <span>Add-on credits never expire and roll over indefinitely.</span>
           </div>
         </div>
@@ -543,14 +543,14 @@ function BillingContent() {
           onClose={() => setSelectedInvoice(null)}
           title={`Receipt: ${selectedInvoice.id}`}
         >
-          <div className="space-y-5 text-xs text-slate-200">
+          <div className="space-y-5 text-xs text-slate-800">
             {/* Header branding */}
-            <div className="flex items-center justify-between pb-4 border-b border-slate-800">
+            <div className="flex items-center justify-between pb-4 border-b border-slate-100">
               <div>
-                <span className="text-base font-black text-white block">TrustScore Inc.</span>
+                <span className="text-base font-black text-slate-900 block">TrustScore Inc.</span>
                 <span className="text-[10px] text-slate-500">ABN: 88 192 849 102 • Sydney, Australia</span>
               </div>
-              <span className="px-2.5 py-1 rounded-full font-bold uppercase text-[10px] bg-emerald-500/10 text-emerald-400 border border-emerald-500/20">
+              <span className="px-2.5 py-1 rounded-full font-bold uppercase text-[10px] bg-emerald-50 text-emerald-700 border border-emerald-200">
                 Paid in Full
               </span>
             </div>
@@ -559,35 +559,35 @@ function BillingContent() {
             <div className="grid grid-cols-2 gap-3 text-xs">
               <div>
                 <span className="text-slate-500 block">Billed To:</span>
-                <span className="font-bold text-slate-100 block">Verified Business Account</span>
-                <span className="text-slate-400">{paymentMethod ? `${paymentMethod.brand} •••• ${paymentMethod.last4}` : "Stripe Payment"}</span>
+                <span className="font-bold text-slate-900 block">Verified Business Account</span>
+                <span className="text-slate-500">{paymentMethod ? `${paymentMethod.brand} •••• ${paymentMethod.last4}` : "Stripe Payment"}</span>
               </div>
               <div className="text-right">
                 <span className="text-slate-500 block">Invoice Date:</span>
-                <span className="font-bold text-slate-100 block">{selectedInvoice.date}</span>
-                <span className="text-slate-400">Status: {selectedInvoice.status}</span>
+                <span className="font-bold text-slate-900 block">{selectedInvoice.date}</span>
+                <span className="text-slate-500">Status: {selectedInvoice.status}</span>
               </div>
             </div>
 
             {/* Line items */}
-            <div className="bg-slate-950 rounded-2xl p-4 border border-slate-800 space-y-2">
-              <div className="flex justify-between font-bold text-slate-100 pb-2 border-b border-slate-800">
+            <div className="bg-slate-50 rounded-xl p-4 border border-slate-200 space-y-2">
+              <div className="flex justify-between font-bold text-slate-900 pb-2 border-b border-slate-200">
                 <span>Description</span>
                 <span>Amount</span>
               </div>
-              <div className="flex justify-between text-slate-300">
+              <div className="flex justify-between text-slate-700">
                 <span>{selectedInvoice.description}</span>
-                <span className="font-mono">{formatCurrency(selectedInvoice.amount)}</span>
+                <span className="font-mono font-semibold">{formatCurrency(selectedInvoice.amount)}</span>
               </div>
-              <div className="flex justify-between text-slate-400 text-[11px] pt-2 border-t border-slate-800">
+              <div className="flex justify-between text-slate-500 text-[11px] pt-2 border-t border-slate-200">
                 <span>Subtotal</span>
                 <span>{formatCurrency(selectedInvoice.amount)}</span>
               </div>
-              <div className="flex justify-between text-slate-400 text-[11px]">
+              <div className="flex justify-between text-slate-500 text-[11px]">
                 <span>Tax (0%)</span>
                 <span>$0.00</span>
               </div>
-              <div className="flex justify-between font-bold text-sm text-emerald-400 pt-2 border-t border-slate-800">
+              <div className="flex justify-between font-bold text-sm text-emerald-600 pt-2 border-t border-slate-200">
                 <span>Total Paid ({selectedInvoice.currency})</span>
                 <span>{formatCurrency(selectedInvoice.amount)}</span>
               </div>
@@ -597,7 +597,7 @@ function BillingContent() {
               <button
                 type="button"
                 onClick={() => window.print()}
-                className="px-4 py-2 bg-slate-900 hover:bg-slate-800 text-slate-200 font-bold text-xs rounded-xl border border-slate-700 flex items-center gap-1.5 cursor-pointer"
+                className="px-4 py-2 bg-white hover:bg-slate-50 text-slate-700 font-bold text-xs rounded-xl border border-slate-200 flex items-center gap-1.5 cursor-pointer shadow-xs"
               >
                 <Printer className="w-3.5 h-3.5" />
                 <span>Print Receipt</span>
@@ -609,7 +609,7 @@ function BillingContent() {
                   success("Receipt Exported", "Receipt details printed.");
                   setSelectedInvoice(null);
                 }}
-                className="px-4 py-2 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl shadow-sm flex items-center gap-1.5 cursor-pointer"
+                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl shadow-xs flex items-center gap-1.5 cursor-pointer"
               >
                 <Download className="w-3.5 h-3.5" />
                 <span>Done</span>

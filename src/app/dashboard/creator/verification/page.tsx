@@ -271,11 +271,11 @@ export default function CreatorVerificationPage() {
 
   if (isLoading) {
     return (
-      <div className="min-h-full flex flex-col bg-slate-950 text-slate-100">
+      <div className="min-h-full flex flex-col bg-[#f8f9fb] text-slate-900">
         <DashboardHeader title="Creator Verification" />
         <div className="py-24 flex flex-col items-center justify-center gap-3 text-slate-400">
-          <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
-          <span className="text-xs font-semibold">Loading verification status...</span>
+          <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+          <span className="text-xs font-semibold text-slate-500">Loading verification status...</span>
         </div>
       </div>
     );
@@ -289,7 +289,9 @@ export default function CreatorVerificationPage() {
           subtitle: "Cryptographically verified direct Meta API telemetry with active marketplace badge",
           badge: "Verified Badge Active",
           icon: ShieldCheck,
-          colorClass: "bg-emerald-500/10 border-emerald-500/30 text-emerald-400",
+          colorClass: "bg-emerald-50 border-emerald-200 text-emerald-900",
+          iconBoxClass: "bg-emerald-100 text-emerald-700 border-emerald-200",
+          badgeClass: "bg-emerald-100 text-emerald-800 border-emerald-300",
         };
       case "PENDING":
         return {
@@ -297,7 +299,9 @@ export default function CreatorVerificationPage() {
           subtitle: "Analyzing post comment entropy and follower acquisition monotonicity",
           badge: "Pending Verification",
           icon: Clock,
-          colorClass: "bg-amber-500/10 border-amber-500/30 text-amber-400",
+          colorClass: "bg-amber-50 border-amber-200 text-amber-900",
+          iconBoxClass: "bg-amber-100 text-amber-700 border-amber-200",
+          badgeClass: "bg-amber-100 text-amber-800 border-amber-300",
         };
       case "NEEDS_ATTENTION":
         return {
@@ -305,7 +309,9 @@ export default function CreatorVerificationPage() {
           subtitle: "OAuth token expired. Re-authenticate to resume telemetry ingestion",
           badge: "Needs Attention",
           icon: AlertCircle,
-          colorClass: "bg-orange-500/10 border-orange-500/30 text-orange-400",
+          colorClass: "bg-orange-50 border-orange-200 text-orange-900",
+          iconBoxClass: "bg-orange-100 text-orange-700 border-orange-200",
+          badgeClass: "bg-orange-100 text-orange-800 border-orange-300",
         };
       case "FAILED":
         return {
@@ -313,7 +319,9 @@ export default function CreatorVerificationPage() {
           subtitle: "Insufficient post sample depth to satisfy Poisson margin bounds",
           badge: "Audit Failed",
           icon: XCircle,
-          colorClass: "bg-rose-500/10 border-rose-500/30 text-rose-400",
+          colorClass: "bg-rose-50 border-rose-200 text-rose-900",
+          iconBoxClass: "bg-rose-100 text-rose-700 border-rose-200",
+          badgeClass: "bg-rose-100 text-rose-800 border-rose-300",
         };
       case "NOT_VERIFIED":
       default:
@@ -322,7 +330,9 @@ export default function CreatorVerificationPage() {
           subtitle: "Connect your primary professional channel via official OAuth to verify audience authenticity",
           badge: "Unverified Creator",
           icon: Lock,
-          colorClass: "bg-slate-800/80 border-slate-700/80 text-slate-400",
+          colorClass: "bg-white border-slate-200 text-slate-900",
+          iconBoxClass: "bg-slate-100 text-slate-600 border-slate-200",
+          badgeClass: "bg-slate-100 text-slate-700 border-slate-200",
         };
     }
   };
@@ -331,7 +341,7 @@ export default function CreatorVerificationPage() {
   const StatusIcon = statusConfig.icon;
 
   return (
-    <div className="min-h-full flex flex-col bg-slate-950 text-slate-100">
+    <div className="min-h-full flex flex-col bg-[#f8f9fb] text-slate-900">
       <DashboardHeader
         title="Creator Verification"
         subtitle="Manage OAuth direct telemetry ingestion, token lifecycles, and verification badges"
@@ -340,9 +350,9 @@ export default function CreatorVerificationPage() {
             type="button"
             onClick={handleSyncAll}
             disabled={isSyncing}
-            className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-slate-900 border border-slate-800 hover:border-slate-700 text-slate-200 transition-all shadow-sm cursor-pointer disabled:opacity-50"
+            className="flex items-center gap-2 px-4 py-2 rounded-xl text-xs font-semibold bg-white border border-slate-200 hover:bg-slate-50 text-slate-700 transition-all shadow-xs cursor-pointer disabled:opacity-50"
           >
-            <RefreshCw className={`w-3.5 h-3.5 text-blue-400 ${isSyncing ? "animate-spin" : ""}`} />
+            <RefreshCw className={`w-3.5 h-3.5 text-blue-600 ${isSyncing ? "animate-spin" : ""}`} />
             <span>{isSyncing ? "Syncing API Data..." : "Refresh Direct Telemetry"}</span>
           </button>
         }
@@ -350,22 +360,22 @@ export default function CreatorVerificationPage() {
 
       <div className="p-4 sm:p-6 lg:p-8 max-w-7xl mx-auto w-full space-y-8">
         {/* SECTION 1: Status Hero Banner */}
-        <div className={`p-6 sm:p-8 rounded-3xl border ${statusConfig.colorClass} bg-slate-900/60 backdrop-blur-sm relative overflow-hidden`}>
+        <div className={`p-6 sm:p-8 rounded-2xl border ${statusConfig.colorClass} shadow-xs relative overflow-hidden`}>
           <div className="relative z-10 flex flex-col md:flex-row md:items-center justify-between gap-6">
             <div className="flex items-start gap-4">
-              <div className="p-3.5 rounded-2xl bg-slate-950/60 border border-slate-800 shrink-0">
+              <div className={`p-3.5 rounded-2xl border shrink-0 ${statusConfig.iconBoxClass}`}>
                 <StatusIcon className="w-8 h-8" />
               </div>
               <div className="space-y-1.5">
                 <div className="flex items-center gap-3 flex-wrap">
-                  <h2 className="text-xl sm:text-2xl font-black text-slate-100 tracking-tight">
+                  <h2 className="text-xl sm:text-2xl font-black tracking-tight">
                     {statusConfig.title}
                   </h2>
-                  <span className="px-3 py-0.5 rounded-full text-xs font-bold bg-slate-950 border border-slate-800 text-slate-200">
+                  <span className={`px-3 py-0.5 rounded-full text-xs font-bold border ${statusConfig.badgeClass}`}>
                     {statusConfig.badge}
                   </span>
                 </div>
-                <p className="text-xs sm:text-sm text-slate-400 max-w-2xl leading-relaxed">
+                <p className="text-xs sm:text-sm opacity-80 max-w-2xl leading-relaxed">
                   {statusConfig.subtitle}
                 </p>
               </div>
@@ -373,20 +383,20 @@ export default function CreatorVerificationPage() {
 
             <div className="flex items-center gap-3 shrink-0">
               {verificationStatus === "VERIFIED" ? (
-                <div className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-emerald-500/20 border border-emerald-500/40 text-emerald-300 text-xs font-bold">
-                  <CheckCircle2 className="w-4 h-4" />
+                <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-emerald-100 border border-emerald-300 text-emerald-800 text-xs font-bold shadow-xs">
+                  <CheckCircle2 className="w-4 h-4 text-emerald-700" />
                   <span>Marketplace Badge Live</span>
                 </div>
               ) : verificationStatus === "PENDING" ? (
-                <div className="flex items-center gap-2 px-4 py-2 rounded-2xl bg-amber-500/20 border border-amber-500/40 text-amber-300 text-xs font-bold">
-                  <Clock className="w-4 h-4 animate-spin text-amber-400" />
+                <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-amber-100 border border-amber-300 text-amber-800 text-xs font-bold shadow-xs">
+                  <Clock className="w-4 h-4 animate-spin text-amber-700" />
                   <span>Audit in Progress</span>
                 </div>
               ) : (
                 <button
                   type="button"
                   onClick={handleSubmitVerification}
-                  className="px-5 py-2.5 rounded-2xl text-xs font-bold bg-blue-600 hover:bg-blue-500 text-white transition-all shadow-md shadow-blue-600/25 flex items-center gap-2 cursor-pointer"
+                  className="px-5 py-2.5 rounded-xl text-xs font-bold bg-blue-600 hover:bg-blue-700 text-white transition-all shadow-xs flex items-center gap-2 cursor-pointer"
                 >
                   <Sparkles className="w-3.5 h-3.5" />
                   <span>Request Verification Audit</span>
@@ -394,16 +404,14 @@ export default function CreatorVerificationPage() {
               )}
             </div>
           </div>
-
-          <div className="absolute -right-12 -bottom-12 w-64 h-64 bg-blue-600/5 rounded-full blur-3xl pointer-events-none" />
         </div>
 
         {/* SECTION 2: Connected Platform Channels */}
         <div className="space-y-4">
           <div className="flex items-center justify-between">
             <div>
-              <h3 className="text-base font-bold text-slate-100">Direct Platform Telemetry Connections</h3>
-              <p className="text-xs text-slate-400">
+              <h3 className="text-base font-bold text-slate-900">Direct Platform Telemetry Connections</h3>
+              <p className="text-xs text-slate-500">
                 Official OAuth connections provide read-only access to post analytics, engagement time series, and reach
               </p>
             </div>
@@ -413,46 +421,46 @@ export default function CreatorVerificationPage() {
             {platforms.map((p) => (
               <div
                 key={p.id}
-                className="p-6 rounded-3xl bg-slate-900/80 border border-slate-800 flex flex-col justify-between space-y-6 hover:border-slate-700/80 transition-all"
+                className="p-6 rounded-2xl bg-white border border-slate-200 flex flex-col justify-between space-y-6 hover:border-slate-300 transition-all shadow-xs"
               >
                 <div className="space-y-4">
                   <div className="flex items-center justify-between">
                     <div className="flex items-center gap-3">
-                      <div className="p-2.5 rounded-2xl bg-slate-950 border border-slate-800">
+                      <div className="p-2.5 rounded-xl bg-slate-50 border border-slate-200">
                         <PlatformIcon platform={p.id} size="md" />
                       </div>
                       <div>
-                        <h4 className="text-sm font-bold text-slate-100">{p.name}</h4>
-                        <span className="text-[11px] text-slate-400 font-mono">{p.authMethod}</span>
+                        <h4 className="text-sm font-bold text-slate-900">{p.name}</h4>
+                        <span className="text-[11px] text-slate-500 font-mono">{p.authMethod}</span>
                       </div>
                     </div>
                   </div>
 
                   {p.connected ? (
-                    <div className="p-4 rounded-2xl bg-slate-950/70 border border-slate-800/80 space-y-2.5">
+                    <div className="p-4 rounded-xl bg-slate-50/80 border border-slate-200/80 space-y-2.5">
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-slate-400">Handle</span>
-                        <span className="font-bold text-slate-200 font-mono">{p.username || "@creator"}</span>
+                        <span className="text-slate-500">Handle</span>
+                        <span className="font-bold text-slate-800 font-mono">{p.username || "@creator"}</span>
                       </div>
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-slate-400">Audience</span>
-                        <span className="font-bold text-emerald-400">{formatNumber(p.followers)}</span>
+                        <span className="text-slate-500">Audience</span>
+                        <span className="font-bold text-emerald-600">{formatNumber(p.followers)}</span>
                       </div>
                       <div className="flex items-center justify-between text-xs">
-                        <span className="text-slate-400">Telemetry Status</span>
-                        <span className="flex items-center gap-1.5 text-emerald-400 font-semibold text-[11px]">
-                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-400 animate-pulse" />
+                        <span className="text-slate-500">Telemetry Status</span>
+                        <span className="flex items-center gap-1.5 text-emerald-600 font-semibold text-[11px]">
+                          <span className="w-1.5 h-1.5 rounded-full bg-emerald-500 animate-pulse" />
                           <span>Direct Ingest Active</span>
                         </span>
                       </div>
-                      <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-800/60">
-                        <span className="text-slate-400">Last Synced</span>
-                        <span className="text-slate-400 text-[11px]">{p.lastSynced}</span>
+                      <div className="flex items-center justify-between text-xs pt-1 border-t border-slate-200/80">
+                        <span className="text-slate-500">Last Synced</span>
+                        <span className="text-slate-500 text-[11px]">{p.lastSynced}</span>
                       </div>
                     </div>
                   ) : (
-                    <div className="p-4 rounded-2xl bg-slate-950/40 border border-dashed border-slate-800 text-center py-6 space-y-2">
-                      <p className="text-xs text-slate-400">Channel not connected for direct API verification</p>
+                    <div className="p-4 rounded-xl bg-slate-50/60 border border-dashed border-slate-300 text-center py-6 space-y-2">
+                      <p className="text-xs text-slate-600">Channel not connected for direct API verification</p>
                       <span className="inline-block text-[11px] font-semibold text-slate-400">
                         Read-only telemetry scopes required
                       </span>
@@ -460,22 +468,22 @@ export default function CreatorVerificationPage() {
                   )}
                 </div>
 
-                <div className="pt-2 border-t border-slate-800/60">
+                <div className="pt-2 border-t border-slate-100">
                   {p.connected ? (
                     <div className="flex items-center gap-2">
                       <button
                         type="button"
                         onClick={handleSyncAll}
                         disabled={isSyncing}
-                        className="flex-1 py-2 px-3 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-200 text-xs font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50"
+                        className="flex-1 py-2 px-3 rounded-xl bg-white hover:bg-slate-50 border border-slate-200 text-slate-700 text-xs font-semibold transition-all flex items-center justify-center gap-1.5 cursor-pointer disabled:opacity-50 shadow-xs"
                       >
-                        <RefreshCw className={`w-3 h-3 ${isSyncing ? "animate-spin text-blue-400" : ""}`} />
+                        <RefreshCw className={`w-3 h-3 ${isSyncing ? "animate-spin text-blue-600" : "text-slate-500"}`} />
                         <span>Sync Now</span>
                       </button>
                       <button
                         type="button"
                         onClick={() => handleDisconnect(p.id, p.name)}
-                        className="py-2 px-3 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 text-xs font-semibold transition-all flex items-center justify-center gap-1 cursor-pointer"
+                        className="py-2 px-3 rounded-xl bg-rose-50 hover:bg-rose-100 text-rose-700 border border-rose-200 text-xs font-semibold transition-all flex items-center justify-center gap-1 cursor-pointer"
                         title="Disconnect platform account"
                       >
                         <Unlink className="w-3.5 h-3.5" />
@@ -485,7 +493,7 @@ export default function CreatorVerificationPage() {
                     <button
                       type="button"
                       onClick={() => handleConnect(p.id, p.name)}
-                      className="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-md shadow-blue-600/20 cursor-pointer"
+                      className="w-full py-2.5 px-4 rounded-xl bg-blue-600 hover:bg-blue-700 text-white text-xs font-bold transition-all flex items-center justify-center gap-2 shadow-xs cursor-pointer"
                     >
                       <Link2 className="w-3.5 h-3.5" />
                       <span>Connect with {p.name.split(" ")[0]}</span>
@@ -499,32 +507,32 @@ export default function CreatorVerificationPage() {
 
         {/* SECTION 3: Why Verification Matters & Mathematical Rigor */}
         <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
-          <div className="p-6 rounded-3xl bg-slate-900/60 border border-slate-800 space-y-3">
-            <div className="w-10 h-10 rounded-2xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center">
+          <div className="p-6 rounded-2xl bg-white border border-slate-200 space-y-3 shadow-xs">
+            <div className="w-10 h-10 rounded-xl bg-blue-50 border border-blue-200 text-blue-600 flex items-center justify-center">
               <Shield className="w-5 h-5" />
             </div>
-            <h4 className="text-sm font-bold text-slate-100">Zero Password Requirement</h4>
-            <p className="text-xs text-slate-400 leading-relaxed">
+            <h4 className="text-sm font-bold text-slate-900">Zero Password Requirement</h4>
+            <p className="text-xs text-slate-500 leading-relaxed">
               We never request passwords or write permissions. TrustScore uses official OAuth scopes exclusively to read post metrics and comment velocity.
             </p>
           </div>
 
-          <div className="p-6 rounded-3xl bg-slate-900/60 border border-slate-800 space-y-3">
-            <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center">
+          <div className="p-6 rounded-2xl bg-white border border-slate-200 space-y-3 shadow-xs">
+            <div className="w-10 h-10 rounded-xl bg-emerald-50 border border-emerald-200 text-emerald-600 flex items-center justify-center">
               <Layers className="w-5 h-5" />
             </div>
-            <h4 className="text-sm font-bold text-slate-100">Bayesian Margin Precision</h4>
-            <p className="text-xs text-slate-400 leading-relaxed">
+            <h4 className="text-sm font-bold text-slate-900">Bayesian Margin Precision</h4>
+            <p className="text-xs text-slate-500 leading-relaxed">
               Direct telemetry feeds our Bayesian engine with exact post metrics, reducing uncertainty margins from ±8.5% down to ±1.5%.
             </p>
           </div>
 
-          <div className="p-6 rounded-3xl bg-slate-900/60 border border-slate-800 space-y-3">
-            <div className="w-10 h-10 rounded-2xl bg-purple-500/10 border border-purple-500/20 text-purple-400 flex items-center justify-center">
+          <div className="p-6 rounded-2xl bg-white border border-slate-200 space-y-3 shadow-xs">
+            <div className="w-10 h-10 rounded-xl bg-purple-50 border border-purple-200 text-purple-600 flex items-center justify-center">
               <Sparkles className="w-5 h-5" />
             </div>
-            <h4 className="text-sm font-bold text-slate-100">Priority Brand Discovery</h4>
-            <p className="text-xs text-slate-400 leading-relaxed">
+            <h4 className="text-sm font-bold text-slate-900">Priority Brand Discovery</h4>
+            <p className="text-xs text-slate-500 leading-relaxed">
               Verified creators appear with a verified credibility badge on the brand marketplace and receive up to 3.8x more direct inbound collaboration proposals.
             </p>
           </div>

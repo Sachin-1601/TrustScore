@@ -75,15 +75,15 @@ export function CreatorNextSteps({ creator }: CreatorNextStepsProps) {
   const pendingActions = actions.filter((a) => !a.isComplete);
 
   return (
-    <div className="bg-slate-900/90 border border-slate-800 rounded-3xl p-6 sm:p-7 space-y-5 shadow-lg">
-      <div className="flex items-center justify-between pb-3 border-b border-slate-800/80">
+    <div className="bg-white border border-slate-200 rounded-2xl p-6 sm:p-7 space-y-5 shadow-xs">
+      <div className="flex items-center justify-between pb-3 border-b border-slate-100">
         <div className="flex items-center gap-2">
-          <Sliders className="w-4 h-4 text-blue-400" />
-          <h3 className="text-base font-bold text-slate-100">
+          <Sliders className="w-4 h-4 text-blue-600" />
+          <h3 className="text-base font-bold text-slate-900">
             What To Do Next
           </h3>
         </div>
-        <span className="text-xs font-semibold text-slate-400">
+        <span className="text-xs font-semibold text-slate-500">
           {pendingActions.length === 0
             ? "100% Optimized"
             : `${pendingActions.length} item${pendingActions.length === 1 ? "" : "s"} remaining`}
@@ -97,23 +97,23 @@ export function CreatorNextSteps({ creator }: CreatorNextStepsProps) {
             return (
               <div
                 key={action.id}
-                className="p-4 bg-slate-950/80 hover:bg-slate-950 border border-slate-800/90 hover:border-slate-700/80 rounded-2xl transition-all space-y-3"
+                className="p-4 bg-slate-50/80 hover:bg-slate-50 border border-slate-200/80 rounded-xl transition-all space-y-3"
               >
                 <div className="flex items-start justify-between gap-3">
                   <div className="flex items-start gap-3">
-                    <div className="w-8 h-8 rounded-xl bg-blue-500/10 border border-blue-500/20 text-blue-400 flex items-center justify-center shrink-0 mt-0.5">
+                    <div className="w-8 h-8 rounded-xl bg-blue-50 border border-blue-200/80 text-blue-600 flex items-center justify-center shrink-0 mt-0.5">
                       <Icon className="w-4 h-4" />
                     </div>
                     <div className="space-y-1">
                       <div className="flex items-center gap-2 flex-wrap">
-                        <h4 className="text-xs sm:text-sm font-bold text-slate-200">
+                        <h4 className="text-xs sm:text-sm font-bold text-slate-800">
                           {action.title}
                         </h4>
-                        <span className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-blue-500/10 text-blue-400 border border-blue-500/20">
+                        <span className="px-2 py-0.5 rounded-full text-[9px] font-bold uppercase tracking-wider bg-blue-50 text-blue-700 border border-blue-200/80">
                           {action.badge}
                         </span>
                       </div>
-                      <p className="text-xs text-slate-400 leading-relaxed">
+                      <p className="text-xs text-slate-500 leading-relaxed">
                         {action.description}
                       </p>
                     </div>
@@ -123,7 +123,7 @@ export function CreatorNextSteps({ creator }: CreatorNextStepsProps) {
                 <div className="flex justify-end pt-1">
                   <Link
                     href={action.href}
-                    className="py-1.5 px-3 bg-blue-600 hover:bg-blue-500 text-white font-bold text-xs rounded-xl transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
+                    className="py-1.5 px-3 bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs rounded-xl transition-all shadow-xs flex items-center gap-1.5 cursor-pointer"
                   >
                     <span>{action.ctaText}</span>
                     <ArrowRight className="w-3.5 h-3.5" />
@@ -133,14 +133,14 @@ export function CreatorNextSteps({ creator }: CreatorNextStepsProps) {
             );
           })
         ) : (
-          <div className="p-6 bg-slate-950/80 rounded-2xl border border-emerald-500/20 text-center space-y-2">
-            <div className="w-10 h-10 rounded-2xl bg-emerald-500/10 border border-emerald-500/20 text-emerald-400 flex items-center justify-center mx-auto">
+          <div className="p-6 bg-emerald-50/60 rounded-xl border border-emerald-200 text-center space-y-2">
+            <div className="w-10 h-10 rounded-2xl bg-emerald-100 text-emerald-700 flex items-center justify-center mx-auto">
               <CheckCircle2 className="w-5 h-5" />
             </div>
-            <h4 className="text-sm font-bold text-slate-200">
+            <h4 className="text-sm font-bold text-slate-800">
               Profile Setup Complete &amp; Fully Optimized
             </h4>
-            <p className="text-xs text-slate-400 max-w-sm mx-auto">
+            <p className="text-xs text-slate-500 max-w-sm mx-auto">
               Your profile has complete metadata, active telemetry, and verified metrics ready for brand sponsorships.
             </p>
           </div>

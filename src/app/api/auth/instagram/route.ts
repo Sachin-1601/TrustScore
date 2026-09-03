@@ -3,20 +3,23 @@ import { getServerSession } from "@/lib/session";
 import {
   getInstagramClientId,
   getInstagramOAuthCallbackUrl,
+  getAppBaseUrl,
   createInstagramOAuthState,
   buildInstagramAuthorizeUrl,
 } from "@/lib/instagramOAuth";
 
 export async function GET(req: Request) {
+  const baseUrl = getAppBaseUrl(req);
+
   try {
     const session = await getServerSession();
     if (!session) {
-      const loginUrl = new URL("/login", req.url);
+      const loginUrl = new URL("/login", baseUrl);
       return NextResponse.redirect(loginUrl);
     }
 
     if (session.role !== "CREATOR" && session.role !== "ADMIN") {
-      const fallbackUrl = new URL("/dashboard/businesses", req.url);
+      const fallbackUrl = new URL("/dashboard/businesses", baseUrl);
       return NextResponse.redirect(fallbackUrl);
     }
 
@@ -24,7 +27,7 @@ export async function GET(req: Request) {
     if (!clientId) {
       const errorUrl = new URL(
         "/dashboard/creator/verification?error=Instagram+App+ID+is+not+configured+in+environment",
-        req.url
+        baseUrl
       );
       return NextResponse.redirect(errorUrl);
     }
@@ -41,7 +44,7 @@ export async function GET(req: Request) {
     console.error("[Instagram OAuth] Failed to initialize authorization:", err);
     const errorUrl = new URL(
       `/dashboard/creator/verification?error=${encodeURIComponent(err.message || "Failed to initialize Instagram authorization")}`,
-      req.url
+      baseUrl
     );
     return NextResponse.redirect(errorUrl);
   }
