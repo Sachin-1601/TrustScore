@@ -66,22 +66,31 @@ export function getInstagramApiVersion(): string {
 }
 
 /**
- * Determines the exact OAuth callback URL based on request context and environment
+ * Determines the exact OAuth callback URL based on environment configuration and request context
  */
-export function getInstagramOAuthCallbackUrl(req: Request): string {
-  if (
-    process.env.NEXT_PUBLIC_APP_URL &&
-    process.env.NODE_ENV === "production" &&
-    !process.env.NEXT_PUBLIC_APP_URL.includes("localhost")
-  ) {
-    const base = process.env.NEXT_PUBLIC_APP_URL.replace(/\/+$/, "");
+export function getInstagramOAuthCallbackUrl(req?: Request): string {
+  // 1. Explicit canonical environment variable (Highest Priority)
+  const explicitUri = process.env.INSTAGRAM_REDIRECT_URI;
+  if (explicitUri && explicitUri.trim().length > 0) {
+    return explicitUri.trim();
+  }
+
+  // 2. Base platform URL configuration
+  if (process.env.NEXT_PUBLIC_APP_URL && process.env.NEXT_PUBLIC_APP_URL.trim().length > 0) {
+    const base = process.env.NEXT_PUBLIC_APP_URL.trim().replace(/\/+$/, "");
     return `${base}/api/auth/instagram/callback`;
   }
 
-  const url = new URL(req.url);
-  const host = req.headers.get("x-forwarded-host") || req.headers.get("host") || url.host;
-  const proto = req.headers.get("x-forwarded-proto") || (url.protocol.replace(":", "") || "http");
-  return `${proto}://${host}/api/auth/instagram/callback`;
+  // 3. Fallback from incoming HTTP request headers (if available)
+  if (req) {
+    const url = new URL(req.url);
+    const host = req.headers.get("x-forwarded-host") || req.headers.get("host") || url.host;
+    const proto = req.headers.get("x-forwarded-proto") || (url.protocol.replace(":", "") || "http");
+    return `${proto}://${host}/api/auth/instagram/callback`;
+  }
+
+  // 4. Default localhost development fallback
+  return "http://localhost:3000/api/auth/instagram/callback";
 }
 
 /**

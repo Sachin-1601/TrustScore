@@ -75,21 +75,29 @@ async function runInstagramIntegrationTests() {
   console.log("  ✅ PASS: Cryptographic OAuth state token verified");
 
   // 4. Environment Variables Resolution
-  console.log("\n[TEST 5] Environment Variable Name Resolution (INSTAGRAM_APP_ID & INSTAGRAM_APP_SECRET)");
+  console.log("\n[TEST 5] Environment Variable Name Resolution (INSTAGRAM_APP_ID, INSTAGRAM_APP_SECRET, INSTAGRAM_REDIRECT_URI)");
   const originalAppId = process.env.INSTAGRAM_APP_ID;
   const originalAppSecret = process.env.INSTAGRAM_APP_SECRET;
+  const originalRedirectUri = process.env.INSTAGRAM_REDIRECT_URI;
 
   process.env.INSTAGRAM_APP_ID = "987654321098765";
   process.env.INSTAGRAM_APP_SECRET = "mock_secret_for_test";
+  process.env.INSTAGRAM_REDIRECT_URI = "http://localhost:3000/api/auth/instagram/callback";
 
-  const { getInstagramClientId, getInstagramClientSecret } = await import("../lib/instagramOAuth");
+  const { getInstagramClientId, getInstagramClientSecret, getInstagramOAuthCallbackUrl } = await import("../lib/instagramOAuth");
   assert.strictEqual(getInstagramClientId(), "987654321098765", "INSTAGRAM_APP_ID is resolved");
   assert.strictEqual(getInstagramClientSecret(), "mock_secret_for_test", "INSTAGRAM_APP_SECRET is resolved");
+  assert.strictEqual(getInstagramOAuthCallbackUrl(), "http://localhost:3000/api/auth/instagram/callback", "INSTAGRAM_REDIRECT_URI takes exact precedence");
+
+  // Test custom production redirect URI precedence
+  process.env.INSTAGRAM_REDIRECT_URI = "https://app.trustscore.io/api/auth/instagram/callback";
+  assert.strictEqual(getInstagramOAuthCallbackUrl(), "https://app.trustscore.io/api/auth/instagram/callback", "Custom production redirect URI resolved exactly");
 
   // Restore
   if (originalAppId) process.env.INSTAGRAM_APP_ID = originalAppId; else delete process.env.INSTAGRAM_APP_ID;
   if (originalAppSecret) process.env.INSTAGRAM_APP_SECRET = originalAppSecret; else delete process.env.INSTAGRAM_APP_SECRET;
-  console.log("  ✅ PASS: Dedicated INSTAGRAM_APP_ID & INSTAGRAM_APP_SECRET variable resolution verified");
+  if (originalRedirectUri) process.env.INSTAGRAM_REDIRECT_URI = originalRedirectUri; else delete process.env.INSTAGRAM_REDIRECT_URI;
+  console.log("  ✅ PASS: Dedicated INSTAGRAM_APP_ID, INSTAGRAM_APP_SECRET & INSTAGRAM_REDIRECT_URI verified");
 
   // 5. End-to-End Creator Telemetry Sync & Model Ingestion
   console.log("\n[TEST 6] End-to-End Database Mapping & Synchronization Pipeline");
