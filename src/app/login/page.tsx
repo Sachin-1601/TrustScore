@@ -123,14 +123,23 @@ function LoginContent() {
       setUnverifiedEmail(res.email || email.trim());
       setErrorMessage(res.error || "Please verify your email address before signing in.");
     } else if (res.success && res.session) {
+      console.log(`[AUTH DEBUG] login success | email: ${res.session.email} | role: ${res.session.role} | onboardingCompleted: ${res.session.onboardingCompleted}`);
+      const isComplete = res.session.onboardingCompleted === true;
       if (res.session.role === "CREATOR") {
-        router.push("/dashboard/creator");
+        const dest = isComplete ? "/dashboard/creator" : "/onboarding/creator";
+        console.log(`[ROUTING DEBUG] redirect destination: ${dest}`);
+        router.push(dest);
       } else if (res.session.role === "BUSINESS" || res.session.role === "AGENCY") {
-        router.push("/dashboard/businesses");
+        const dest = isComplete ? "/dashboard/businesses" : "/onboarding/business";
+        console.log(`[ROUTING DEBUG] redirect destination: ${dest}`);
+        router.push(dest);
       } else if (res.session.role === "ADMIN") {
+        console.log("[ROUTING DEBUG] redirect destination: /admin");
         router.push("/admin");
       } else {
-        router.push("/dashboard/businesses");
+        const dest = isComplete ? "/dashboard/businesses" : "/onboarding/business";
+        console.log(`[ROUTING DEBUG] redirect destination: ${dest}`);
+        router.push(dest);
       }
     } else {
       setErrorMessage(res.error || "Invalid login credentials. Please try again.");

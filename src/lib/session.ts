@@ -34,6 +34,8 @@ export interface SessionPayload {
   name: string;
   role: UserRole;
   avatar?: string;
+  onboardingCompleted?: boolean;
+  onboardingStep?: number;
   creatorId?: string;
   businessId?: string;
   creatorProfileId?: string;

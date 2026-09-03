@@ -63,7 +63,6 @@ TrustScore/
 │   │   ├── advertisementService.ts   # Ad Rotation & Telemetry
 │   │   ├── paymentService.ts         # Stripe Checkout & Webhook Handlers
 │   │   ├── pricingService.ts         # Centralized SaaS Pricing Config
-│   │   ├── socialDataProvider.ts     # Platform Graph API Abstraction
 │   │   └── authService.ts            # RBAC & Session Management
 │   ├── db/                           # Database Client & Repository Layer
 │   ├── contexts/                     # AuthContext & ToastContext

@@ -207,20 +207,23 @@ export async function GET(req: Request) {
         name: user.name,
         role: user.role,
         avatar: user.avatar || undefined,
+        onboardingCompleted: user.onboardingCompleted ?? false,
+        onboardingStep: user.onboardingStep ?? 1,
         creatorProfileId: user.creatorProfile?.id,
         businessProfileId: user.businessProfile?.id,
       });
 
-      // Preserve existing account type: redirect to user's assigned dashboard
-      const targetDashboard =
-        user.role === "CREATOR"
-          ? "/dashboard/creator"
-          : user.role === "ADMIN"
-          ? "/admin"
-          : "/dashboard/businesses";
+      let targetDestination: string;
+      if (user.role === "ADMIN") {
+        targetDestination = "/admin";
+      } else if (user.role === "CREATOR") {
+        targetDestination = user.onboardingCompleted ? "/dashboard/creator" : "/onboarding/creator";
+      } else {
+        targetDestination = user.onboardingCompleted ? "/dashboard/businesses" : "/onboarding/business";
+      }
 
-      console.log(`[Google OAuth Callback] Authentication successful. Redirecting to ${targetDashboard}`);
-      return NextResponse.redirect(new URL(targetDashboard, req.url), 302);
+      console.log(`[Google OAuth Callback] Authentication successful. Redirecting to ${targetDestination}`);
+      return NextResponse.redirect(new URL(targetDestination, req.url), 302);
     }
 
     return NextResponse.redirect(

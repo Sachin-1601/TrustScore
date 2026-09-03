@@ -30,18 +30,22 @@ export async function GET(req: Request) {
       name: result.user.name,
       role: result.user.role as any,
       avatar: result.user.avatar,
+      onboardingCompleted: result.user.onboardingCompleted,
+      onboardingStep: result.user.onboardingStep,
       creatorProfileId: result.user.creatorProfileId,
       businessProfileId: result.user.businessProfileId,
     });
 
-    const targetDashboard =
-      result.user.role === "CREATOR"
-        ? "/dashboard/creator"
-        : result.user.role === "ADMIN"
-        ? "/admin"
-        : "/dashboard/businesses";
+    let targetDestination: string;
+    if (result.user.role === "ADMIN") {
+      targetDestination = "/admin";
+    } else if (result.user.role === "CREATOR") {
+      targetDestination = result.user.onboardingCompleted ? "/dashboard/creator" : "/onboarding/creator";
+    } else {
+      targetDestination = result.user.onboardingCompleted ? "/dashboard/businesses" : "/onboarding/business";
+    }
 
-    return NextResponse.redirect(new URL(targetDashboard, req.url), 302);
+    return NextResponse.redirect(new URL(targetDestination, req.url), 302);
   } catch (err: any) {
     console.error("Email verification route error:", err);
     return NextResponse.redirect(

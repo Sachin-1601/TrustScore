@@ -7,44 +7,65 @@ export async function proxy(request: NextRequest) {
   const token = request.cookies.get(SESSION_COOKIE_NAME)?.value;
   const session = token ? await verifySessionToken(token) : null;
 
-  // 1. Unauthenticated users trying to access dashboard/admin routes
-  if (pathname.startsWith("/dashboard") || pathname.startsWith("/admin")) {
+  // 1. Unauthenticated users trying to access protected dashboard/admin/onboarding routes
+  if (
+    pathname.startsWith("/dashboard") ||
+    pathname.startsWith("/admin") ||
+    pathname.startsWith("/onboarding")
+  ) {
     if (!session) {
       const loginUrl = new URL("/login", request.url);
       return NextResponse.redirect(loginUrl);
     }
 
-    // 2. Canonical /dashboard redirect
-    if (pathname === "/dashboard") {
-      if (session.role === "CREATOR") {
-        return NextResponse.redirect(new URL("/dashboard/creator", request.url));
-      } else if (session.role === "ADMIN") {
+    const isOnboardingComplete = session.onboardingCompleted === true;
+
+    // 2. ADMIN Role Routing
+    if (session.role === "ADMIN") {
+      if (pathname.startsWith("/onboarding") || pathname.startsWith("/dashboard")) {
         return NextResponse.redirect(new URL("/admin", request.url));
-      } else {
+      }
+      return NextResponse.next();
+    }
+
+    // 3. CREATOR Role Routing
+    if (session.role === "CREATOR") {
+      if (!isOnboardingComplete) {
+        // Creator must finish onboarding before accessing dashboard or cross-role onboarding
+        if (pathname !== "/onboarding/creator") {
+          return NextResponse.redirect(new URL("/onboarding/creator", request.url));
+        }
+        return NextResponse.next();
+      }
+
+      // Onboarding complete - blocked from re-entering onboarding or business dashboard
+      if (pathname.startsWith("/onboarding")) {
+        return NextResponse.redirect(new URL("/dashboard/creator", request.url));
+      }
+      if (pathname === "/dashboard" || pathname.startsWith("/dashboard/businesses") || pathname.startsWith("/admin")) {
+        return NextResponse.redirect(new URL("/dashboard/creator", request.url));
+      }
+      return NextResponse.next();
+    }
+
+    // 4. BUSINESS & AGENCY Role Routing
+    if (session.role === "BUSINESS" || session.role === "AGENCY") {
+      if (!isOnboardingComplete) {
+        // Business must finish onboarding before accessing dashboard or cross-role onboarding
+        if (pathname !== "/onboarding/business") {
+          return NextResponse.redirect(new URL("/onboarding/business", request.url));
+        }
+        return NextResponse.next();
+      }
+
+      // Onboarding complete - blocked from re-entering onboarding or creator dashboard
+      if (pathname.startsWith("/onboarding")) {
         return NextResponse.redirect(new URL("/dashboard/businesses", request.url));
       }
-    }
-
-    // 3. Creator trying to access Business dashboard
-    if (session.role === "CREATOR" && pathname.startsWith("/dashboard/businesses")) {
-      return NextResponse.redirect(new URL("/dashboard/creator", request.url));
-    }
-
-    // 4. Business trying to access Creator dashboard
-    if (
-      (session.role === "BUSINESS" || session.role === "AGENCY") &&
-      pathname.startsWith("/dashboard/creator")
-    ) {
-      return NextResponse.redirect(new URL("/dashboard/businesses", request.url));
-    }
-
-    // 5. Non-admin trying to access Admin console
-    if (
-      session.role !== "ADMIN" &&
-      (pathname.startsWith("/admin") || pathname === "/dashboard/model-insights")
-    ) {
-      const dest = session.role === "CREATOR" ? "/dashboard/creator" : "/dashboard/businesses";
-      return NextResponse.redirect(new URL(dest, request.url));
+      if (pathname === "/dashboard" || pathname.startsWith("/dashboard/creator") || pathname.startsWith("/admin")) {
+        return NextResponse.redirect(new URL("/dashboard/businesses", request.url));
+      }
+      return NextResponse.next();
     }
   }
 
@@ -52,5 +73,5 @@ export async function proxy(request: NextRequest) {
 }
 
 export const config = {
-  matcher: ["/dashboard/:path*", "/admin/:path*"],
+  matcher: ["/dashboard/:path*", "/admin/:path*", "/onboarding/:path*"],
 };

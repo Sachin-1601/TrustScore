@@ -96,6 +96,8 @@ model User {
   avatar                  String?
   role                    UserRole                 @default(BUSINESS)
   emailVerifiedAt         DateTime?
+  onboardingCompleted     Boolean                  @default(false)
+  onboardingStep          Int                      @default(1)
   createdAt               DateTime                 @default(now())
   updatedAt               DateTime                 @updatedAt
 
@@ -288,6 +290,11 @@ model BusinessProfile {
   website               String
   isSponsored           Boolean         @default(false)
   activeCampaignsCount  Int             @default(0)
+  goals                 String[]        @default([])
+  targetCategories      String[]        @default([])
+  preferredPlatforms    String[]        @default([])
+  targetFollowerRange   String?
+  approxBudget          Float?
   createdAt             DateTime        @default(now())
   updatedAt             DateTime        @updatedAt
 

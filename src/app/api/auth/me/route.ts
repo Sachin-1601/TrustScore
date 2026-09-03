@@ -11,7 +11,10 @@ export async function GET() {
 
     // Refresh user state from database/service
     const userSession = await AuthService.getUserById(session.userId);
-    return NextResponse.json({ session: userSession || session }, { status: 200 });
+    const activeSession = userSession || session;
+    console.log(`[AUTH DEBUG] /api/auth/me role: ${activeSession?.role} | email: ${activeSession?.email}`);
+
+    return NextResponse.json({ session: activeSession }, { status: 200 });
   } catch (err: any) {
     return NextResponse.json({ session: null, error: err.message }, { status: 500 });
   }

@@ -14,6 +14,7 @@ export async function POST(req: Request) {
     const result = await AuthService.login(email, password, accountType);
 
     if (result.emailUnverified) {
+      console.log(`[AUTH DEBUG] login email: ${email} -> emailUnverified: true`);
       return NextResponse.json(
         {
           error: result.error || "Please verify your email address before signing in.",
@@ -25,8 +26,11 @@ export async function POST(req: Request) {
     }
 
     if (result.error || !result.session) {
+      console.log(`[AUTH DEBUG] login email: ${email} -> error: ${result.error}`);
       return NextResponse.json({ error: result.error || "Authentication failed" }, { status: 401 });
     }
+
+    console.log(`[AUTH DEBUG] login email: ${result.session.email} | database role: ${result.session.role} | session role: ${result.session.role}`);
 
     await setSessionCookie({
       userId: result.session.id,
@@ -34,6 +38,8 @@ export async function POST(req: Request) {
       name: result.session.name,
       role: result.session.role as any,
       avatar: result.session.avatar,
+      onboardingCompleted: result.session.onboardingCompleted,
+      onboardingStep: result.session.onboardingStep,
       creatorProfileId: result.session.creatorProfileId,
       businessProfileId: result.session.businessProfileId,
     });

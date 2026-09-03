@@ -23,17 +23,31 @@ export default function DashboardLayout({
       return;
     }
 
+    console.log(`[ROUTING DEBUG] pathname: ${pathname} | authenticated: ${!!user} | role: ${role} | onboardingCompleted: ${user.onboardingCompleted}`);
+
+    // Check onboarding completion
+    if (!user.onboardingCompleted && role !== "ADMIN") {
+      const onboardingPath = role === "CREATOR" ? "/onboarding/creator" : "/onboarding/business";
+      console.log(`[ROUTING DEBUG] Incomplete onboarding for ${role} -> redirect: ${onboardingPath}`);
+      router.replace(onboardingPath);
+      return;
+    }
+
     // Role-based route guards
     if (role === "CREATOR") {
       if (pathname === "/dashboard" || pathname.startsWith("/dashboard/businesses")) {
+        console.log(`[ROUTING DEBUG] CREATOR on ${pathname} -> redirect: /dashboard/creator`);
         router.replace("/dashboard/creator");
       }
     } else if (role === "BUSINESS" || role === "AGENCY") {
       if (pathname === "/dashboard" || pathname.startsWith("/dashboard/creator")) {
+        console.log(`[ROUTING DEBUG] BUSINESS on ${pathname} -> redirect: /dashboard/businesses`);
         router.replace("/dashboard/businesses");
       }
     } else if (role !== "ADMIN" && (pathname === "/admin" || pathname === "/dashboard/model-insights")) {
-      router.replace(role === "CREATOR" ? "/dashboard/creator" : "/dashboard/businesses");
+      const dest = role === "CREATOR" ? "/dashboard/creator" : "/dashboard/businesses";
+      console.log(`[ROUTING DEBUG] NON-ADMIN on ${pathname} -> redirect: ${dest}`);
+      router.replace(dest);
     }
   }, [user, role, isLoading, pathname, router]);
 
@@ -43,6 +57,16 @@ export default function DashboardLayout({
       <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-slate-400 gap-3">
         <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
         <p className="text-xs font-semibold">Loading TrustScore Workspace...</p>
+      </div>
+    );
+  }
+
+  // Guard: Block rendering children if onboarding is incomplete
+  if (!user.onboardingCompleted && role !== "ADMIN") {
+    return (
+      <div className="min-h-screen flex flex-col items-center justify-center bg-slate-950 text-slate-400 gap-3">
+        <Loader2 className="w-8 h-8 animate-spin text-blue-500" />
+        <p className="text-xs font-semibold">Redirecting to Account Onboarding...</p>
       </div>
     );
   }

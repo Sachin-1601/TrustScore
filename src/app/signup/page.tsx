@@ -156,12 +156,13 @@ function SignupContent() {
       setResendCooldown(res.emailSent ? 60 : 0);
     } else if (res.success && res.session) {
       // Explicit role-based destination for non-verification flows
+      const isComplete = res.session.onboardingCompleted === true;
       if (res.session.role === "CREATOR") {
-        router.push("/dashboard/creator");
+        router.push(isComplete ? "/dashboard/creator" : "/onboarding/creator");
       } else if (res.session.role === "ADMIN") {
         router.push("/admin");
       } else {
-        router.push("/dashboard/businesses");
+        router.push(isComplete ? "/dashboard/businesses" : "/onboarding/business");
       }
     } else {
       setErrorMessage(res.error || "Signup failed. Please check your information and try again.");

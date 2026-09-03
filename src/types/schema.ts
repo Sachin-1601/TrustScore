@@ -48,6 +48,8 @@ export interface UserSession {
   name: string;
   role: UserRole;
   avatar?: string;
+  onboardingCompleted: boolean;
+  onboardingStep?: number;
   creatorProfileId?: string;
   businessProfileId?: string;
 }
